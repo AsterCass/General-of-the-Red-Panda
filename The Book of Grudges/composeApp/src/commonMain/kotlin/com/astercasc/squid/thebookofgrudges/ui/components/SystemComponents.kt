@@ -1,7 +1,11 @@
 package com.astercasc.squid.thebookofgrudges.ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -39,15 +43,34 @@ fun NewGrudgeSheet(
     closeSheet: () -> Unit,
 ) {
 
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
 
     ModalBottomSheet(
         shape = RoundedCornerShape(6.dp),
         onDismissRequest = closeSheet,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
-        Column(modifier = Modifier.fillMaxWidth().height(300.dp)) {
-            Text("NewGrudgeSheet")
+        // todo 这里可能触发 ModalBottomSheet 的滚动，也可能触发 Column 的，所以最好是再做一个页面
+        Column(
+            modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+        ) {
+            TextField(
+                state = rememberTextFieldState(),
+                lineLimits = TextFieldLineLimits.SingleLine,
+                label = { Text("Label") },
+            )
+
+            Text("12342432")
+
+
+            OutlinedButton(
+                onClick = {},
+            ) {
+                Text("todo create")
+            }
+
         }
     }
 }

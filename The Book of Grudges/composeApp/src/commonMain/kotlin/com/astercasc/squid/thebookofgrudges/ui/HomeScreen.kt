@@ -58,6 +58,10 @@ fun HomeScreen() {
                         headlineContent = { Text("todo $index") })
                 }
 
+                item {
+                    Spacer(Modifier.height(75.dp))
+                }
+
             }
 
             SmallFloatingActionButton(
