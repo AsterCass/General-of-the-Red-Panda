@@ -1,0 +1,38 @@
+<resources>
+
+    <string name="app_name"> Tomoyo </string>
+    <string name="none"> </string>
+
+    <string name="grudge_one">Slightly Annoyed</string>
+    <string name="grudge_one_desc">I remember it, but I’m too lazy to be mad. You get a free pass… for now</string>
+
+    <string name="grudge_two">Raised Eyebrow</string>
+    <string name="grudge_two_desc">Your action wrinkled my soul a little, but it’s not grudge-worthy yet</string>
+
+    <string name="grudge_three">Logging It</string>
+    <string name="grudge_three_desc">I’ll jot this down. When I’m free, I’ll decide whether to be angry</string>
+
+    <string name="grudge_four">Slightly Offended</string>
+    <string name="grudge_four_desc">This caused a ripple in my heart. Mildly offended</string>
+
+    <string name="grudge_five">Thinking About It Tonight</string>
+    <string name="grudge_five_desc">The kind of thing I’ll remember before sleep and go “Hmph.”</string>
+
+    <string name="grudge_six">Entering the Grudge Notebook</string>
+    <string name="grudge_six_desc">Officially recorded. You have entered the notebook</string>
+
+    <string name="grudge_seven">Mental Explosion</string>
+    <string name="grudge_seven_desc">You upset me enough to hold an internal meeting about you</string>
+
+    <string name="grudge_eight">Hate +999</string>
+    <string name="grudge_eight_desc">Keep going and I’ll need to download the “Hate Expansion Pack.”</string>
+
+    <string name="grudge_nine">Blacklist Candidate</string>
+    <string name="grudge_nine_desc">You’re now waiting at the entrance of my blacklist</string>
+
+    <string name="grudge_ten">Ancestral Arch-Nemesis</string>
+    <string name="grudge_ten_desc">Not only do I hold this grudge—I'm passing it down to future generations</string>
+
+    
+
+</resources>
