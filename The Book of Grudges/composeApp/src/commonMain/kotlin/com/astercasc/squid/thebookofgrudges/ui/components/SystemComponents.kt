@@ -1,6 +1,7 @@
 package com.astercasc.squid.thebookofgrudges.ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,6 +29,44 @@ fun MainAppBar(
                 text = title, style = MaterialTheme.typography.headlineSmall
             )
 
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NewGrudgeSheet(
+    closeSheet: () -> Unit,
+) {
+
+    val sheetState = rememberModalBottomSheetState()
+
+    ModalBottomSheet(
+        shape = RoundedCornerShape(6.dp),
+        onDismissRequest = closeSheet,
+        sheetState = sheetState
+    ) {
+        Column(modifier = Modifier.fillMaxWidth().height(300.dp)) {
+            Text("NewGrudgeSheet")
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ReadGrudgeSheet(
+    closeSheet: () -> Unit,
+) {
+
+    val sheetState = rememberModalBottomSheetState()
+
+    ModalBottomSheet(
+        shape = RoundedCornerShape(6.dp),
+        onDismissRequest = closeSheet,
+        sheetState = sheetState
+    ) {
+        Column(modifier = Modifier.fillMaxWidth().height(150.dp)) {
+            Text("ReadGrudgeSheet")
         }
     }
 }

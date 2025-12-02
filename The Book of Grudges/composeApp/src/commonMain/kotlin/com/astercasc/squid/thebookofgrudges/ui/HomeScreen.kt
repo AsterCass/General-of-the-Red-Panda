@@ -8,7 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.sharp.MenuBook
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -17,6 +17,8 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import com.astercasc.squid.thebookofgrudges.constant.enums.ViewEnum
 import com.astercasc.squid.thebookofgrudges.ui.components.MainAppBar
+import com.astercasc.squid.thebookofgrudges.ui.components.NewGrudgeSheet
+import com.astercasc.squid.thebookofgrudges.ui.components.ReadGrudgeSheet
 
 object HomeScreenObj : Screen {
 
@@ -32,6 +34,10 @@ object HomeScreenObj : Screen {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
+
+    var showNewGrudgeSheet by remember { mutableStateOf(false) }
+    var showReadGrudgeSheet by remember { mutableStateOf(false) }
+
 
     Scaffold(
         topBar = {
@@ -55,7 +61,7 @@ fun HomeScreen() {
             }
 
             SmallFloatingActionButton(
-                onClick = { /* todo */ },
+                onClick = { showNewGrudgeSheet = true },
                 shape = RoundedCornerShape(6.dp),
                 modifier = Modifier.align(Alignment.BottomStart).padding(start = 16.dp, bottom = 16.dp)
             ) {
@@ -76,7 +82,7 @@ fun HomeScreen() {
 
 
             SmallFloatingActionButton(
-                onClick = { /* todo */ },
+                onClick = { showReadGrudgeSheet = true },
                 shape = CircleShape,
                 modifier = Modifier.align(Alignment.CenterEnd).padding(end = 16.dp)
             ) {
@@ -86,6 +92,16 @@ fun HomeScreen() {
                     contentDescription = "todo something"
                 )
 
+            }
+
+
+            if (showNewGrudgeSheet) {
+                NewGrudgeSheet { showNewGrudgeSheet = false }
+            }
+
+
+            if (showReadGrudgeSheet) {
+                ReadGrudgeSheet { showReadGrudgeSheet = false }
             }
 
         }
