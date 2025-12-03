@@ -5,7 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
-import com.astercasc.squid.thebookofgrudges.theme.AppTypography
+import com.astercasc.squid.thebookofgrudges.theme.appTypography
 import com.astercasc.squid.thebookofgrudges.theme.darkScheme
 import com.astercasc.squid.thebookofgrudges.theme.lightScheme
 import com.astercasc.squid.thebookofgrudges.ui.HomeScreenObj
@@ -20,7 +20,7 @@ fun App() {
     Navigator(HomeScreenObj) { _ ->
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = AppTypography,
+            typography = appTypography(),
         ) {
             CurrentScreen()
         }
