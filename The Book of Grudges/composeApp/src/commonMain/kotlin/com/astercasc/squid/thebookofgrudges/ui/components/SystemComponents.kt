@@ -20,6 +20,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.astercasc.squid.thebookofgrudges.constant.enums.GrudgeLevelEnum
+import com.astercasc.squid.thebookofgrudges.utils.getStringByName
 import kotlinx.coroutines.launch
 
 
@@ -47,10 +49,13 @@ fun MainAppBar(
     }
 }
 
+val GrudgeLevelMinColor = Color(0xFF2196F3)
+val GrudgeLevelMaxColor = Color(0xFFF44336)
+
 fun getCurrentColor(value: Float): Color {
     val normalizedValue = (value - 1f) / 9f // 归一化到 0-1
-    val blue = Color(0xFF2196F3)
-    val red = Color(0xFFF44336)
+    val blue = GrudgeLevelMinColor
+    val red = GrudgeLevelMaxColor
 
     return Color(
         red = blue.red + (red.red - blue.red) * normalizedValue,
@@ -83,7 +88,7 @@ fun NewGrudgeSheet(
         // todo 这里可能触发 ModalBottomSheet 的滚动，也可能触发 Column 的，所以最好是再做一个页面
         Column(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp).verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
 
             // important 这里 OutlinedTextField 默认的样式太大了，使用 MaterialTheme 修改降级
@@ -92,23 +97,29 @@ fun NewGrudgeSheet(
                     bodyLarge = MaterialTheme.typography.bodyMedium
                 )
             ) {
-                OutlinedTextField(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    state = newGTitleState,
-                    lineLimits = TextFieldLineLimits.SingleLine,
-                    label = { Text("todo 仇恨标题") },
-                    placeholder = { Text("todo 标题占位符") },
-                    shape = RoundedCornerShape(6.dp),
-                )
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        state = newGTitleState,
+                        lineLimits = TextFieldLineLimits.SingleLine,
+                        label = { Text("todo 记仇标题") },
+                        placeholder = { Text("todo 标题占位符") },
+                        shape = RoundedCornerShape(6.dp),
+                    )
 
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    state = newGDescState,
-                    lineLimits = TextFieldLineLimits.MultiLine(1, 3),
-                    label = { Text("todo 仇恨描述") },
-                    placeholder = { Text("todo 描述占位符") },
-                    shape = RoundedCornerShape(6.dp),
-                )
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        state = newGDescState,
+                        lineLimits = TextFieldLineLimits.MultiLine(1, 3),
+                        label = { Text("todo 记仇描述") },
+                        placeholder = { Text("todo 描述占位符") },
+                        shape = RoundedCornerShape(6.dp),
+                    )
+                }
+
             }
 
             Column(
@@ -120,7 +131,7 @@ fun NewGrudgeSheet(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("TODO 仇恨对象：", style = MaterialTheme.typography.bodyLarge)
+                    Text("TODO 记仇对象：", style = MaterialTheme.typography.bodyLarge)
 
                     Box(
                         modifier = Modifier.size(22.dp)
@@ -198,7 +209,7 @@ fun NewGrudgeSheet(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("TODO 仇恨标签：", style = MaterialTheme.typography.bodyLarge)
+                    Text("TODO 记仇标签：", style = MaterialTheme.typography.bodyLarge)
 
                     Box(
                         modifier = Modifier.size(22.dp)
@@ -269,12 +280,25 @@ fun NewGrudgeSheet(
 
             Column(modifier = Modifier.fillMaxWidth()) {
 
-                Text("TODO 仇恨等级：", style = MaterialTheme.typography.bodyLarge)
+
+                Row {
+                    Text("TODO 记仇等级：", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        "${newGSliderPosition.toInt()}  ${
+                            getStringByName(
+                                GrudgeLevelEnum.getEnumByCode(newGSliderPosition.toInt()).title
+                            )
+                        }",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = getCurrentColor(newGSliderPosition)
+                    )
+                }
+
 
                 Slider(
+                    modifier = Modifier.height(22.dp).background(Color.Transparent),
                     value = newGSliderPosition,
                     onValueChange = updateSliderPosition,
-                    steps = 8,
                     valueRange = 1f..10f,
                     track = {
                         Canvas(
@@ -284,7 +308,7 @@ fun NewGrudgeSheet(
                         ) {
                             val radius = 6.dp.toPx()
                             val gradient = Brush.horizontalGradient(
-                                colors = listOf(Color(0xFF2196F3), Color(0xFFF44336))
+                                colors = listOf(GrudgeLevelMinColor, GrudgeLevelMaxColor)
                             )
                             drawRoundRect(
                                 brush = gradient,
@@ -301,6 +325,19 @@ fun NewGrudgeSheet(
                         )
                     }
                 )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        getStringByName(
+                            GrudgeLevelEnum.getEnumByCode(newGSliderPosition.toInt()).desc
+                        ),
+                        modifier = Modifier.alpha(0.5f),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
 
             }
 

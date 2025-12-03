@@ -3,35 +3,36 @@
     <string name="app_name"> Tomoyo </string>
     <string name="none"> </string>
 
-    <string name="grudge_one">Slightly Annoyed</string>
-    <string name="grudge_one_desc">I remember it, but I’m too lazy to be mad. You get a free pass… for now</string>
+    <string name="grudge_one">微微不爽</string>
+    <string name="grudge_one_desc">虽然我记住了，但我懒得生气，先放你一马</string>
 
-    <string name="grudge_two">Raised Eyebrow</string>
-    <string name="grudge_two_desc">Your action wrinkled my soul a little, but it’s not grudge-worthy yet</string>
+    <string name="grudge_two">眉头一皱</string>
+    <string name="grudge_two_desc">你这操作让我精神皱了一下，但还不至于上升到仇</string>
 
-    <string name="grudge_three">Logging It</string>
-    <string name="grudge_three_desc">I’ll jot this down. When I’m free, I’ll decide whether to be angry</string>
+    <string name="grudge_three">记一下先</string>
+    <string name="grudge_three_desc">先记着，等我有空了再决定要不要生气</string>
 
-    <string name="grudge_four">Slightly Offended</string>
-    <string name="grudge_four_desc">This caused a ripple in my heart. Mildly offended</string>
+    <string name="grudge_four">我开始介意了</string>
+    <string name="grudge_four_desc">这个事情让我心情波澜了一下，是介意的程度</string>
 
-    <string name="grudge_five">Thinking About It Tonight</string>
-    <string name="grudge_five_desc">The kind of thing I’ll remember before sleep and go “Hmph.”</string>
+    <string name="grudge_five">今晚睡前要想一想</string>
+    <string name="grudge_five_desc">属于那种睡前突然回想起来，然后“哼”一声的程度</string>
 
-    <string name="grudge_six">Entering the Grudge Notebook</string>
-    <string name="grudge_six_desc">Officially recorded. You have entered the notebook</string>
+    <string name="grudge_six">记仇小本本上线</string>
+    <string name="grudge_six_desc">开始认真记录了，已经进小本本</string>
 
-    <string name="grudge_seven">Mental Explosion</string>
-    <string name="grudge_seven_desc">You upset me enough to hold an internal meeting about you</string>
+    <string name="grudge_seven">精神小爆炸</string>
+    <string name="grudge_seven_desc">气到要在心里开个短会讨论一下你</string>
 
-    <string name="grudge_eight">Hate +999</string>
-    <string name="grudge_eight_desc">Keep going and I’ll need to download the “Hate Expansion Pack.”</string>
+    <string name="grudge_eight">仇恨值+999</string>
+    <string name="grudge_eight_desc">再这样下去我可能要开“仇恨积累器”DLC了</string>
 
-    <string name="grudge_nine">Blacklist Candidate</string>
-    <string name="grudge_nine_desc">You’re now waiting at the entrance of my blacklist</string>
+    <string name="grudge_nine">社交黑名单候选人</string>
+    <string name="grudge_nine_desc">你已经在黑名单门口排队取号了</string>
 
-    <string name="grudge_ten">Ancestral Arch-Nemesis</string>
-    <string name="grudge_ten_desc">Not only do I hold this grudge—I'm passing it down to future generations</string>
+    <string name="grudge_ten">祖传大仇人</string>
+    <string name="grudge_ten_desc">不仅我记仇，我准备把这个仇代代相传</string>
+
 
     
 

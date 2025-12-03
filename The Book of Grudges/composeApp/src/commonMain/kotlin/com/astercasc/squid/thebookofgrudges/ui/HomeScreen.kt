@@ -102,7 +102,7 @@ fun HomeScreen() {
             // showNewGrudgeSheet
             val newGTitleState = rememberTextFieldState("")
             val newGDescState = rememberTextFieldState("")
-            var newGSliderPosition by remember { mutableFloatStateOf(0f) }
+            var newGSliderPosition by remember { mutableFloatStateOf(1f) }
 
             if (showNewGrudgeSheet) {
                 NewGrudgeSheet(

@@ -1,7 +1,7 @@
 package com.astercasc.squid.thebookofgrudges.constant.enums
 
 
-enum class GrudgeLevel(
+enum class GrudgeLevelEnum(
     val level: Int,
     val title: String,
     val desc: String,
@@ -21,9 +21,9 @@ enum class GrudgeLevel(
     ;
 
     companion object {
-        fun getEnumByCode(level: Int): GrudgeLevel {
+        fun getEnumByCode(level: Int): GrudgeLevelEnum {
             var ret = ONE
-            for (thisEnum in GrudgeLevel.entries) {
+            for (thisEnum in GrudgeLevelEnum.entries) {
                 if (thisEnum.level == level) {
                     ret = thisEnum
                     break

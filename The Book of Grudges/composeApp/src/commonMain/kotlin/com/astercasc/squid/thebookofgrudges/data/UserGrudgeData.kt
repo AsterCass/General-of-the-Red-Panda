@@ -1,7 +1,7 @@
 package com.astercasc.squid.thebookofgrudges.data
 
 import androidx.compose.ui.graphics.Color
-import com.astercasc.squid.thebookofgrudges.constant.enums.GrudgeLevel
+import com.astercasc.squid.thebookofgrudges.constant.enums.GrudgeLevelEnum
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -9,7 +9,7 @@ data class GrudgeCell(
     var id: Long = 0L,
     var title: String = "",
     var description: String = "",
-    var level : GrudgeLevel = GrudgeLevel.ONE,
+    var level : GrudgeLevelEnum = GrudgeLevelEnum.ONE,
     var referCount : Int = 0,
     var tags : List<GrudgeTag> = listOf(),
     var objs : List<GrudgeObj> = listOf(),
