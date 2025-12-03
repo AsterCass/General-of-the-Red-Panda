@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.sharp.MenuBook
 import androidx.compose.material.icons.filled.Edit
@@ -98,9 +99,19 @@ fun HomeScreen() {
 
             }
 
+            // showNewGrudgeSheet
+            val newGTitleState = rememberTextFieldState("")
+            val newGDescState = rememberTextFieldState("")
+            var newGSliderPosition by remember { mutableFloatStateOf(0f) }
 
             if (showNewGrudgeSheet) {
-                NewGrudgeSheet { showNewGrudgeSheet = false }
+                NewGrudgeSheet(
+                    newGTitleState = newGTitleState,
+                    newGDescState = newGDescState,
+                    newGSliderPosition = newGSliderPosition,
+                    closeSheet = { showNewGrudgeSheet = false },
+                    updateSliderPosition = { newGSliderPosition = it },
+                )
             }
 
 
