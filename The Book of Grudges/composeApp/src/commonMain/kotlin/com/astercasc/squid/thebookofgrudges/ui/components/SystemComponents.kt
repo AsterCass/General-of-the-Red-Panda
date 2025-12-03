@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import com.astercasc.squid.thebookofgrudges.constant.enums.GrudgeLevelEnum
 import com.astercasc.squid.thebookofgrudges.utils.getStringByName
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.vectorResource
+import thebookofgrudges.composeapp.generated.resources.Res
+import thebookofgrudges.composeapp.generated.resources.devil
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -294,7 +297,6 @@ fun NewGrudgeSheet(
                     )
                 }
 
-
                 Slider(
                     modifier = Modifier.height(22.dp).background(Color.Transparent),
                     value = newGSliderPosition,
@@ -319,9 +321,10 @@ fun NewGrudgeSheet(
                     },
                     thumb = {
                         Icon(
-                            modifier = Modifier.size(18.dp).background(Color.LightGray),
-                            imageVector = Icons.Filled.Edit,
-                            contentDescription = "todo something"
+                            imageVector = vectorResource(Res.drawable.devil),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.Unspecified
                         )
                     }
                 )
