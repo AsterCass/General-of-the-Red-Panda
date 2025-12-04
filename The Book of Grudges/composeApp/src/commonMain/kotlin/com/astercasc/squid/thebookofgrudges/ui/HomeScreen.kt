@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.sharp.MenuBook
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -36,8 +37,8 @@ object HomeScreenObj : Screen {
 @Composable
 fun HomeScreen() {
 
-    var showNewGrudgeSheet by remember { mutableStateOf(false) }
-    var showReadGrudgeSheet by remember { mutableStateOf(false) }
+    var showNewGrudgeSheet by rememberSaveable { mutableStateOf(false) }
+    var showReadGrudgeSheet by rememberSaveable { mutableStateOf(false) }
 
 
     Scaffold(
@@ -102,7 +103,9 @@ fun HomeScreen() {
             // showNewGrudgeSheet
             val newGTitleState = rememberTextFieldState("")
             val newGDescState = rememberTextFieldState("")
-            var newGSliderPosition by remember { mutableFloatStateOf(1f) }
+            var newGSliderPosition by rememberSaveable {
+                mutableFloatStateOf(1f)
+            }
 
             if (showNewGrudgeSheet) {
                 NewGrudgeSheet(
