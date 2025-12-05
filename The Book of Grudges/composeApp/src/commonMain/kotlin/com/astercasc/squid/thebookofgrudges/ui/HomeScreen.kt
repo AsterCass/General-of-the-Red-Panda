@@ -40,9 +40,7 @@ fun HomeScreen() {
     var showReadGrudgeSheet by rememberSaveable { mutableStateOf(false) }
     // new tag & obj 这里对话框展示状态不用在重组之后保留
     var openNewObjDialog by remember { mutableStateOf(false) }
-    var newObjectName by rememberSaveable { mutableStateOf("") }
     var openNewTagDialog by remember { mutableStateOf(false) }
-    var newTagName by rememberSaveable { mutableStateOf("") }
 
 
     Scaffold(
