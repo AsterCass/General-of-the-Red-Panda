@@ -18,9 +18,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import com.astercasc.squid.thebookofgrudges.constant.enums.ViewEnum
-import com.astercasc.squid.thebookofgrudges.ui.components.MainAppBar
-import com.astercasc.squid.thebookofgrudges.ui.components.NewGrudgeSheet
-import com.astercasc.squid.thebookofgrudges.ui.components.ReadGrudgeSheet
+import com.astercasc.squid.thebookofgrudges.ui.components.*
 
 object HomeScreenObj : Screen {
 
@@ -37,8 +35,14 @@ object HomeScreenObj : Screen {
 @Composable
 fun HomeScreen() {
 
+    // sheet
     var showNewGrudgeSheet by rememberSaveable { mutableStateOf(false) }
     var showReadGrudgeSheet by rememberSaveable { mutableStateOf(false) }
+    // new tag & obj 这里对话框展示状态不用在重组之后保留
+    var openNewObjDialog by remember { mutableStateOf(false) }
+    var newObjectName by rememberSaveable { mutableStateOf("") }
+    var openNewTagDialog by remember { mutableStateOf(false) }
+    var newTagName by rememberSaveable { mutableStateOf("") }
 
 
     Scaffold(
@@ -107,6 +111,7 @@ fun HomeScreen() {
                 mutableFloatStateOf(1f)
             }
 
+            // newGrudge
             if (showNewGrudgeSheet) {
                 NewGrudgeSheet(
                     newGTitleState = newGTitleState,
@@ -114,13 +119,31 @@ fun HomeScreen() {
                     newGSliderPosition = newGSliderPosition,
                     closeSheet = { showNewGrudgeSheet = false },
                     updateSliderPosition = { newGSliderPosition = it },
+                    openNewObjDialog = { openNewObjDialog = true },
+                    openNewTagDialog = { openNewTagDialog = true }
                 )
             }
 
 
+            // readSheet
             if (showReadGrudgeSheet) {
                 ReadGrudgeSheet { showReadGrudgeSheet = false }
             }
+
+            // newObj
+            if (openNewObjDialog) {
+                NewGrudgeObject(
+                    onDismissRequest = { openNewObjDialog = false },
+                )
+            }
+
+            // newTag
+            if (openNewTagDialog) {
+                NewGrudgeTag(
+                    onDismissRequest = { openNewTagDialog = false },
+                )
+            }
+
 
         }
     }
