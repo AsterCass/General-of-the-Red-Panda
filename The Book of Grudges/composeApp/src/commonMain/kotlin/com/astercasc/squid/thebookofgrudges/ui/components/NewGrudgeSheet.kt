@@ -7,9 +7,11 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,11 +25,13 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.astercasc.squid.thebookofgrudges.constant.enums.GrudgeLevelEnum
+import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.EditGrudgeObjectObj
 import com.astercasc.squid.thebookofgrudges.ui.EditGrudgeTagObj
 import com.astercasc.squid.thebookofgrudges.utils.getStringByName
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.vectorResource
+import org.koin.compose.koinInject
 import thebookofgrudges.composeapp.generated.resources.Res
 import thebookofgrudges.composeapp.generated.resources.devil
 
@@ -58,10 +62,10 @@ fun NewGrudgeSheet(
     openNewTagDialog: () -> Unit,
 ) {
 
+    val globalDataModel: GlobalDataModel = koinInject()
     val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
-
         skipPartiallyExpanded = true
     )
 
@@ -242,27 +246,34 @@ fun NewGrudgeSheet(
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
 
-                    FilterChip(
-                        modifier = Modifier.height(28.dp),
-                        selected = false,
-                        onClick = {},
-                        label = {
-                            Text("家里", modifier = Modifier.padding(vertical = 0.dp))
-                        },
-                        shape = RoundedCornerShape(6.dp),
+                    val tagList = globalDataModel.tagList.collectAsState().value
+                    val tagListSelected = globalDataModel.tagListSelected.collectAsState().value
+
+                    for (tag in tagList) {
+                        FilterChip(
+                            modifier = Modifier.height(28.dp),
+                            selected = tagListSelected.contains(tag),
+                            leadingIcon = if (tagListSelected.contains(tag)) {
+                                {
+                                    Icon(
+                                        imageVector = Icons.Filled.Done,
+                                        contentDescription = "Done icon",
+                                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                                    )
+                                }
+                            } else {
+                                null
+                            },
+                            onClick = {
+                                globalDataModel.toggleTagSelected(tag)
+                            },
+                            label = {
+                                Text(tag.name, modifier = Modifier.padding(vertical = 0.dp))
+                            },
+                            shape = RoundedCornerShape(6.dp),
 
                         )
-
-                    FilterChip(
-                        modifier = Modifier.height(28.dp),
-                        selected = false,
-                        onClick = {},
-                        label = {
-                            Text("酒桌", modifier = Modifier.padding(vertical = 0.dp))
-                        },
-                        shape = RoundedCornerShape(6.dp),
-
-                        )
+                    }
 
 
 

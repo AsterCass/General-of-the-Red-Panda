@@ -1,12 +1,15 @@
 package com.astercasc.squid.thebookofgrudges.data
 
-import androidx.compose.ui.graphics.Color
 import com.astercasc.squid.thebookofgrudges.constant.enums.GrudgeLevelEnum
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+
+val commonJson = Json { ignoreUnknownKeys = true }
 
 @Serializable
 data class GrudgeCell(
-    var id: Long = 0L,
+    var id: String = "",
     var title: String = "",
     var description: String = "",
     var level : GrudgeLevelEnum = GrudgeLevelEnum.ONE,
@@ -18,14 +21,14 @@ data class GrudgeCell(
 
 @Serializable
 data class GrudgeObj(
-    var id: Long = 0L,
+    var id: String = "",
     var name: String = "",
-    var color: Color = Color.Black,
+    var color: ULong = 0UL,
 )
 
 @Serializable
 data class GrudgeTag(
-    var id: Long = 0L,
+    var id: String = "",
     var name: String = "",
-    var color: Color = Color.Black,
+    var color: ULong = 0UL,
 )
