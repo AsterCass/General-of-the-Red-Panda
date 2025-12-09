@@ -9,6 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.astercasc.squid.thebookofgrudges.data.DataStorageManager
+import com.astercasc.squid.thebookofgrudges.data.getNewTag
+import com.astercasc.squid.thebookofgrudges.data.setNewTag
+import org.koin.compose.koinInject
 
 @Composable
 fun NewGrudgeTag(
@@ -17,6 +21,7 @@ fun NewGrudgeTag(
 ) {
 
     val newTagName = rememberTextFieldState("")
+    val dataStorageManager: DataStorageManager = koinInject()
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
@@ -63,7 +68,8 @@ fun NewGrudgeTag(
                     Button(
                         modifier = Modifier.weight(1f),
                         onClick = {
-
+                            getNewTag(dataStorageManager)
+                            setNewTag(dataStorageManager, newTagName.text.toString())
                             onDismissRequest()
                         },
                         shape = RoundedCornerShape(6.dp),

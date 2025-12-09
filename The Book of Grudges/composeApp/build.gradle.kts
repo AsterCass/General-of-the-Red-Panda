@@ -61,6 +61,23 @@ kotlin {
             implementation(libs.voyager.tabNavigator)
             implementation(libs.voyager.transitions)
             implementation(libs.voyager.koin)
+
+            //https://github.com/russhwolf/multiplatform-settings
+            //https://developer.android.com/jetpack/androidx/releases/datastore
+            //https://developer.android.com/kotlin/multiplatform/datastore
+            //implementation(libs.multiplatform.settings.coroutines)
+            // 当前datastore 还不支持 wasmJs 和 js
+            //implementation(libs.androidx.datastore)
+            //implementaton(libs.androidx.datastore.preferences)
+            //implementation(libs.multiplatform.settings.datastore)
+            implementation(libs.multiplatform.settings)
+
+            //https://github.com/InsertKoinIO/koin
+            implementation(project.dependencies.platform("io.insert-koin:koin-bom:4.1.1"))
+            implementation("io.insert-koin:koin-core")
+            implementation("io.insert-koin:koin-compose")
+
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
