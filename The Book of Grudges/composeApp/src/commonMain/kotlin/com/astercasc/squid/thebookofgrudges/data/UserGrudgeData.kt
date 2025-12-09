@@ -24,6 +24,7 @@ data class GrudgeObj(
     var id: String = "",
     var name: String = "",
     var color: ULong = 0UL,
+    var createTime: Long = 0L,
 )
 
 @Serializable
@@ -31,4 +32,5 @@ data class GrudgeTag(
     var id: String = "",
     var name: String = "",
     var color: ULong = 0UL,
+    var createTime: Long = 0L,
 )

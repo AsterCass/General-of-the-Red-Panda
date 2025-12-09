@@ -1,5 +1,7 @@
 package com.astercasc.squid.thebookofgrudges.data
 
+import com.astercasc.squid.thebookofgrudges.constant.EXAMPLE_TAG_1
+import com.astercasc.squid.thebookofgrudges.constant.EXAMPLE_TAG_2
 import com.astercasc.squid.thebookofgrudges.constant.TAG_PREFIX
 import com.astercasc.squid.thebookofgrudges.data.DataStorageManager.Companion.USER_TAG_LIST
 import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
@@ -12,8 +14,8 @@ fun initTagList(dataStorageManager: DataStorageManager): List<GrudgeTag> {
     val listStr = dataStorageManager.getString(USER_TAG_LIST)
     return if (listStr.isBlank()) {
         listOf(
-            GrudgeTag("${TAG_PREFIX}0", "下次一定"),
-            GrudgeTag("${TAG_PREFIX}1", "背后原因让人暖心"),
+            EXAMPLE_TAG_1,
+            EXAMPLE_TAG_2,
         )
     } else {
         commonJson.decodeFromString<List<GrudgeTag>>(listStr)
@@ -31,6 +33,7 @@ fun addNewTag(
             id = "${TAG_PREFIX}${Clock.System.now().epochSeconds}${Random.nextUInt()}",
             name = name,
             color = 0UL,
+            createTime = Clock.System.now().epochSeconds
         )
     )
     dataStorageManager.setString(USER_TAG_LIST, commonJson.encodeToString(globalDataModel.tagList.value))
