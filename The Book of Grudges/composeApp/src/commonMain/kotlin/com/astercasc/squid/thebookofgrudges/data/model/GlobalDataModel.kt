@@ -18,6 +18,14 @@ class GlobalDataModel(
             list.plus(tag)
         }
     }
+    fun removeTag(tagId: String) {
+        _tagListSelected.update { list ->
+            list.filterNot { it.id == tagId }
+        }
+        _tagList.update { list ->
+            list.filterNot { it.id == tagId }
+        }
+    }
 
     private val _tagListSelected = MutableStateFlow<List<GrudgeTag>>(emptyList())
     val tagListSelected = _tagListSelected.asStateFlow()

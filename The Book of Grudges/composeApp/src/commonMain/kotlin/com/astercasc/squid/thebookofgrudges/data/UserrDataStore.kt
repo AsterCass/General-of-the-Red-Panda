@@ -37,5 +37,13 @@ fun addNewTag(
         )
     )
     dataStorageManager.setString(USER_TAG_LIST, commonJson.encodeToString(globalDataModel.tagList.value))
+}
 
+fun deleteTag(
+    globalDataModel: GlobalDataModel,
+    dataStorageManager: DataStorageManager,
+    id: String
+) {
+    globalDataModel.removeTag(id)
+    dataStorageManager.setString(USER_TAG_LIST, commonJson.encodeToString(globalDataModel.tagList.value))
 }
