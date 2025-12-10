@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.sharp.MenuBook
@@ -18,7 +19,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import com.astercasc.squid.thebookofgrudges.constant.enums.ViewEnum
+import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.components.*
+import org.koin.compose.koinInject
 
 object HomeScreenObj : Screen {
 
@@ -35,6 +38,8 @@ object HomeScreenObj : Screen {
 @Composable
 fun HomeScreen() {
 
+    // inject
+    val globalDataModel : GlobalDataModel = koinInject()
     // sheet
     var showNewGrudgeSheet by rememberSaveable { mutableStateOf(false) }
     var showReadGrudgeSheet by rememberSaveable { mutableStateOf(false) }
@@ -118,7 +123,14 @@ fun HomeScreen() {
                     closeSheet = { showNewGrudgeSheet = false },
                     updateSliderPosition = { newGSliderPosition = it },
                     openNewObjDialog = { openNewObjDialog = true },
-                    openNewTagDialog = { openNewTagDialog = true }
+                    openNewTagDialog = { openNewTagDialog = true },
+                    clearStatus = {
+                        newGTitleState.clearText()
+                        newGDescState.clearText()
+                        newGSliderPosition = 1f
+                        globalDataModel.clearObjSelected()
+                        globalDataModel.clearTagSelected()
+                    }
                 )
             }
 

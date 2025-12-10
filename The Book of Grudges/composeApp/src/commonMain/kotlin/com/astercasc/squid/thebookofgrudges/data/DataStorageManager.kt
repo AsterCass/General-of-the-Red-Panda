@@ -17,6 +17,7 @@ class DataStorageManager(private val settings: Settings) {
     companion object {
         const val USER_TAG_LIST = "USER_TAG_LIST"
         const val USER_OBJ_LIST = "USER_OBJ_LIST"
+        const val USER_GRU_LIST = "USER_GRU_LIST"
 
     }
 

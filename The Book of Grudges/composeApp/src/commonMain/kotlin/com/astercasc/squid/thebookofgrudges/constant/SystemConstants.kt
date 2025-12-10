@@ -7,6 +7,8 @@ const val TAG_PREFIX: String = "GT"
 
 const val OBJ_PREFIX: String = "GO"
 
+const val GRU_PREFIX: String = "GG"
+
 val EXAMPLE_TAG_1: GrudgeTag = GrudgeTag(
     id = "${TAG_PREFIX}0",
     name = "下次一定",

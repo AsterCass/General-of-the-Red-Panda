@@ -38,6 +38,10 @@ class GlobalDataModel(
         }
     }
 
+    fun clearTagSelected() {
+        _tagListSelected.value = emptyList()
+    }
+
 
     // obj
     private val _objList = MutableStateFlow(initObjList(dataStorageManager))
@@ -68,6 +72,27 @@ class GlobalDataModel(
             }
         }
     }
+    fun clearObjSelected() {
+        _objListSelected.value = emptyList()
+    }
+    
+    // grudge
+    private val _gruList = MutableStateFlow(initGrudgeList(dataStorageManager))
+    val gruList = _gruList.asStateFlow()
+    fun addGru(gru: GrudgeCell) {
+        _gruList.update { list ->
+            list.plus(gru)
+        }
+    }
+
+    private val _gruListSelected = MutableStateFlow<List<GrudgeCell>>(emptyList())
+    val gruListSelected = _gruListSelected.asStateFlow()
+
+    private val _currentGru = MutableStateFlow(GrudgeCell())
+    val currentGru = _currentGru.asStateFlow()
+
+
+
 
 
 

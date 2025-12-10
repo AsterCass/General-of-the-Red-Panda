@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.astercasc.squid.thebookofgrudges.constant.enums.GrudgeLevelEnum
+import com.astercasc.squid.thebookofgrudges.data.DataStorageManager
+import com.astercasc.squid.thebookofgrudges.data.addNewGru
 import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.EditGrudgeObjectObj
 import com.astercasc.squid.thebookofgrudges.ui.EditGrudgeTagObj
@@ -60,9 +62,11 @@ fun NewGrudgeSheet(
     updateSliderPosition: (Float) -> Unit,
     openNewObjDialog: () -> Unit,
     openNewTagDialog: () -> Unit,
+    clearStatus: () -> Unit,
 ) {
 
     val globalDataModel: GlobalDataModel = koinInject()
+    val dataStorageManager: DataStorageManager = koinInject()
     val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
@@ -373,7 +377,25 @@ fun NewGrudgeSheet(
 
                 Button(
                     modifier = Modifier.weight(1f),
-                    onClick = {},
+                    onClick = {
+                        scope
+                            .launch {
+                                addNewGru(
+                                    globalDataModel = globalDataModel,
+                                    dataStorageManager = dataStorageManager,
+                                    title = newGTitleState.text.toString(),
+                                    description = newGDescState.text.toString(),
+                                    level = newGSliderPosition.toInt(),
+                                )
+                                clearStatus()
+                                sheetState.hide()
+                            }
+                            .invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    closeSheet()
+                                }
+                            }
+                    },
                     shape = RoundedCornerShape(6.dp),
 
                     ) {

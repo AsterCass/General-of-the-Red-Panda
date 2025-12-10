@@ -12,7 +12,7 @@ data class GrudgeCell(
     var id: String = "",
     var title: String = "",
     var description: String = "",
-    var level : GrudgeLevelEnum = GrudgeLevelEnum.ONE,
+    var level : Int = 1,
     var referCount : Int = 0,
     var tags : List<GrudgeTag> = listOf(),
     var objs : List<GrudgeObj> = listOf(),
