@@ -157,28 +157,33 @@ fun NewGrudgeSheet(
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
 
-                    FilterChip(
-                        modifier = Modifier.height(28.dp),
-                        selected = false,
-                        onClick = {},
-                        label = {
-                            Text("错的不是我，是这个世界", modifier = Modifier.padding(vertical = 0.dp))
-                        },
-                        shape = RoundedCornerShape(6.dp),
+                    val objList = globalDataModel.objList.collectAsState().value
+                    val objListSelected = globalDataModel.objListSelected.collectAsState().value
 
-                        )
+                    for (obj in objList) {
+                        FilterChip(
+                            modifier = Modifier.height(28.dp),
+                            selected = objListSelected.contains(obj),
+                            leadingIcon = if (objListSelected.contains(obj)) {
+                                {
+                                    Icon(
+                                        imageVector = Icons.Filled.Done,
+                                        contentDescription = "Done icon",
+                                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                                    )
+                                }
+                            } else {
+                                null
+                            },
+                            onClick = {
+                                globalDataModel.toggleObjSelected(obj)
+                            },
+                            label = {
+                                Text(obj.name, modifier = Modifier.padding(vertical = 0.dp))
+                            },
+                            shape = RoundedCornerShape(6.dp),
 
-                    repeat(5) {
-//                        FilterChip(
-//                            modifier = Modifier.height(28.dp),
-//                            selected = false,
-//                            onClick = {},
-//                            label = {
-//                                Text("Tag $it" , modifier = Modifier.padding(vertical = 0.dp))
-//                            },
-//                            shape = RoundedCornerShape(6.dp),
-//
-//                        )
+                            )
                     }
 
                     Box(

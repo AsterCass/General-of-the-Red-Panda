@@ -9,12 +9,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.astercasc.squid.thebookofgrudges.data.DataStorageManager
+import com.astercasc.squid.thebookofgrudges.data.addNewObj
+import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
+import org.koin.compose.koinInject
 
 @Composable
 fun NewGrudgeObject(
     onDismissRequest: () -> Unit
 ) {
     val newObjectName = rememberTextFieldState("")
+    val dataStorageManager: DataStorageManager = koinInject()
+    val globalDataModel: GlobalDataModel = koinInject()
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
@@ -61,7 +67,7 @@ fun NewGrudgeObject(
                     Button(
                         modifier = Modifier.weight(1f),
                         onClick = {
-
+                            addNewObj(globalDataModel, dataStorageManager, newObjectName.text.toString())
                             onDismissRequest()
                         },
                         shape = RoundedCornerShape(6.dp),
