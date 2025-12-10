@@ -1,5 +1,6 @@
 package com.astercasc.squid.thebookofgrudges.ui
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -14,14 +15,25 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MAX
+import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MAX_COLOR
+import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN
+import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN_COLOR
 import com.astercasc.squid.thebookofgrudges.constant.enums.ViewEnum
 import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.components.*
+import com.astercasc.squid.thebookofgrudges.utils.formatTimestamp
+import com.astercasc.squid.thebookofgrudges.utils.interColorRange
+import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.koinInject
+import thebookofgrudges.composeapp.generated.resources.Res
+import thebookofgrudges.composeapp.generated.resources.trident
 
 object HomeScreenObj : Screen {
 
@@ -46,7 +58,8 @@ fun HomeScreen() {
     // new tag & obj 这里对话框展示状态不用在重组之后保留
     var openNewObjDialog by remember { mutableStateOf(false) }
     var openNewTagDialog by remember { mutableStateOf(false) }
-
+    // gru data
+    val gruList = globalDataModel.gruList.collectAsState().value
 
     Scaffold(
         topBar = {
@@ -59,12 +72,205 @@ fun HomeScreen() {
             // 主内容
 
             LazyColumn(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .padding(start = 12.dp, end = 12.dp, top = 18.dp, bottom = 12.dp).fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                for (gru in gruList) {
 
-                items(20) { index ->
-                    ListItem(
-                        headlineContent = { Text("todo $index") })
+                    val mainColor = interColorRange(
+                        GRUDGE_LEVEL_MIN_COLOR,
+                        GRUDGE_LEVEL_MAX_COLOR,
+                        gru.level.toFloat(),
+                        GRUDGE_LEVEL_MIN,
+                        GRUDGE_LEVEL_MAX,
+
+                        )
+
+                    val isEmptyTagObj = gru.tags.isEmpty() && gru.objs.isEmpty()
+
+                    item {
+                        OutlinedCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(6.dp),
+                            elevation = CardDefaults.cardElevation(
+                                defaultElevation = 3.dp
+                            ),
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.Top
+                                ) {
+
+                                    Text(
+                                        modifier = Modifier.weight(1f).padding(end = 8.dp).alpha(0.7f),
+                                        text = gru.title,
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+
+                                    Text(
+                                        modifier = Modifier.wrapContentWidth().alpha(0.35f),
+                                        text = "提及次数: ${gru.referCount}",
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+
+                                }
+
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.Top
+                                ) {
+
+                                    FlowRow(
+                                        modifier = Modifier.weight(1f).padding(end = 8.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                                    ) {
+                                        for (obj in gru.objs) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .border(
+                                                        width = 1.dp,
+                                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                                        shape = RoundedCornerShape(6.dp)
+                                                    )
+                                                    .padding(vertical = 3.dp, horizontal = 5.dp),
+                                            ) {
+                                                Text(
+                                                    text = obj.name,
+                                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                    style = MaterialTheme.typography.labelSmall
+                                                )
+                                            }
+                                        }
+
+                                        for (tag in gru.tags) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .border(
+                                                        width = 1.dp,
+                                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                                        shape = RoundedCornerShape(6.dp)
+                                                    )
+                                                    .padding(vertical = 3.dp, horizontal = 5.dp),
+                                            ) {
+                                                Text(
+                                                    text = tag.name,
+                                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                    style = MaterialTheme.typography.labelSmall
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    if (!isEmptyTagObj) {
+                                        CardIcons(mainColor, gru.level)
+                                    }
+                                }
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.Top
+                                ) {
+
+                                    Text(
+                                        modifier = Modifier.wrapContentWidth().alpha(0.35f),
+                                        text = gru.description,
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+
+                                    if (isEmptyTagObj) {
+                                        CardIcons(mainColor, gru.level)
+                                    }
+                                }
+
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+
+                                    Text(
+                                        modifier = Modifier.wrapContentWidth().alpha(0.35f),
+                                        text = formatTimestamp(gru.createTime),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+
+                                    Row(
+                                        horizontalArrangement = Arrangement.End,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+
+                                        Button(
+                                            modifier = Modifier.height(24.dp),
+                                            contentPadding = PaddingValues(0.dp),
+                                            onClick = {
+                                            },
+                                            colors = ButtonDefaults.buttonColors().copy(
+                                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                            ),
+                                            shape = RoundedCornerShape(6.dp),
+                                        ) {
+                                            Text(
+                                                text = "编辑",
+                                                style = MaterialTheme.typography.labelSmall
+                                            )
+                                        }
+
+
+                                        Button(
+                                            modifier = Modifier.padding(horizontal = 6.dp).height(24.dp),
+                                            contentPadding = PaddingValues(0.dp),
+                                            onClick = {
+                                            },
+                                            colors = ButtonDefaults.buttonColors().copy(
+                                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                            ),
+                                            shape = RoundedCornerShape(6.dp),
+                                        ) {
+                                            Text(
+                                                text = "再次提及",
+                                                style = MaterialTheme.typography.labelSmall
+                                            )
+                                        }
+
+
+                                        Button(
+                                            modifier = Modifier.height(24.dp),
+                                            contentPadding = PaddingValues(0.dp),
+                                            onClick = {
+                                            },
+                                            colors = ButtonDefaults.buttonColors().copy(
+                                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                                            ),
+                                            shape = RoundedCornerShape(6.dp),
+                                        ) {
+                                            Text(
+                                                text = "已报仇",
+                                                style = MaterialTheme.typography.labelSmall
+                                            )
+                                        }
+                                    }
+
+                                }
+
+                            }
+
+
+                        }
+                    }
                 }
 
                 item {
@@ -97,7 +303,7 @@ fun HomeScreen() {
             SmallFloatingActionButton(
                 onClick = { showReadGrudgeSheet = true },
                 shape = CircleShape,
-                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 16.dp)
+                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = 16.dp)
             ) {
                 Icon(
                     modifier = Modifier.padding(12.dp).size(25.dp),
@@ -161,3 +367,26 @@ fun HomeScreen() {
 
 }
 
+
+@Composable
+fun CardIcons(
+    color: Color,
+    level: Int
+) {
+    Row(
+        modifier = Modifier.wrapContentWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = vectorResource(Res.drawable.trident),
+            contentDescription = null,
+            modifier = Modifier.size(24.dp),
+            tint = color,
+        )
+        Text(
+            text = "X $level",
+            color = color,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}

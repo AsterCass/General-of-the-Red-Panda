@@ -24,6 +24,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MAX
+import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MAX_COLOR
+import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN
+import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN_COLOR
 import com.astercasc.squid.thebookofgrudges.constant.enums.GrudgeLevelEnum
 import com.astercasc.squid.thebookofgrudges.data.DataStorageManager
 import com.astercasc.squid.thebookofgrudges.data.addNewGru
@@ -31,26 +35,12 @@ import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.EditGrudgeObjectObj
 import com.astercasc.squid.thebookofgrudges.ui.EditGrudgeTagObj
 import com.astercasc.squid.thebookofgrudges.utils.getStringByName
+import com.astercasc.squid.thebookofgrudges.utils.interColorRange
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.koinInject
 import thebookofgrudges.composeapp.generated.resources.Res
 import thebookofgrudges.composeapp.generated.resources.devil
-
-val GrudgeLevelMinColor = Color(0xFF2196F3)
-val GrudgeLevelMaxColor = Color(0xFFF44336)
-
-fun getCurrentColor(value: Float): Color {
-    val normalizedValue = (value - 1f) / 9f // 归一化到 0-1
-    val blue = GrudgeLevelMinColor
-    val red = GrudgeLevelMaxColor
-
-    return Color(
-        red = blue.red + (red.red - blue.red) * normalizedValue,
-        green = blue.green + (red.green - blue.green) * normalizedValue,
-        blue = blue.blue + (red.blue - blue.blue) * normalizedValue
-    )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -316,16 +306,21 @@ fun NewGrudgeSheet(
                                 GrudgeLevelEnum.getEnumByCode(newGSliderPosition.toInt()).title
                             )
                         }",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = getCurrentColor(newGSliderPosition)
+                        style = MaterialTheme.typography.bodyLarge, color = interColorRange(
+                            GRUDGE_LEVEL_MIN_COLOR,
+                            GRUDGE_LEVEL_MAX_COLOR,
+                            newGSliderPosition,
+                            GRUDGE_LEVEL_MIN,
+                            GRUDGE_LEVEL_MAX,
+
+                            )
                     )
                 }
 
                 Slider(
                     modifier = Modifier.height(22.dp).background(Color.Transparent),
                     value = newGSliderPosition,
-                    onValueChange = updateSliderPosition,
-                    valueRange = 1f..10f,
+                    onValueChange = updateSliderPosition, valueRange = GRUDGE_LEVEL_MIN..GRUDGE_LEVEL_MAX,
                     track = {
                         Canvas(
                             modifier = Modifier
@@ -334,7 +329,7 @@ fun NewGrudgeSheet(
                         ) {
                             val radius = 6.dp.toPx()
                             val gradient = Brush.horizontalGradient(
-                                colors = listOf(GrudgeLevelMinColor, GrudgeLevelMaxColor)
+                                colors = listOf(GRUDGE_LEVEL_MIN_COLOR, GRUDGE_LEVEL_MAX_COLOR)
                             )
                             drawRoundRect(
                                 brush = gradient,

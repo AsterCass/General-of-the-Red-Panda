@@ -1,5 +1,6 @@
 package com.astercasc.squid.thebookofgrudges.constant
 
+import androidx.compose.ui.graphics.Color
 import com.astercasc.squid.thebookofgrudges.data.GrudgeObj
 import com.astercasc.squid.thebookofgrudges.data.GrudgeTag
 
@@ -8,6 +9,11 @@ const val TAG_PREFIX: String = "GT"
 const val OBJ_PREFIX: String = "GO"
 
 const val GRU_PREFIX: String = "GG"
+
+val GRUDGE_LEVEL_MIN_COLOR = Color(0xFF2196F3)
+val GRUDGE_LEVEL_MAX_COLOR = Color(0xFFF44336)
+const val GRUDGE_LEVEL_MIN = 1f;
+const val GRUDGE_LEVEL_MAX = 10f;
 
 val EXAMPLE_TAG_1: GrudgeTag = GrudgeTag(
     id = "${TAG_PREFIX}0",
