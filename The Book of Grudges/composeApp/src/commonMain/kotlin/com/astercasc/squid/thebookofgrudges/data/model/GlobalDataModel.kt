@@ -85,6 +85,28 @@ class GlobalDataModel(
         }
     }
 
+    fun removeGru(gruId: String) {
+        _gruListSelected.update { list ->
+            list.filterNot { it.id == gruId }
+        }
+        _gruList.update { list ->
+            list.filterNot { it.id == gruId }
+        }
+    }
+
+    fun addGruRef(gruId: String) {
+        _gruList.update { list ->
+            list.map { obj ->
+                if (obj.id == gruId) {
+                    obj.copy(
+                        referCount = obj.referCount + 1,
+                    )
+                } else obj
+            }
+        }
+    }
+
+
     private val _gruListSelected = MutableStateFlow<List<GrudgeCell>>(emptyList())
     val gruListSelected = _gruListSelected.asStateFlow()
 

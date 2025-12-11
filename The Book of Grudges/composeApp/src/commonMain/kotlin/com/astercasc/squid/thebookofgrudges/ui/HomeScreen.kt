@@ -26,6 +26,10 @@ import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MAX_COLOR
 import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN
 import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN_COLOR
 import com.astercasc.squid.thebookofgrudges.constant.enums.ViewEnum
+import com.astercasc.squid.thebookofgrudges.data.DataStorageManager
+import com.astercasc.squid.thebookofgrudges.data.GrudgeCell
+import com.astercasc.squid.thebookofgrudges.data.addGruRef
+import com.astercasc.squid.thebookofgrudges.data.deleteGru
 import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.components.*
 import com.astercasc.squid.thebookofgrudges.utils.formatTimestamp
@@ -52,14 +56,17 @@ fun HomeScreen() {
 
     // inject
     val globalDataModel : GlobalDataModel = koinInject()
+    val dataStorageManager: DataStorageManager = koinInject()
     // sheet
     var showNewGrudgeSheet by rememberSaveable { mutableStateOf(false) }
     var showReadGrudgeSheet by rememberSaveable { mutableStateOf(false) }
     // new tag & obj 这里对话框展示状态不用在重组之后保留
     var openNewObjDialog by remember { mutableStateOf(false) }
     var openNewTagDialog by remember { mutableStateOf(false) }
+    var deleteGruDialog by remember { mutableStateOf(false) }
     // gru data
     val gruList = globalDataModel.gruList.collectAsState().value
+    var currentDeleteGru by remember { mutableStateOf(GrudgeCell()) }
 
     Scaffold(
         topBar = {
@@ -232,6 +239,11 @@ fun HomeScreen() {
                                             modifier = Modifier.padding(horizontal = 6.dp).height(24.dp),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
+                                                addGruRef(
+                                                    globalDataModel = globalDataModel,
+                                                    dataStorageManager = dataStorageManager,
+                                                    id = gru.id,
+                                                )
                                             },
                                             colors = ButtonDefaults.buttonColors().copy(
                                                 containerColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -250,6 +262,8 @@ fun HomeScreen() {
                                             modifier = Modifier.height(24.dp),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
+                                                currentDeleteGru = gru
+                                                deleteGruDialog = true
                                             },
                                             colors = ButtonDefaults.buttonColors().copy(
                                                 containerColor = MaterialTheme.colorScheme.errorContainer,
@@ -357,6 +371,21 @@ fun HomeScreen() {
             if (openNewTagDialog) {
                 NewGrudgeTag(
                     onDismissRequest = { openNewTagDialog = false },
+                )
+            }
+
+            // delete
+            if (deleteGruDialog) {
+                SystemConfirm(
+                    title = "是否不再对【${currentDeleteGru.title}】记仇",
+                    onConfirmRequest = {
+                        deleteGru(
+                            globalDataModel = globalDataModel,
+                            dataStorageManager = dataStorageManager,
+                            id = currentDeleteGru.id,
+                        )
+                    },
+                    onDismissRequest = { deleteGruDialog = false },
                 )
             }
 
