@@ -133,8 +133,8 @@ class GlobalDataModel(
     }
 
     fun removeGru(gruId: String) {
-        _gruListSelected.update { list ->
-            list.filterNot { it.id == gruId }
+        _gruIdListSelected.update { list ->
+            list.filterNot { it == gruId }
         }
         _gruList.update { list ->
             list.filterNot { it.id == gruId }
@@ -154,15 +154,33 @@ class GlobalDataModel(
     }
 
 
-    private val _gruListSelected = MutableStateFlow<List<GrudgeCell>>(emptyList())
-    val gruListSelected = _gruListSelected.asStateFlow()
-
-    private val _currentGru = MutableStateFlow(GrudgeCell())
-    val currentGru = _currentGru.asStateFlow()
+    private val _gruIdListSelected = MutableStateFlow<List<String>>(emptyList())
+    val gruIdListSelected = _gruIdListSelected.asStateFlow()
 
 
+    // search 
+    private val _objListSearch = MutableStateFlow<List<String>>(emptyList())
+    val objListSearch = _objListSearch.asStateFlow()
+    fun toggleObjSearch(objId: String) {
+        _objListSearch.update { list ->
+            if (list.any { it == objId }) {
+                list.filterNot { it == objId }
+            } else {
+                list.plus(objId)
+            }
+        }
+    }
 
-
-
+    private val _tagListSearch = MutableStateFlow<List<String>>(emptyList())
+    val tagListSearch = _tagListSearch.asStateFlow()
+    fun toggleTagSearch(tagId: String) {
+        _tagListSearch.update { list ->
+            if (list.any { it == tagId }) {
+                list.filterNot { it == tagId }
+            } else {
+                list.plus(tagId)
+            }
+        }
+    }
 
 }

@@ -68,7 +68,8 @@ fun NewEditGrudgeSheet(
     ) {
         // todo 这里可能触发 ModalBottomSheet 的滚动，也可能触发 Column 的，所以最好是再做一个页面
         Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp).verticalScroll(rememberScrollState()),
+            modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
 

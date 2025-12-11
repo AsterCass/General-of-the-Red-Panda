@@ -58,6 +58,14 @@ fun HomeScreen() {
     val scope = rememberCoroutineScope()
     // read sheet
     var showReadGrudgeSheet by rememberSaveable { mutableStateOf(false) }
+    val searchSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    val searchKeyState = rememberTextFieldState("")
+    val searchLevelMin = rememberTextFieldState("")
+    val searchLevelMax = rememberTextFieldState("")
+    val searchReferMin = rememberTextFieldState("")
+    val searchReferMax = rememberTextFieldState("")
     // new sheet
     var newGruSheetShow by rememberSaveable { mutableStateOf(false) }
     val newGruSheetState = rememberModalBottomSheetState(
@@ -488,7 +496,15 @@ fun HomeScreen() {
 
             // readSheet
             if (showReadGrudgeSheet) {
-                ReadGrudgeSheet { showReadGrudgeSheet = false }
+                ReadGrudgeSheet(
+                    searchSheetState = searchSheetState,
+                    searchKeyState = searchKeyState,
+                    searchLevelMin = searchLevelMin,
+                    searchLevelMax = searchLevelMax,
+                    searchReferMin = searchReferMin,
+                    searchReferMax = searchReferMax,
+                    closeSheet = { showReadGrudgeSheet = false },
+                )
             }
 
             // newObj

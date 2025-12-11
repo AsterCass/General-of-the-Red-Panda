@@ -10,8 +10,8 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class, FormatStringsInDatetimeFormats::class)
-fun formatTimestamp(timestampMillis: Long): String {
-    val instant = Instant.fromEpochMilliseconds(timestampMillis * 1000)
+fun formatTimestamp(timestamp: Long, millis: Boolean = false): String {
+    val instant = Instant.fromEpochMilliseconds(if (millis) timestamp else timestamp * 1000)
     val zone = TimeZone.currentSystemDefault()
     val localDT = instant.toLocalDateTime(zone)
     val formatter = LocalDateTime.Format {
