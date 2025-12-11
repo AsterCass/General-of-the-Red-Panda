@@ -43,11 +43,12 @@ import thebookofgrudges.composeapp.generated.resources.devil
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewEditGrudgeSheet(
-    newGTitleState: TextFieldState,
-    newGDescState: TextFieldState,
-    newGSliderPosition: Float,
+    isNew: Boolean,
+    gruTitleState: TextFieldState,
+    gruDescState: TextFieldState,
+    gruSliderPosition: Float,
     closeSheet: () -> Unit,
-    newGruSheetState: SheetState,
+    gruSheetState: SheetState,
     updateSliderPosition: (Float) -> Unit,
     openNewObjDialog: () -> Unit,
     openNewTagDialog: () -> Unit,
@@ -62,7 +63,7 @@ fun NewEditGrudgeSheet(
     ModalBottomSheet(
         shape = RoundedCornerShape(6.dp, 6.dp, 0.dp, 0.dp),
         onDismissRequest = closeSheet,
-        sheetState = newGruSheetState,
+        sheetState = gruSheetState,
 
     ) {
         // todo 这里可能触发 ModalBottomSheet 的滚动，也可能触发 Column 的，所以最好是再做一个页面
@@ -83,7 +84,7 @@ fun NewEditGrudgeSheet(
                 ) {
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth().height(58.dp),
-                        state = newGTitleState,
+                        state = gruTitleState,
                         lineLimits = TextFieldLineLimits.SingleLine,
                         label = { Text("todo 记仇标题") },
                         placeholder = { Text("todo 标题占位符") },
@@ -92,7 +93,7 @@ fun NewEditGrudgeSheet(
 
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth().height(100.dp),
-                        state = newGDescState,
+                        state = gruDescState,
                         lineLimits = TextFieldLineLimits.MultiLine(1, 3),
                         label = { Text("todo 记仇描述") },
                         placeholder = { Text("todo 描述占位符") },
@@ -120,7 +121,7 @@ fun NewEditGrudgeSheet(
                             .clickable(onClick = {
                                 scope
                                     .launch {
-                                        newGruSheetState.hide()
+                                        gruSheetState.hide()
                                     }
                                     .invokeOnCompletion {
                                         navigator.push(EditGrudgeObjectObj)
@@ -148,7 +149,8 @@ fun NewEditGrudgeSheet(
                 ) {
 
                     val objList = globalDataModel.objList.collectAsState().value
-                    val objListSelected = globalDataModel.objListSelected.collectAsState().value
+                    val objListSelected = if (isNew) globalDataModel.objListSelectedNew.collectAsState().value
+                    else globalDataModel.objListSelectedEdit.collectAsState().value
 
                     for (obj in objList) {
                         FilterChip(
@@ -166,7 +168,8 @@ fun NewEditGrudgeSheet(
                                 null
                             },
                             onClick = {
-                                globalDataModel.toggleObjSelected(obj)
+                                if (isNew) globalDataModel.toggleObjSelectedNew(obj)
+                                else globalDataModel.toggleObjSelectedEdit(obj)
                             },
                             label = {
                                 Text(obj.name, modifier = Modifier.padding(vertical = 0.dp))
@@ -213,7 +216,7 @@ fun NewEditGrudgeSheet(
                             .clickable(onClick = {
                                 scope
                                     .launch {
-                                        newGruSheetState.hide()
+                                        gruSheetState.hide()
                                     }
                                     .invokeOnCompletion {
                                         navigator.push(EditGrudgeTagObj)
@@ -242,7 +245,8 @@ fun NewEditGrudgeSheet(
                 ) {
 
                     val tagList = globalDataModel.tagList.collectAsState().value
-                    val tagListSelected = globalDataModel.tagListSelected.collectAsState().value
+                    val tagListSelected = if (isNew) globalDataModel.tagListSelectedNew.collectAsState().value
+                    else globalDataModel.tagListSelectedEdit.collectAsState().value
 
                     for (tag in tagList) {
                         FilterChip(
@@ -260,7 +264,8 @@ fun NewEditGrudgeSheet(
                                 null
                             },
                             onClick = {
-                                globalDataModel.toggleTagSelected(tag)
+                                if (isNew) globalDataModel.toggleTagSelectedNew(tag)
+                                else globalDataModel.toggleTagSelectedEdit(tag)
                             },
                             label = {
                                 Text(tag.name, modifier = Modifier.padding(vertical = 0.dp))
@@ -297,15 +302,15 @@ fun NewEditGrudgeSheet(
                 Row {
                     Text("TODO 记仇等级：", style = MaterialTheme.typography.bodyLarge)
                     Text(
-                        "${newGSliderPosition.toInt()}  ${
+                        "${gruSliderPosition.toInt()}  ${
                             getStringByName(
-                                GrudgeLevelEnum.getEnumByCode(newGSliderPosition.toInt()).title
+                                GrudgeLevelEnum.getEnumByCode(gruSliderPosition.toInt()).title
                             )
                         }",
                         style = MaterialTheme.typography.bodyLarge, color = interColorRange(
                             GRUDGE_LEVEL_MIN_COLOR,
                             GRUDGE_LEVEL_MAX_COLOR,
-                            newGSliderPosition,
+                            gruSliderPosition,
                             GRUDGE_LEVEL_MIN,
                             GRUDGE_LEVEL_MAX,
 
@@ -314,8 +319,7 @@ fun NewEditGrudgeSheet(
                 }
 
                 Slider(
-                    modifier = Modifier.height(22.dp).background(Color.Transparent),
-                    value = newGSliderPosition,
+                    modifier = Modifier.height(22.dp).background(Color.Transparent), value = gruSliderPosition,
                     onValueChange = updateSliderPosition, valueRange = GRUDGE_LEVEL_MIN..GRUDGE_LEVEL_MAX,
                     track = {
                         Canvas(
@@ -350,7 +354,7 @@ fun NewEditGrudgeSheet(
                 ) {
                     Text(
                         getStringByName(
-                            GrudgeLevelEnum.getEnumByCode(newGSliderPosition.toInt()).desc
+                            GrudgeLevelEnum.getEnumByCode(gruSliderPosition.toInt()).desc
                         ),
                         modifier = Modifier.alpha(0.5f),
                         style = MaterialTheme.typography.labelMedium

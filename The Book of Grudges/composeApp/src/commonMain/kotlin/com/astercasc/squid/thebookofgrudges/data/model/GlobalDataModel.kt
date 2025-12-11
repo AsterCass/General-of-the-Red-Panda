@@ -18,7 +18,10 @@ class GlobalDataModel(
         }
     }
     fun removeTag(tagId: String) {
-        _tagListSelected.update { list ->
+        _tagListSelectedNew.update { list ->
+            list.filterNot { it.id == tagId }
+        }
+        _tagListSelectedEdit.update { list ->
             list.filterNot { it.id == tagId }
         }
         _tagList.update { list ->
@@ -26,10 +29,10 @@ class GlobalDataModel(
         }
     }
 
-    private val _tagListSelected = MutableStateFlow<List<GrudgeTag>>(emptyList())
-    val tagListSelected = _tagListSelected.asStateFlow()
-    fun toggleTagSelected(tag: GrudgeTag) {
-        _tagListSelected.update { list ->
+    private val _tagListSelectedNew = MutableStateFlow<List<GrudgeTag>>(emptyList())
+    val tagListSelectedNew = _tagListSelectedNew.asStateFlow()
+    fun toggleTagSelectedNew(tag: GrudgeTag) {
+        _tagListSelectedNew.update { list ->
             if (list.any { it.id == tag.id }) {
                 list.filterNot { it.id == tag.id }
             } else {
@@ -38,8 +41,24 @@ class GlobalDataModel(
         }
     }
 
-    fun clearTagSelected() {
-        _tagListSelected.value = emptyList()
+    fun clearTagSelectedNew() {
+        _tagListSelectedNew.value = emptyList()
+    }
+
+    private val _tagListSelectedEdit = MutableStateFlow<List<GrudgeTag>>(emptyList())
+    val tagListSelectedEdit = _tagListSelectedEdit.asStateFlow()
+    fun toggleTagSelectedEdit(tag: GrudgeTag) {
+        _tagListSelectedEdit.update { list ->
+            if (list.any { it.id == tag.id }) {
+                list.filterNot { it.id == tag.id }
+            } else {
+                list.plus(tag)
+            }
+        }
+    }
+
+    fun resetTagSelectedEdit(list: List<GrudgeTag>) {
+        _tagListSelectedEdit.value = list
     }
 
 
@@ -53,7 +72,10 @@ class GlobalDataModel(
     }
 
     fun removeObj(objId: String) {
-        _objListSelected.update { list ->
+        _objListSelectedNew.update { list ->
+            list.filterNot { it.id == objId }
+        }
+        _objListSelectedEdit.update { list ->
             list.filterNot { it.id == objId }
         }
         _objList.update { list ->
@@ -61,10 +83,10 @@ class GlobalDataModel(
         }
     }
 
-    private val _objListSelected = MutableStateFlow<List<GrudgeObj>>(emptyList())
-    val objListSelected = _objListSelected.asStateFlow()
-    fun toggleObjSelected(obj: GrudgeObj) {
-        _objListSelected.update { list ->
+    private val _objListSelectedNew = MutableStateFlow<List<GrudgeObj>>(emptyList())
+    val objListSelectedNew = _objListSelectedNew.asStateFlow()
+    fun toggleObjSelectedNew(obj: GrudgeObj) {
+        _objListSelectedNew.update { list ->
             if (list.any { it.id == obj.id }) {
                 list.filterNot { it.id == obj.id }
             } else {
@@ -72,8 +94,25 @@ class GlobalDataModel(
             }
         }
     }
-    fun clearObjSelected() {
-        _objListSelected.value = emptyList()
+
+    fun clearObjSelectedNew() {
+        _objListSelectedNew.value = emptyList()
+    }
+
+    private val _objListSelectedEdit = MutableStateFlow<List<GrudgeObj>>(emptyList())
+    val objListSelectedEdit = _objListSelectedEdit.asStateFlow()
+    fun toggleObjSelectedEdit(obj: GrudgeObj) {
+        _objListSelectedEdit.update { list ->
+            if (list.any { it.id == obj.id }) {
+                list.filterNot { it.id == obj.id }
+            } else {
+                list.plus(obj)
+            }
+        }
+    }
+
+    fun resetObjSelectedEdit(list: List<GrudgeObj>) {
+        _objListSelectedEdit.value = list
     }
     
     // grudge
@@ -82,6 +121,14 @@ class GlobalDataModel(
     fun addGru(gru: GrudgeCell) {
         _gruList.update { list ->
             list.plus(gru)
+        }
+    }
+
+    fun editGru(gru: GrudgeCell) {
+        _gruList.update { list ->
+            list.map { obj ->
+                if (obj.id == gru.id) gru else obj
+            }
         }
     }
 

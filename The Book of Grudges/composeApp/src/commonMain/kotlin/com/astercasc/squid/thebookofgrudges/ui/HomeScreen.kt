@@ -56,12 +56,29 @@ fun HomeScreen() {
     val globalDataModel : GlobalDataModel = koinInject()
     val dataStorageManager: DataStorageManager = koinInject()
     val scope = rememberCoroutineScope()
-    // sheet
-    var showNewGrudgeSheet by rememberSaveable { mutableStateOf(false) }
+    // read sheet
     var showReadGrudgeSheet by rememberSaveable { mutableStateOf(false) }
+    // new sheet
+    var newGruSheetShow by rememberSaveable { mutableStateOf(false) }
     val newGruSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+    val newGTitleState = rememberTextFieldState("")
+    val newGDescState = rememberTextFieldState("")
+    var newGSliderPosition by rememberSaveable {
+        mutableFloatStateOf(1f)
+    }
+    // edit sheet
+    var editGru by remember { mutableStateOf(GrudgeCell()) }
+    var editGruSheetShow by rememberSaveable { mutableStateOf(false) }
+    val editGruSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    val editGTitleState = rememberTextFieldState("")
+    val editGDescState = rememberTextFieldState("")
+    var editGSliderPosition by rememberSaveable {
+        mutableFloatStateOf(1f)
+    }
     // new tag & obj 这里对话框展示状态不用在重组之后保留
     var openNewObjDialog by remember { mutableStateOf(false) }
     var openNewTagDialog by remember { mutableStateOf(false) }
@@ -69,7 +86,6 @@ fun HomeScreen() {
     // gru data
     val gruList = globalDataModel.gruList.collectAsState().value
     var currentDeleteGru by remember { mutableStateOf(GrudgeCell()) }
-    var currentEditGru by remember { mutableStateOf(GrudgeCell()) }
 
     Scaffold(
         topBar = {
@@ -224,7 +240,17 @@ fun HomeScreen() {
                                             modifier = Modifier.height(24.dp),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
-                                                currentEditGru = gru
+                                                editGru = gru
+                                                editGTitleState.edit {
+                                                    replace(0, length, editGru.title)
+                                                }
+                                                editGDescState.edit {
+                                                    replace(0, length, editGru.description)
+                                                }
+                                                editGSliderPosition = editGru.level.toFloat()
+                                                globalDataModel.resetTagSelectedEdit(editGru.tags)
+                                                globalDataModel.resetObjSelectedEdit(editGru.objs)
+                                                editGruSheetShow = true
                                             },
                                             colors = ButtonDefaults.buttonColors().copy(
                                                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -298,7 +324,7 @@ fun HomeScreen() {
             }
 
             SmallFloatingActionButton(
-                onClick = { showNewGrudgeSheet = true },
+                onClick = { newGruSheetShow = true },
                 shape = RoundedCornerShape(6.dp),
                 modifier = Modifier.align(Alignment.BottomStart).padding(start = 16.dp, bottom = 16.dp)
             ) {
@@ -331,21 +357,17 @@ fun HomeScreen() {
 
             }
 
-            // showNewGrudgeSheet
-            val newGTitleState = rememberTextFieldState("")
-            val newGDescState = rememberTextFieldState("")
-            var newGSliderPosition by rememberSaveable {
-                mutableFloatStateOf(1f)
-            }
+
 
             // newGrudge
-            if (showNewGrudgeSheet) {
+            if (newGruSheetShow) {
                 NewEditGrudgeSheet(
-                    newGTitleState = newGTitleState,
-                    newGDescState = newGDescState,
-                    newGSliderPosition = newGSliderPosition,
-                    closeSheet = { showNewGrudgeSheet = false },
-                    newGruSheetState = newGruSheetState,
+                    isNew = true,
+                    gruTitleState = newGTitleState,
+                    gruDescState = newGDescState,
+                    gruSliderPosition = newGSliderPosition,
+                    closeSheet = { newGruSheetShow = false },
+                    gruSheetState = newGruSheetState,
                     updateSliderPosition = { newGSliderPosition = it },
                     openNewObjDialog = { openNewObjDialog = true },
                     openNewTagDialog = { openNewTagDialog = true },
@@ -370,13 +392,13 @@ fun HomeScreen() {
                                     newGTitleState.clearText()
                                     newGDescState.clearText()
                                     newGSliderPosition = 1f
-                                    globalDataModel.clearObjSelected()
-                                    globalDataModel.clearTagSelected()
+                                    globalDataModel.clearObjSelectedNew()
+                                    globalDataModel.clearTagSelectedNew()
                                     // hide
                                     newGruSheetState.hide()
                                 }.invokeOnCompletion {
                                     if (!newGruSheetState.isVisible) {
-                                        showNewGrudgeSheet = false
+                                        newGruSheetShow = false
                                     }
                                 }
                             },
@@ -390,13 +412,74 @@ fun HomeScreen() {
                             onClick = {
                                 scope.launch { newGruSheetState.hide() }.invokeOnCompletion {
                                     if (!newGruSheetState.isVisible) {
-                                        showNewGrudgeSheet = false
+                                        newGruSheetShow = false
                                     }
                                 }
                             },
                             shape = RoundedCornerShape(6.dp),
                         ) {
                             Text("算了，先放Ta一马")
+                        }
+                    }
+                }
+            }
+
+
+            // editGrudge
+            if (editGruSheetShow) {
+                NewEditGrudgeSheet(
+                    isNew = false,
+                    gruTitleState = editGTitleState,
+                    gruDescState = editGDescState,
+                    gruSliderPosition = editGSliderPosition,
+                    closeSheet = { editGruSheetShow = false },
+                    gruSheetState = editGruSheetState,
+                    updateSliderPosition = { editGSliderPosition = it },
+                    openNewObjDialog = { openNewObjDialog = true },
+                    openNewTagDialog = { openNewTagDialog = true },
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+
+                        Button(
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                scope.launch {
+                                    //edit
+                                    editGru(
+                                        globalDataModel = globalDataModel,
+                                        dataStorageManager = dataStorageManager,
+                                        title = editGTitleState.text.toString(),
+                                        description = editGDescState.text.toString(),
+                                        level = editGSliderPosition.toInt(),
+                                        editGru = editGru,
+                                    )
+                                    // hide
+                                    editGruSheetState.hide()
+                                }.invokeOnCompletion {
+                                    if (!editGruSheetState.isVisible) {
+                                        editGruSheetShow = false
+                                    }
+                                }
+                            },
+                            shape = RoundedCornerShape(6.dp),
+                        ) {
+                            Text("确定保存")
+                        }
+
+                        OutlinedButton(
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                scope.launch { editGruSheetState.hide() }.invokeOnCompletion {
+                                    if (!editGruSheetState.isVisible) {
+                                        editGruSheetShow = false
+                                    }
+                                }
+                            },
+                            shape = RoundedCornerShape(6.dp),
+                        ) {
+                            Text("放弃")
                         }
                     }
                 }

@@ -113,9 +113,32 @@ fun addNewGru(
             title = title,
             description = description,
             level = level,
-            tags = globalDataModel.tagListSelected.value,
-            objs = globalDataModel.objListSelected.value,
+            tags = globalDataModel.tagListSelectedNew.value,
+            objs = globalDataModel.objListSelectedNew.value,
             createTime = Clock.System.now().epochSeconds
+        )
+    )
+    dataStorageManager.setString(USER_GRU_LIST, commonJson.encodeToString(globalDataModel.gruList.value))
+}
+
+@OptIn(ExperimentalTime::class)
+fun editGru(
+    globalDataModel: GlobalDataModel,
+    dataStorageManager: DataStorageManager,
+    title: String,
+    description: String,
+    level: Int,
+    editGru: GrudgeCell,
+) {
+    globalDataModel.editGru(
+        GrudgeCell(
+            id = editGru.id,
+            title = title,
+            description = description,
+            level = level,
+            tags = globalDataModel.tagListSelectedEdit.value,
+            objs = globalDataModel.objListSelectedEdit.value,
+            createTime = editGru.createTime,
         )
     )
     dataStorageManager.setString(USER_GRU_LIST, commonJson.encodeToString(globalDataModel.gruList.value))
