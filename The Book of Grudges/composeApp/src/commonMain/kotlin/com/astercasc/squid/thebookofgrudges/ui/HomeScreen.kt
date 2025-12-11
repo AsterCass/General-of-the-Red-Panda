@@ -26,14 +26,12 @@ import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MAX_COLOR
 import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN
 import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN_COLOR
 import com.astercasc.squid.thebookofgrudges.constant.enums.ViewEnum
-import com.astercasc.squid.thebookofgrudges.data.DataStorageManager
-import com.astercasc.squid.thebookofgrudges.data.GrudgeCell
-import com.astercasc.squid.thebookofgrudges.data.addGruRef
-import com.astercasc.squid.thebookofgrudges.data.deleteGru
+import com.astercasc.squid.thebookofgrudges.data.*
 import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.components.*
 import com.astercasc.squid.thebookofgrudges.utils.formatTimestamp
 import com.astercasc.squid.thebookofgrudges.utils.interColorRange
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.koinInject
 import thebookofgrudges.composeapp.generated.resources.Res
@@ -57,9 +55,13 @@ fun HomeScreen() {
     // inject
     val globalDataModel : GlobalDataModel = koinInject()
     val dataStorageManager: DataStorageManager = koinInject()
+    val scope = rememberCoroutineScope()
     // sheet
     var showNewGrudgeSheet by rememberSaveable { mutableStateOf(false) }
     var showReadGrudgeSheet by rememberSaveable { mutableStateOf(false) }
+    val newGruSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
     // new tag & obj 这里对话框展示状态不用在重组之后保留
     var openNewObjDialog by remember { mutableStateOf(false) }
     var openNewTagDialog by remember { mutableStateOf(false) }
@@ -67,6 +69,7 @@ fun HomeScreen() {
     // gru data
     val gruList = globalDataModel.gruList.collectAsState().value
     var currentDeleteGru by remember { mutableStateOf(GrudgeCell()) }
+    var currentEditGru by remember { mutableStateOf(GrudgeCell()) }
 
     Scaffold(
         topBar = {
@@ -221,6 +224,7 @@ fun HomeScreen() {
                                             modifier = Modifier.height(24.dp),
                                             contentPadding = PaddingValues(0.dp),
                                             onClick = {
+                                                currentEditGru = gru
                                             },
                                             colors = ButtonDefaults.buttonColors().copy(
                                                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -336,22 +340,66 @@ fun HomeScreen() {
 
             // newGrudge
             if (showNewGrudgeSheet) {
-                NewGrudgeSheet(
+                NewEditGrudgeSheet(
                     newGTitleState = newGTitleState,
                     newGDescState = newGDescState,
                     newGSliderPosition = newGSliderPosition,
                     closeSheet = { showNewGrudgeSheet = false },
+                    newGruSheetState = newGruSheetState,
                     updateSliderPosition = { newGSliderPosition = it },
                     openNewObjDialog = { openNewObjDialog = true },
                     openNewTagDialog = { openNewTagDialog = true },
-                    clearStatus = {
-                        newGTitleState.clearText()
-                        newGDescState.clearText()
-                        newGSliderPosition = 1f
-                        globalDataModel.clearObjSelected()
-                        globalDataModel.clearTagSelected()
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+
+                        Button(
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                scope.launch {
+                                    //new
+                                    addNewGru(
+                                        globalDataModel = globalDataModel,
+                                        dataStorageManager = dataStorageManager,
+                                        title = newGTitleState.text.toString(),
+                                        description = newGDescState.text.toString(),
+                                        level = newGSliderPosition.toInt(),
+                                    )
+                                    //clear status
+                                    newGTitleState.clearText()
+                                    newGDescState.clearText()
+                                    newGSliderPosition = 1f
+                                    globalDataModel.clearObjSelected()
+                                    globalDataModel.clearTagSelected()
+                                    // hide
+                                    newGruSheetState.hide()
+                                }.invokeOnCompletion {
+                                    if (!newGruSheetState.isVisible) {
+                                        showNewGrudgeSheet = false
+                                    }
+                                }
+                            },
+                            shape = RoundedCornerShape(6.dp),
+                        ) {
+                            Text("开始卧薪尝胆")
+                        }
+
+                        OutlinedButton(
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                scope.launch { newGruSheetState.hide() }.invokeOnCompletion {
+                                    if (!newGruSheetState.isVisible) {
+                                        showNewGrudgeSheet = false
+                                    }
+                                }
+                            },
+                            shape = RoundedCornerShape(6.dp),
+                        ) {
+                            Text("算了，先放Ta一马")
+                        }
                     }
-                )
+                }
             }
 
 

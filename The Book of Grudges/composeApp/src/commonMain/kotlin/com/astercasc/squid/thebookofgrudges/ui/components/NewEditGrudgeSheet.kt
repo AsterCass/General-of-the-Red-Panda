@@ -29,8 +29,6 @@ import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MAX_COLOR
 import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN
 import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN_COLOR
 import com.astercasc.squid.thebookofgrudges.constant.enums.GrudgeLevelEnum
-import com.astercasc.squid.thebookofgrudges.data.DataStorageManager
-import com.astercasc.squid.thebookofgrudges.data.addNewGru
 import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.EditGrudgeObjectObj
 import com.astercasc.squid.thebookofgrudges.ui.EditGrudgeTagObj
@@ -44,29 +42,27 @@ import thebookofgrudges.composeapp.generated.resources.devil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewGrudgeSheet(
+fun NewEditGrudgeSheet(
     newGTitleState: TextFieldState,
     newGDescState: TextFieldState,
     newGSliderPosition: Float,
     closeSheet: () -> Unit,
+    newGruSheetState: SheetState,
     updateSliderPosition: (Float) -> Unit,
     openNewObjDialog: () -> Unit,
     openNewTagDialog: () -> Unit,
-    clearStatus: () -> Unit,
+    operation: @Composable () -> Unit,
 ) {
 
     val globalDataModel: GlobalDataModel = koinInject()
-    val dataStorageManager: DataStorageManager = koinInject()
     val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
+
 
     ModalBottomSheet(
         shape = RoundedCornerShape(6.dp, 6.dp, 0.dp, 0.dp),
         onDismissRequest = closeSheet,
-        sheetState = sheetState,
+        sheetState = newGruSheetState,
 
     ) {
         // todo 这里可能触发 ModalBottomSheet 的滚动，也可能触发 Column 的，所以最好是再做一个页面
@@ -124,7 +120,7 @@ fun NewGrudgeSheet(
                             .clickable(onClick = {
                                 scope
                                     .launch {
-                                        sheetState.hide()
+                                        newGruSheetState.hide()
                                     }
                                     .invokeOnCompletion {
                                         navigator.push(EditGrudgeObjectObj)
@@ -217,7 +213,7 @@ fun NewGrudgeSheet(
                             .clickable(onClick = {
                                 scope
                                     .launch {
-                                        sheetState.hide()
+                                        newGruSheetState.hide()
                                     }
                                     .invokeOnCompletion {
                                         navigator.push(EditGrudgeTagObj)
@@ -363,57 +359,7 @@ fun NewGrudgeSheet(
 
             }
 
-
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-
-                Button(
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        scope
-                            .launch {
-                                addNewGru(
-                                    globalDataModel = globalDataModel,
-                                    dataStorageManager = dataStorageManager,
-                                    title = newGTitleState.text.toString(),
-                                    description = newGDescState.text.toString(),
-                                    level = newGSliderPosition.toInt(),
-                                )
-                                clearStatus()
-                                sheetState.hide()
-                            }
-                            .invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    closeSheet()
-                                }
-                            }
-                    },
-                    shape = RoundedCornerShape(6.dp),
-
-                    ) {
-                    Text("开始卧薪尝胆")
-                }
-
-                OutlinedButton(
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        scope
-                            .launch { sheetState.hide() }
-                            .invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    closeSheet()
-                                }
-                            }
-                    },
-                    shape = RoundedCornerShape(6.dp),
-                ) {
-                    Text("算了，先放Ta一马")
-                }
-            }
-
+            operation()
 
         }
     }
