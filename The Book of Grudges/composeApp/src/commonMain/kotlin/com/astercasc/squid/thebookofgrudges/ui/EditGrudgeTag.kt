@@ -88,7 +88,7 @@ fun EditGrudgeTag() {
                                     )
                                     Text(
                                         modifier = Modifier.alpha(0.35f),
-                                        text = "创建日期 ${formatTimestamp(tag.createTime)}",
+                                        text = "创建时间 ${formatTimestamp(tag.createTime)}",
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }

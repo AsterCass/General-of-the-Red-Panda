@@ -16,7 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
+import com.astercasc.squid.thebookofgrudges.ui.ReadGrudgeObj
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -35,6 +38,7 @@ fun ReadGrudgeSheet(
 
     // inject
     val globalDataModel: GlobalDataModel = koinInject()
+    val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
 
     ModalBottomSheet(
@@ -280,12 +284,20 @@ fun ReadGrudgeSheet(
                     onClick = {
                         scope.launch {
                             // operation
+                            globalDataModel.updateParams(
+                                keyword = searchKeyState.text.toString(),
+                                minLevel = searchLevelMin.text.toString(),
+                                maxLevel = searchLevelMax.text.toString(),
+                                minRefer = searchReferMin.text.toString(),
+                                maxRefer = searchReferMax.text.toString(),
+                            )
                             // hide
                             searchSheetState.hide()
                         }.invokeOnCompletion {
                             if (!searchSheetState.isVisible) {
                                 closeSheet()
                             }
+                            navigator.push(ReadGrudgeObj)
                         }
                     },
                     shape = RoundedCornerShape(6.dp),

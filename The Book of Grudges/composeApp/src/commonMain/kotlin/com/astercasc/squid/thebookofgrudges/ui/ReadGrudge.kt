@@ -1,19 +1,39 @@
 package com.astercasc.squid.thebookofgrudges.ui
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.sharp.MenuBook
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MAX
+import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MAX_COLOR
+import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN
+import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN_COLOR
 import com.astercasc.squid.thebookofgrudges.constant.enums.ViewEnum
+import com.astercasc.squid.thebookofgrudges.data.DataStorageManager
+import com.astercasc.squid.thebookofgrudges.data.deleteGru
+import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.components.MainAppBar
+import com.astercasc.squid.thebookofgrudges.ui.components.SystemConfirm
+import com.astercasc.squid.thebookofgrudges.utils.formatTimestamp
+import com.astercasc.squid.thebookofgrudges.utils.interColorRange
+import org.jetbrains.compose.resources.vectorResource
+import org.koin.compose.koinInject
+import thebookofgrudges.composeapp.generated.resources.Res
+import thebookofgrudges.composeapp.generated.resources.trident
 
 object ReadGrudgeObj : Screen {
 
@@ -30,7 +50,18 @@ object ReadGrudgeObj : Screen {
 @Composable
 fun ReadGrudge() {
 
-
+    // inject
+    val globalDataModel: GlobalDataModel = koinInject()
+    val dataStorageManager: DataStorageManager = koinInject()
+    // search data
+    val gruIdListSelected = globalDataModel.gruIdListSelected.collectAsState().value
+    // gru data
+    val gruList = globalDataModel.gruList.collectAsState().value
+    val gruIdMap = gruList.associateBy { it.id }
+    val pagerState = rememberPagerState(pageCount = {
+        gruIdListSelected.size
+    })
+    var deleteGruDialog by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             MainAppBar("todo title")
@@ -40,7 +71,200 @@ fun ReadGrudge() {
 
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
 
-            Text("Read Grudge")
+
+            HorizontalPager(
+                state = pagerState, verticalAlignment = Alignment.Top
+            ) { page ->
+
+                // grudge
+                val gru = gruIdMap[gruIdListSelected[page]] ?: return@HorizontalPager
+
+                // color
+                val mainColor = interColorRange(
+                    GRUDGE_LEVEL_MIN_COLOR,
+                    GRUDGE_LEVEL_MAX_COLOR,
+                    gru.level.toFloat(),
+                    GRUDGE_LEVEL_MIN,
+                    GRUDGE_LEVEL_MAX,
+                )
+
+                Column(
+                    modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 18.dp, bottom = 12.dp).fillMaxWidth()
+                ) {
+
+                    OutlinedCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(6.dp),
+                        elevation = CardDefaults.cardElevation(
+                            defaultElevation = 3.dp
+                        ),
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.Top
+                            ) {
+
+                                Text(
+                                    modifier = Modifier.weight(1f).padding(end = 8.dp).alpha(0.7f),
+                                    text = gru.title,
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+
+                                Text(
+                                    modifier = Modifier.wrapContentWidth().alpha(0.35f),
+                                    text = "提及次数: ${gru.referCount}",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+
+                            }
+
+
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp),
+                            ) {
+                                for (obj in gru.objs) {
+                                    Box(
+                                        modifier = Modifier.clip(RoundedCornerShape(6.dp))
+                                            .background(MaterialTheme.colorScheme.primaryContainer)
+                                            .padding(vertical = 3.dp, horizontal = 6.dp),
+                                    ) {
+                                        Text(
+                                            text = obj.name,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                    }
+                                }
+
+                                for (tag in gru.tags) {
+                                    Box(
+                                        modifier = Modifier.clip(RoundedCornerShape(6.dp))
+                                            .background(MaterialTheme.colorScheme.primaryContainer)
+                                            .padding(vertical = 3.dp, horizontal = 6.dp),
+                                    ) {
+                                        Text(
+                                            text = tag.name,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                    }
+                                }
+
+                            }
+
+
+                            Text(
+                                modifier = Modifier.alpha(0.35f),
+                                text = gru.description,
+                                style = MaterialTheme.typography.labelMedium
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+
+                                Text(
+                                    modifier = Modifier.alpha(0.35f),
+                                    text = "记仇等级：",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+
+                                repeat(gru.level) { index ->
+                                    Icon(
+                                        imageVector = vectorResource(Res.drawable.trident),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(24.dp).offset(x = (index * -4).dp),
+                                        tint = mainColor,
+                                    )
+                                }
+
+                            }
+
+                            HorizontalDivider(
+                                modifier = Modifier.padding(vertical = 6.dp),
+                            )
+
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+
+                                Text(
+                                    modifier = Modifier.alpha(0.35f),
+                                    text = "创建时间：${formatTimestamp(gru.createTime)}",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+
+                                Text(
+                                    modifier = Modifier.alpha(0.35f),
+                                    text = "更新时间：${formatTimestamp(gru.updateTime)}",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+
+                            }
+
+
+                        }
+
+
+                    }
+
+                    Spacer(Modifier.height(75.dp))
+
+                }
+
+
+            }
+
+
+
+
+
+
+
+
+            SmallFloatingActionButton(
+                onClick = {
+                    deleteGruDialog = true
+                },
+                shape = CircleShape,
+                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = 16.dp)
+            ) {
+                Icon(
+                    modifier = Modifier.padding(12.dp).size(25.dp),
+                    imageVector = Icons.AutoMirrored.Sharp.MenuBook,
+                    contentDescription = "todo something"
+                )
+
+            }
+
+            // delete
+            if (deleteGruDialog) {
+                val gru = gruIdMap[gruIdListSelected[pagerState.currentPage]] ?: return@Box
+                SystemConfirm(
+                    title = "是否不再对【${gru.title}】记仇",
+                    onConfirmRequest = {
+                        deleteGru(
+                            globalDataModel = globalDataModel,
+                            dataStorageManager = dataStorageManager,
+                            id = gru.id,
+                        )
+                    },
+                    onDismissRequest = { deleteGruDialog = false },
+                )
+            }
+
+
+
 
         }
     }

@@ -181,7 +181,7 @@ fun HomeScreen() {
                                                         color = MaterialTheme.colorScheme.primaryContainer,
                                                         shape = RoundedCornerShape(6.dp)
                                                     )
-                                                    .padding(vertical = 3.dp, horizontal = 5.dp),
+                                                    .padding(vertical = 3.dp, horizontal = 6.dp),
                                             ) {
                                                 Text(
                                                     text = obj.name,
@@ -199,7 +199,7 @@ fun HomeScreen() {
                                                         color = MaterialTheme.colorScheme.primaryContainer,
                                                         shape = RoundedCornerShape(6.dp)
                                                     )
-                                                    .padding(vertical = 3.dp, horizontal = 5.dp),
+                                                    .padding(vertical = 3.dp, horizontal = 6.dp),
                                             ) {
                                                 Text(
                                                     text = tag.name,
