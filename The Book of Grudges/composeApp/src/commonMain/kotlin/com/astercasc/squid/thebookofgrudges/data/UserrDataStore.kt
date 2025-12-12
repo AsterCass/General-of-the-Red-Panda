@@ -115,7 +115,8 @@ fun addNewGru(
             level = level,
             tags = globalDataModel.tagListSelectedNew.value,
             objs = globalDataModel.objListSelectedNew.value,
-            createTime = Clock.System.now().epochSeconds
+            createTime = Clock.System.now().epochSeconds,
+            updateTime = Clock.System.now().epochSeconds,
         )
     )
     dataStorageManager.setString(USER_GRU_LIST, commonJson.encodeToString(globalDataModel.gruList.value))
@@ -139,6 +140,7 @@ fun editGru(
             tags = globalDataModel.tagListSelectedEdit.value,
             objs = globalDataModel.objListSelectedEdit.value,
             createTime = editGru.createTime,
+            updateTime = Clock.System.now().epochSeconds,
         )
     )
     dataStorageManager.setString(USER_GRU_LIST, commonJson.encodeToString(globalDataModel.gruList.value))

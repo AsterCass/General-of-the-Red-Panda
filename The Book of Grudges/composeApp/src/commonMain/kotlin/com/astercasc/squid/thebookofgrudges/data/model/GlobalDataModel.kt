@@ -4,6 +4,8 @@ import com.astercasc.squid.thebookofgrudges.data.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class GlobalDataModel(
     dataStorageManager: DataStorageManager
@@ -141,12 +143,14 @@ class GlobalDataModel(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     fun addGruRef(gruId: String) {
         _gruList.update { list ->
             list.map { obj ->
                 if (obj.id == gruId) {
                     obj.copy(
                         referCount = obj.referCount + 1,
+                        updateTime = Clock.System.now().epochSeconds,
                     )
                 } else obj
             }

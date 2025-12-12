@@ -17,6 +17,7 @@ data class GrudgeCell(
     var tags : List<GrudgeTag> = listOf(),
     var objs : List<GrudgeObj> = listOf(),
     var createTime : Long = 0L,
+    var updateTime : Long = 0L,
 )
 
 @Serializable
