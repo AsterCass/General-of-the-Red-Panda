@@ -253,6 +253,14 @@ fun ReadGrudgeSheet(
                     onClick = {
                         scope.launch {
                             // operation
+                            globalDataModel.updateParams(
+                                keyword = searchKeyState.text.toString(),
+                                minLevel = searchLevelMin.text.toString(),
+                                maxLevel = searchLevelMax.text.toString(),
+                                minRefer = searchReferMin.text.toString(),
+                                maxRefer = searchReferMax.text.toString(),
+                            )
+                            globalDataModel.startSearch()
                             // hide
                             searchSheetState.hide()
                         }.invokeOnCompletion {
@@ -288,7 +296,19 @@ fun ReadGrudgeSheet(
                 OutlinedButton(
                     modifier = Modifier.weight(1f),
                     onClick = {
-                        scope.launch { searchSheetState.hide() }.invokeOnCompletion {
+                        scope.launch {
+                            //operation
+                            searchKeyState.clearText()
+                            searchLevelMin.clearText()
+                            searchLevelMax.clearText()
+                            searchReferMin.clearText()
+                            searchReferMax.clearText()
+                            globalDataModel.clearObjSearch()
+                            globalDataModel.clearTagSearch()
+                            globalDataModel.stopSearch()
+                            //hide
+                            searchSheetState.hide()
+                        }.invokeOnCompletion {
                             if (!searchSheetState.isVisible) {
                                 closeSheet()
                             }

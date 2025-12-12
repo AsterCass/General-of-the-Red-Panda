@@ -154,11 +154,43 @@ class GlobalDataModel(
     }
 
 
+    // search
+    private val _gruSearch = MutableStateFlow(false)
+    val gruSearch = _gruSearch.asStateFlow()
+    fun startSearch() {
+        _gruSearch.value = true
+    }
+
+    fun stopSearch() {
+        _gruSearch.value = false
+    }
+
+
     private val _gruIdListSelected = MutableStateFlow<List<String>>(emptyList())
     val gruIdListSelected = _gruIdListSelected.asStateFlow()
+    fun updateParams(
+        keyword: String,
+        minLevel: String,
+        maxLevel: String,
+        minRefer: String,
+        maxRefer: String,
+    ) {
+        val objSet = _objListSearch.value.toSet()
+        val tagSet = _tagListSearch.value.toSet()
+
+        _gruIdListSelected.value = _gruList.value.filter { item ->
+            ((keyword.isBlank() || item.title.contains(keyword, ignoreCase = true) || item.description.contains(
+                keyword, ignoreCase = true
+            )) && (minLevel.isBlank() || item.level >= (minLevel.toIntOrNull()
+                ?: 0)) && (maxLevel.isBlank() || item.level <= (maxLevel.toIntOrNull()
+                ?: Int.MAX_VALUE)) && (minRefer.isBlank() || item.referCount >= (minRefer.toIntOrNull()
+                ?: 0)) && (maxRefer.isBlank() || item.referCount <= (maxRefer.toIntOrNull()
+                ?: Int.MAX_VALUE))) && (_objListSearch.value.isEmpty() || item.objs.any { it.id in objSet }) && (_tagListSearch.value.isEmpty() || item.tags.any { it.id in tagSet })
+
+        }.map { it.id }
+    }
 
 
-    // search 
     private val _objListSearch = MutableStateFlow<List<String>>(emptyList())
     val objListSearch = _objListSearch.asStateFlow()
     fun toggleObjSearch(objId: String) {
@@ -171,6 +203,10 @@ class GlobalDataModel(
         }
     }
 
+    fun clearObjSearch() {
+        _objListSearch.value = emptyList()
+    }
+
     private val _tagListSearch = MutableStateFlow<List<String>>(emptyList())
     val tagListSearch = _tagListSearch.asStateFlow()
     fun toggleTagSearch(tagId: String) {
@@ -181,6 +217,10 @@ class GlobalDataModel(
                 list.plus(tagId)
             }
         }
+    }
+
+    fun clearTagSearch() {
+        _tagListSearch.value = emptyList()
     }
 
 }

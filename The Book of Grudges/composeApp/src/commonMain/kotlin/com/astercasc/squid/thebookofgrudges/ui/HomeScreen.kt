@@ -66,6 +66,8 @@ fun HomeScreen() {
     val searchLevelMax = rememberTextFieldState("")
     val searchReferMin = rememberTextFieldState("")
     val searchReferMax = rememberTextFieldState("")
+    val gruIdListSelected = globalDataModel.gruIdListSelected.collectAsState().value
+    val gruSearch = globalDataModel.gruSearch.collectAsState().value
     // new sheet
     var newGruSheetShow by rememberSaveable { mutableStateOf(false) }
     val newGruSheetState = rememberModalBottomSheetState(
@@ -111,6 +113,10 @@ fun HomeScreen() {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 for (gru in gruList) {
+
+                    if (gruSearch && !gruIdListSelected.contains(gru.id)) {
+                        continue
+                    }
 
                     val mainColor = interColorRange(
                         GRUDGE_LEVEL_MIN_COLOR,
