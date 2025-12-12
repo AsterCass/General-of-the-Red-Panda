@@ -4,10 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.sharp.MenuBook
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,12 +21,14 @@ import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN
 import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN_COLOR
 import com.astercasc.squid.thebookofgrudges.constant.enums.ViewEnum
 import com.astercasc.squid.thebookofgrudges.data.DataStorageManager
+import com.astercasc.squid.thebookofgrudges.data.addGruRef
 import com.astercasc.squid.thebookofgrudges.data.deleteGru
 import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.components.MainAppBar
 import com.astercasc.squid.thebookofgrudges.ui.components.SystemConfirm
 import com.astercasc.squid.thebookofgrudges.utils.formatTimestamp
 import com.astercasc.squid.thebookofgrudges.utils.interColorRange
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.koinInject
 import thebookofgrudges.composeapp.generated.resources.Res
@@ -53,6 +52,7 @@ fun ReadGrudge() {
     // inject
     val globalDataModel: GlobalDataModel = koinInject()
     val dataStorageManager: DataStorageManager = koinInject()
+    val scope = rememberCoroutineScope()
     // search data
     val gruIdListSelected = globalDataModel.gruIdListSelected.collectAsState().value
     // gru data
@@ -131,12 +131,12 @@ fun ReadGrudge() {
                                 for (obj in gru.objs) {
                                     Box(
                                         modifier = Modifier.clip(RoundedCornerShape(6.dp))
-                                            .background(MaterialTheme.colorScheme.primaryContainer)
+                                            .background(MaterialTheme.colorScheme.tertiaryContainer)
                                             .padding(vertical = 3.dp, horizontal = 6.dp),
                                     ) {
                                         Text(
                                             text = obj.name,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            color = MaterialTheme.colorScheme.onTertiaryContainer,
                                             style = MaterialTheme.typography.labelMedium
                                         )
                                     }
@@ -145,12 +145,12 @@ fun ReadGrudge() {
                                 for (tag in gru.tags) {
                                     Box(
                                         modifier = Modifier.clip(RoundedCornerShape(6.dp))
-                                            .background(MaterialTheme.colorScheme.primaryContainer)
+                                            .background(MaterialTheme.colorScheme.tertiaryContainer)
                                             .padding(vertical = 3.dp, horizontal = 6.dp),
                                     ) {
                                         Text(
                                             text = tag.name,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            color = MaterialTheme.colorScheme.onTertiaryContainer,
                                             style = MaterialTheme.typography.labelMedium
                                         )
                                     }
@@ -218,7 +218,7 @@ fun ReadGrudge() {
 
                     }
 
-                    Spacer(Modifier.height(75.dp))
+                    Spacer(Modifier.height(150.dp))
 
                 }
 
@@ -226,30 +226,89 @@ fun ReadGrudge() {
             }
 
 
+            val gru = gruIdMap[gruIdListSelected[pagerState.currentPage]] ?: return@Box
 
+            SmallFloatingActionButton(
+                onClick = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                    }
+                },
+                shape = RoundedCornerShape(6.dp),
+                elevation = FloatingActionButtonDefaults.elevation(2.dp),
+                modifier = Modifier.align(Alignment.BottomStart).padding(start = 16.dp, bottom = 16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("上一个记仇")
+                }
 
-
-
+            }
 
 
             SmallFloatingActionButton(
                 onClick = {
                     deleteGruDialog = true
                 },
-                shape = CircleShape,
-                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = 16.dp)
+                shape = RoundedCornerShape(6.dp),
+                elevation = FloatingActionButtonDefaults.elevation(2.dp),
+                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = 136.dp),
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
             ) {
-                Icon(
-                    modifier = Modifier.padding(12.dp).size(25.dp),
-                    imageVector = Icons.AutoMirrored.Sharp.MenuBook,
-                    contentDescription = "todo something"
-                )
+                Row(
+                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("已报仇")
+                }
 
+            }
+
+            SmallFloatingActionButton(
+                onClick = {
+                    addGruRef(
+                        globalDataModel = globalDataModel,
+                        dataStorageManager = dataStorageManager,
+                        id = gru.id,
+                    )
+                },
+                shape = RoundedCornerShape(6.dp),
+                elevation = FloatingActionButtonDefaults.elevation(2.dp),
+                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = 76.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("提及 + 1")
+                }
+
+            }
+
+            SmallFloatingActionButton(
+                onClick = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                    }
+                },
+                shape = RoundedCornerShape(6.dp),
+                elevation = FloatingActionButtonDefaults.elevation(2.dp),
+                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = 16.dp),
+            ) {
+                Text(
+                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
+                    text = "下一个记仇"
+                )
             }
 
             // delete
             if (deleteGruDialog) {
-                val gru = gruIdMap[gruIdListSelected[pagerState.currentPage]] ?: return@Box
                 SystemConfirm(
                     title = "是否不再对【${gru.title}】记仇",
                     onConfirmRequest = {
