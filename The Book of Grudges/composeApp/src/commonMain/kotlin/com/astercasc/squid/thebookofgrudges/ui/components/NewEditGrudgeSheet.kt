@@ -64,12 +64,15 @@ fun NewEditGrudgeSheet(
         shape = RoundedCornerShape(6.dp, 6.dp, 0.dp, 0.dp),
         onDismissRequest = closeSheet,
         sheetState = gruSheetState,
+        containerColor = BottomSheetDefaults.ContainerColor.copy(
+            alpha = 0.92f,
+        ),
 
     ) {
         // todo 这里可能触发 ModalBottomSheet 的滚动，也可能触发 Column 的，所以最好是再做一个页面
         Column(
             modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState()).background(Color.Transparent),
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
 

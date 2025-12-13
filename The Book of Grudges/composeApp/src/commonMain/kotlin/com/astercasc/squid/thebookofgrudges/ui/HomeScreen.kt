@@ -17,10 +17,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageShader
-import androidx.compose.ui.graphics.ShaderBrush
-import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -33,14 +33,15 @@ import com.astercasc.squid.thebookofgrudges.constant.enums.ViewEnum
 import com.astercasc.squid.thebookofgrudges.data.*
 import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.components.*
+import com.astercasc.squid.thebookofgrudges.utils.LocalBgBrush
 import com.astercasc.squid.thebookofgrudges.utils.formatTimestamp
 import com.astercasc.squid.thebookofgrudges.utils.interColorRange
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.koinInject
 import thebookofgrudges.composeapp.generated.resources.Res
-import thebookofgrudges.composeapp.generated.resources.bg
+import thebookofgrudges.composeapp.generated.resources.bg1
 import thebookofgrudges.composeapp.generated.resources.trident
 
 object HomeScreenObj : Screen {
@@ -109,15 +110,15 @@ fun HomeScreen() {
     }, bottomBar = {}, floatingActionButton = {}, floatingActionButtonPosition = FabPosition.Start
     ) { padding ->
 
-
-        val image = imageResource(Res.drawable.bg)
-        val shader = ImageShader(image, tileModeX = TileMode.Repeated, tileModeY = TileMode.Repeated)
-        val brush = remember { ShaderBrush(shader) }
-
         Box(
             modifier = Modifier.fillMaxSize().padding(padding)
                 .background(
-                    brush = brush
+                    brush = LocalBgBrush.current
+                )
+                .paint(
+                    painter = painterResource(Res.drawable.bg1),
+                    contentScale = ContentScale.Crop,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primaryContainer),
                 )
         ) {
             // 主内容
@@ -155,10 +156,14 @@ fun HomeScreen() {
                             elevation = CardDefaults.cardElevation(
                                 defaultElevation = 3.dp
                             ),
+                            colors = CardDefaults.outlinedCardColors().copy(
+                                containerColor = CardDefaults.outlinedCardColors().containerColor.copy(alpha = 0.92f),
+                            ),
                         ) {
+
+
                             Column(
-                                modifier = Modifier.fillMaxWidth()
-//                                    .background(brush = brush)
+                                modifier = Modifier.fillMaxWidth().background(Color.Transparent)
                                     .padding(12.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                             ) {

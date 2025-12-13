@@ -1,30 +1,10 @@
 package com.astercasc.squid.thebookofgrudges.utils
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Brush
 import org.jetbrains.compose.resources.stringResource
-import thebookofgrudges.composeapp.generated.resources.Res
-import thebookofgrudges.composeapp.generated.resources.app_name
-import thebookofgrudges.composeapp.generated.resources.grudge_eight
-import thebookofgrudges.composeapp.generated.resources.grudge_eight_desc
-import thebookofgrudges.composeapp.generated.resources.grudge_five
-import thebookofgrudges.composeapp.generated.resources.grudge_five_desc
-import thebookofgrudges.composeapp.generated.resources.grudge_four
-import thebookofgrudges.composeapp.generated.resources.grudge_four_desc
-import thebookofgrudges.composeapp.generated.resources.grudge_nine
-import thebookofgrudges.composeapp.generated.resources.grudge_nine_desc
-import thebookofgrudges.composeapp.generated.resources.grudge_one
-import thebookofgrudges.composeapp.generated.resources.grudge_one_desc
-import thebookofgrudges.composeapp.generated.resources.grudge_seven
-import thebookofgrudges.composeapp.generated.resources.grudge_seven_desc
-import thebookofgrudges.composeapp.generated.resources.grudge_six
-import thebookofgrudges.composeapp.generated.resources.grudge_six_desc
-import thebookofgrudges.composeapp.generated.resources.grudge_ten
-import thebookofgrudges.composeapp.generated.resources.grudge_ten_desc
-import thebookofgrudges.composeapp.generated.resources.grudge_three
-import thebookofgrudges.composeapp.generated.resources.grudge_three_desc
-import thebookofgrudges.composeapp.generated.resources.grudge_two
-import thebookofgrudges.composeapp.generated.resources.grudge_two_desc
-import thebookofgrudges.composeapp.generated.resources.none
+import thebookofgrudges.composeapp.generated.resources.*
 
 
 @Composable
@@ -32,6 +12,12 @@ fun getStringByName(key: String): String {
     val res = StringResourceRegistry.map[key] ?: Res.string.none
     return stringResource(res)
 }
+
+
+val LocalBgBrush = staticCompositionLocalOf<Brush> {
+    error("Res not found")
+}
+
 object StringResourceRegistry {
     val map = mapOf(
         "app_name" to Res.string.app_name,

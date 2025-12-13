@@ -1,5 +1,6 @@
 package com.astercasc.squid.thebookofgrudges.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -43,11 +45,15 @@ fun ReadGrudgeSheet(
 
     ModalBottomSheet(
         shape = RoundedCornerShape(6.dp, 6.dp, 0.dp, 0.dp),
-        onDismissRequest = closeSheet, sheetState = searchSheetState
+        onDismissRequest = closeSheet, sheetState = searchSheetState,
+        containerColor = BottomSheetDefaults.ContainerColor.copy(
+            alpha = 0.92f,
+        ),
     ) {
+        // todo 这里可能触发 ModalBottomSheet 的滚动，也可能触发 Column 的，所以最好是再做一个页面
         Column(
             modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState()).background(Color.Transparent),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Row(

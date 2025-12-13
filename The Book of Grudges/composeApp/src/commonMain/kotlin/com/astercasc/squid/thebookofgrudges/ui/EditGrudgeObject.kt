@@ -1,5 +1,6 @@
 package com.astercasc.squid.thebookofgrudges.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -11,6 +12,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -23,8 +28,12 @@ import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.components.MainAppBar
 import com.astercasc.squid.thebookofgrudges.ui.components.NewGrudgeObject
 import com.astercasc.squid.thebookofgrudges.ui.components.SystemConfirm
+import com.astercasc.squid.thebookofgrudges.utils.LocalBgBrush
 import com.astercasc.squid.thebookofgrudges.utils.formatTimestamp
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import thebookofgrudges.composeapp.generated.resources.Res
+import thebookofgrudges.composeapp.generated.resources.bg2
 
 object EditGrudgeObjectObj : Screen {
 
@@ -58,12 +67,19 @@ fun EditGrudgeObject() {
         val objList = globalDataModel.objList.collectAsState().value
         var currentSelectObj by remember { mutableStateOf(GrudgeObj()) }
 
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+        Box(
+            modifier = Modifier.fillMaxSize().padding(padding).background(
+                    brush = LocalBgBrush.current
+                ).paint(
+                    painter = painterResource(Res.drawable.bg2),
+                    contentScale = ContentScale.Crop,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primaryContainer),
+                )
+        ) {
 
 
             LazyColumn(
-                modifier = Modifier
-                    .padding(horizontal = 12.dp).fillMaxSize(),
+                modifier = Modifier.padding(horizontal = 12.dp).fillMaxSize().background(Color.Transparent),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
@@ -79,9 +95,12 @@ fun EditGrudgeObject() {
                             elevation = CardDefaults.cardElevation(
                                 defaultElevation = 3.dp
                             ),
+                            colors = CardDefaults.outlinedCardColors().copy(
+                                containerColor = CardDefaults.outlinedCardColors().containerColor.copy(alpha = 0.92f),
+                            ),
                         ) {
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                modifier = Modifier.fillMaxWidth().background(Color.Transparent).padding(12.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
