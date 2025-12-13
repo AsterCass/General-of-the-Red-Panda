@@ -1,5 +1,6 @@
 package com.astercasc.squid.thebookofgrudges.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,6 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageShader
+import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
@@ -32,9 +36,11 @@ import com.astercasc.squid.thebookofgrudges.ui.components.*
 import com.astercasc.squid.thebookofgrudges.utils.formatTimestamp
 import com.astercasc.squid.thebookofgrudges.utils.interColorRange
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.koinInject
 import thebookofgrudges.composeapp.generated.resources.Res
+import thebookofgrudges.composeapp.generated.resources.bg
 import thebookofgrudges.composeapp.generated.resources.trident
 
 object HomeScreenObj : Screen {
@@ -104,14 +110,27 @@ fun HomeScreen() {
     ) { padding ->
 
 
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+        val image = imageResource(Res.drawable.bg)
+        val shader = ImageShader(image, tileModeX = TileMode.Repeated, tileModeY = TileMode.Repeated)
+        val brush = remember { ShaderBrush(shader) }
+
+        Box(
+            modifier = Modifier.fillMaxSize().padding(padding)
+                .background(
+                    brush = brush
+                )
+        ) {
             // 主内容
 
             LazyColumn(
                 modifier = Modifier
-                    .padding(start = 12.dp, end = 12.dp, top = 18.dp, bottom = 12.dp).fillMaxSize(),
+                    .padding(horizontal = 12.dp).fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                item {
+                    Spacer(Modifier.height(18.dp))
+                }
+
                 for (gru in gruList) {
 
                     if (gruSearch && !gruIdListSelected.contains(gru.id)) {
@@ -138,7 +157,9 @@ fun HomeScreen() {
                             ),
                         ) {
                             Column(
-                                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                modifier = Modifier.fillMaxWidth()
+//                                    .background(brush = brush)
+                                    .padding(12.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
                                 Row(

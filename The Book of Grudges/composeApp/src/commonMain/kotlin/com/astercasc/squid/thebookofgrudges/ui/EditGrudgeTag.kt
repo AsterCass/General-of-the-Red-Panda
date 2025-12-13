@@ -62,9 +62,13 @@ fun EditGrudgeTag() {
 
             LazyColumn(
                 modifier = Modifier
-                    .padding(start = 12.dp, end = 12.dp, top = 18.dp, bottom = 12.dp).fillMaxSize(),
+                    .padding(horizontal = 12.dp).fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                item {
+                    Spacer(Modifier.height(18.dp))
+                }
+
                 for (tag in tagList) {
                     item {
                         OutlinedCard(

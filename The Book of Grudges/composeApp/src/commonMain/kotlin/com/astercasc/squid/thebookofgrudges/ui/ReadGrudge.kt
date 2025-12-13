@@ -145,12 +145,12 @@ fun ReadGrudge() {
                                 for (tag in gru.tags) {
                                     Box(
                                         modifier = Modifier.clip(RoundedCornerShape(6.dp))
-                                            .background(MaterialTheme.colorScheme.tertiaryContainer)
+                                            .background(MaterialTheme.colorScheme.secondaryContainer)
                                             .padding(vertical = 3.dp, horizontal = 6.dp),
                                     ) {
                                         Text(
                                             text = tag.name,
-                                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer,
                                             style = MaterialTheme.typography.labelMedium
                                         )
                                     }
