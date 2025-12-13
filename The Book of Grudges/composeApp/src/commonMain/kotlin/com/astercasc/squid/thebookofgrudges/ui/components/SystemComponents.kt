@@ -8,6 +8,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import org.jetbrains.compose.resources.stringResource
+import thebookofgrudges.composeapp.generated.resources.Res
+import thebookofgrudges.composeapp.generated.resources.system_confirm_cancel
+import thebookofgrudges.composeapp.generated.resources.system_confirm_ok
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,8 +41,8 @@ fun MainAppBar(
 @Composable
 fun SystemConfirm(
     title: String,
-    onConfirmRequest: () -> Unit,
-    onDismissRequest: () -> Unit
+    onConfirmRequest: () -> Unit = {},
+    onDismissRequest: () -> Unit = {},
 ) {
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
@@ -75,7 +79,7 @@ fun SystemConfirm(
                         shape = RoundedCornerShape(6.dp),
 
                         ) {
-                        Text("确认")
+                        Text(stringResource(Res.string.system_confirm_ok))
                     }
 
                     OutlinedButton(
@@ -83,7 +87,7 @@ fun SystemConfirm(
                         onClick = onDismissRequest,
                         shape = RoundedCornerShape(6.dp),
                     ) {
-                        Text("取消")
+                        Text(stringResource(Res.string.system_confirm_cancel))
                     }
                 }
             }

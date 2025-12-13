@@ -1,7 +1,16 @@
 <resources>
 
-    <string name="app_name"> Tomoyo </string>
+    <string name="app_name"> Grudges </string>
     <string name="none"> </string>
+    <string name="system_confirm_ok"> OK </string>
+    <string name="system_confirm_cancel"> Cancel </string>
+
+    <string name="home_title"> The Book of Grudges </string>
+    <string name="read_gru_title"> Read Grudges </string>
+
+    <string name="add_gru"> Add Grudge </string>
+
+    <string name="error_gru_title_empty"> xxxxx </string>
 
     <string name="grudge_one">Slightly Annoyed</string>
     <string name="grudge_one_desc">I remember it, but I’m too lazy to be mad. You get a free pass… for now</string>

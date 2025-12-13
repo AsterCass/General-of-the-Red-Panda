@@ -35,10 +35,10 @@ import com.astercasc.squid.thebookofgrudges.utils.LocalBgBrush
 import com.astercasc.squid.thebookofgrudges.utils.formatTimestamp
 import com.astercasc.squid.thebookofgrudges.utils.interColorRange
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.koinInject
-import thebookofgrudges.composeapp.generated.resources.Res
-import thebookofgrudges.composeapp.generated.resources.trident
+import thebookofgrudges.composeapp.generated.resources.*
 
 object HomeScreenObj : Screen {
 
@@ -97,13 +97,16 @@ fun HomeScreen() {
     var openNewObjDialog by remember { mutableStateOf(false) }
     var openNewTagDialog by remember { mutableStateOf(false) }
     var deleteGruDialog by remember { mutableStateOf(false) }
+    var errorDialogText by remember { mutableStateOf("") }
     // gru data
     val gruList = globalDataModel.gruList.collectAsState().value
     var currentDeleteGru by remember { mutableStateOf(GrudgeCell()) }
+    //text
+    val errorDialogTextRes = stringResource(Res.string.error_gru_title_empty)
 
     Scaffold(
         topBar = {
-        MainAppBar("todo title")
+            MainAppBar(stringResource(Res.string.home_title))
     }, bottomBar = {}, floatingActionButton = {}, floatingActionButtonPosition = FabPosition.Start
     ) { padding ->
 
@@ -366,9 +369,9 @@ fun HomeScreen() {
                     Icon(
                         modifier = Modifier.size(18.dp),
                         imageVector = Icons.Filled.Edit,
-                        contentDescription = "todo something"
+                        contentDescription = stringResource(Res.string.add_gru)
                     )
-                    Text("todo something")
+                    Text(stringResource(Res.string.add_gru))
                 }
 
             }
@@ -382,7 +385,7 @@ fun HomeScreen() {
                 Icon(
                     modifier = Modifier.padding(12.dp).size(25.dp),
                     imageVector = Icons.AutoMirrored.Sharp.MenuBook,
-                    contentDescription = "todo something"
+                    contentDescription = stringResource(Res.string.read_gru_title),
                 )
 
             }
@@ -409,6 +412,10 @@ fun HomeScreen() {
                         Button(
                             modifier = Modifier.weight(1f),
                             onClick = {
+                                if (newGTitleState.text.isEmpty()) {
+                                    errorDialogText = errorDialogTextRes
+                                    return@Button
+                                }
                                 scope.launch {
                                     //new
                                     addNewGru(
@@ -475,6 +482,10 @@ fun HomeScreen() {
                         Button(
                             modifier = Modifier.weight(1f),
                             onClick = {
+                                if (editGTitleState.text.isEmpty()) {
+                                    errorDialogText = errorDialogTextRes
+                                    return@Button
+                                }
                                 scope.launch {
                                     //edit
                                     editGru(
@@ -555,6 +566,14 @@ fun HomeScreen() {
                         )
                     },
                     onDismissRequest = { deleteGruDialog = false },
+                )
+            }
+
+            // error
+            if (!errorDialogText.isEmpty()) {
+                SystemConfirm(
+                    title = errorDialogText,
+                    onDismissRequest = { errorDialogText = "" },
                 )
             }
 
