@@ -1,5 +1,6 @@
 package com.astercasc.squid.thebookofgrudges
 
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.astercasc.squid.thebookofgrudges.di.KoinInit
@@ -15,7 +16,8 @@ fun main() = application {
 
     Window(
         onCloseRequest = ::exitApplication,
-        title = "thebookofgrudges",
+        icon = painterResource("logo.png"),
+        title = "喵喵记仇",
     ) {
         App()
     }

@@ -125,14 +125,28 @@ dependencies {
     debugImplementation(compose.uiTooling)
 }
 
+//  ./gradlew packageReleaseDistribution
 compose.desktop {
     application {
         mainClass = "com.astercasc.squid.thebookofgrudges.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.astercasc.squid.thebookofgrudges"
+
+            includeAllModules = true
+
+            packageName = "Grudges"
             packageVersion = "1.0.0"
+            description = "The Book of Grudges"
+            copyright = "astercasc.com. All rights reserved."
+            vendor = "Aster Casc"
+
+            windows {
+                menuGroup = "GotRP"
+                iconFile.set(project.file("src/jvmMain/resources/logo.ico"))
+                upgradeUuid = "a33226c1-436e-44e4-9f4a-f9fbc6fc0dde"
+            }
+
         }
     }
 }
