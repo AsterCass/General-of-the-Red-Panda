@@ -28,7 +28,13 @@ import com.astercasc.squid.thebookofgrudges.ui.components.NewGrudgeTag
 import com.astercasc.squid.thebookofgrudges.ui.components.SystemConfirm
 import com.astercasc.squid.thebookofgrudges.utils.LocalBgBrush
 import com.astercasc.squid.thebookofgrudges.utils.formatTimestamp
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import thebookofgrudges.composeapp.generated.resources.Res
+import thebookofgrudges.composeapp.generated.resources.create_time
+import thebookofgrudges.composeapp.generated.resources.delete_tag_title
+import thebookofgrudges.composeapp.generated.resources.edit_tag_title
+import thebookofgrudges.composeapp.generated.resources.system_delete
 
 object EditGrudgeTagObj : Screen {
 
@@ -47,7 +53,7 @@ fun EditGrudgeTag() {
 
     Scaffold(
         topBar = {
-            MainAppBar("标签管理")
+            MainAppBar(stringResource(Res.string.edit_tag_title))
         }, bottomBar = {}, floatingActionButton = {}, floatingActionButtonPosition = FabPosition.Start
     ) { padding ->
 
@@ -104,7 +110,8 @@ fun EditGrudgeTag() {
                                     )
                                     Text(
                                         modifier = Modifier.alpha(0.35f),
-                                        text = "创建时间 ${formatTimestamp(tag.createTime)}",
+                                        text = stringResource(Res.string.create_time) +
+                                                " ${formatTimestamp(tag.createTime)}",
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }
@@ -123,7 +130,7 @@ fun EditGrudgeTag() {
                                     shape = RoundedCornerShape(6.dp),
                                 ) {
                                     Text(
-                                        text = "Delete",
+                                        text = stringResource(Res.string.system_delete),
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }
@@ -149,7 +156,7 @@ fun EditGrudgeTag() {
                 Icon(
                     modifier = Modifier.padding(12.dp).size(25.dp),
                     imageVector = Icons.Filled.Add,
-                    contentDescription = "todo something"
+                    contentDescription = "Add Grudge Tag",
                 )
 
             }
@@ -164,7 +171,7 @@ fun EditGrudgeTag() {
             // delete
             if (deleteTagDialog) {
                 SystemConfirm(
-                    title = "是否删除【${currentSelectTag.name}】标签",
+                    title = stringResource(Res.string.delete_tag_title) + "【${currentSelectTag.name}】",
                     onConfirmRequest = {
                         deleteTag(globalDataModel, dataStorageManager, currentSelectTag.id)
                     },

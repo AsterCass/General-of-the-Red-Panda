@@ -28,7 +28,9 @@ import com.astercasc.squid.thebookofgrudges.ui.components.NewGrudgeObject
 import com.astercasc.squid.thebookofgrudges.ui.components.SystemConfirm
 import com.astercasc.squid.thebookofgrudges.utils.LocalBgBrush
 import com.astercasc.squid.thebookofgrudges.utils.formatTimestamp
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import thebookofgrudges.composeapp.generated.resources.*
 
 object EditGrudgeObjectObj : Screen {
 
@@ -47,7 +49,7 @@ fun EditGrudgeObject() {
 
     Scaffold(
         topBar = {
-            MainAppBar("对象管理")
+            MainAppBar(stringResource(Res.string.edit_obj_title))
         }, bottomBar = {}, floatingActionButton = {}, floatingActionButtonPosition = FabPosition.Start
     ) { padding ->
 
@@ -104,7 +106,7 @@ fun EditGrudgeObject() {
                                     )
                                     Text(
                                         modifier = Modifier.alpha(0.35f),
-                                        text = "创建时间 ${formatTimestamp(obj.createTime)}",
+                                        text = stringResource(Res.string.create_time) + " ${formatTimestamp(obj.createTime)}",
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }
@@ -123,7 +125,7 @@ fun EditGrudgeObject() {
                                     shape = RoundedCornerShape(6.dp),
                                 ) {
                                     Text(
-                                        text = "Delete",
+                                        text = stringResource(Res.string.system_delete),
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }
@@ -149,7 +151,7 @@ fun EditGrudgeObject() {
                 Icon(
                     modifier = Modifier.padding(12.dp).size(25.dp),
                     imageVector = Icons.Filled.Add,
-                    contentDescription = "todo something"
+                    contentDescription = "Add Grudge Object",
                 )
 
             }
@@ -164,7 +166,7 @@ fun EditGrudgeObject() {
             // delete
             if (deleteObjDialog) {
                 SystemConfirm(
-                    title = "是否删除【${currentSelectObj.name}】对象",
+                    title = stringResource(Res.string.delete_obj_title) + "【${currentSelectObj.name}】",
                     onConfirmRequest = {
                         deleteObj(globalDataModel, dataStorageManager, currentSelectObj.id)
                     },

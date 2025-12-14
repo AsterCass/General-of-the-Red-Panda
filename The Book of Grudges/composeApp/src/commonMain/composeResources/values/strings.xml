@@ -6,6 +6,9 @@
     <string name="system_confirm_save">Save</string>
     <string name="system_confirm_ok">OK</string>
     <string name="system_confirm_cancel">Cancel</string>
+    <string name="system_delete">Delete</string>
+    <string name="create_time">Create Time</string>
+    <string name="update_time">Update Time</string>
 
     <string name="home_title">The Book of Grudges</string>
     <string name="read_gru_title">Read Grudges</string>
@@ -53,6 +56,11 @@
     <string name="add_tag_title_confirm">todo</string>
     <string name="add_tag_title_cancel">todo</string>
     <string name="error_name_empty">todo</string>
+
+    <string name="edit_obj_title">todo</string>
+    <string name="delete_obj_title">todo</string>
+    <string name="edit_tag_title">todo</string>
+    <string name="delete_tag_title">todo</string>
 
 
     <string name="grudge_one">Slightly Annoyed</string>
