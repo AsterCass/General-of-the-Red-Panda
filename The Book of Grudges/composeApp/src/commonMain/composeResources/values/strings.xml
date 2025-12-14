@@ -1,33 +1,49 @@
 <resources>
 
-    <string name="app_name"> Grudges </string>
+    <string name="app_name">Grudges</string>
     <string name="none"> </string>
 
-    <string name="system_confirm_save"> Save </string>
-    <string name="system_confirm_ok"> OK </string>
-    <string name="system_confirm_cancel"> Cancel </string>
+    <string name="system_confirm_save">Save</string>
+    <string name="system_confirm_ok">OK</string>
+    <string name="system_confirm_cancel">Cancel</string>
 
-    <string name="home_title"> The Book of Grudges </string>
-    <string name="read_gru_title"> Read Grudges </string>
+    <string name="home_title">The Book of Grudges</string>
+    <string name="read_gru_title">Read Grudges</string>
 
-    <string name="add_gru"> Add Grudge </string>
-    <string name="edit_gru"> todo </string>
+    <string name="add_gru">Add Grudge</string>
+    <string name="edit_gru">todo</string>
 
-    <string name="gru_refer_count"> todo </string>
-    <string name="gru_refer"> todo </string>
-    <string name="gru_done"> todo </string>
-    <string name="add_gru_confirm"> todo </string>
-    <string name="add_gru_cancel"> todo </string>
-    <string name="delete_gru_confirm"> todo </string>
-    <string name="error_gru_title_empty"> todo </string>
+    <string name="gru_refer_count">todo</string>
+    <string name="gru_refer">todo</string>
+    <string name="gru_done">todo</string>
+    <string name="add_gru_confirm">todo</string>
+    <string name="add_gru_cancel">todo</string>
+    <string name="delete_gru_confirm">todo</string>
+    <string name="error_gru_title_empty">todo</string>
 
-    <string name="gru_title"> todo </string>
-    <string name="gru_title_placeholder"> todo </string>
-    <string name="gru_desc"> todo </string>
-    <string name="gru_desc_placeholder"> todo </string>
-    <string name="gru_objects"> todo </string>
-    <string name="gru_tags"> todo </string>
-    <string name="gru_level"> todo </string>
+    <string name="gru_title">todo</string>
+    <string name="gru_title_placeholder">todo</string>
+    <string name="gru_desc">todo</string>
+    <string name="gru_desc_placeholder">todo</string>
+    <string name="gru_objects">todo</string>
+    <string name="gru_tags">todo</string>
+    <string name="gru_level">todo</string>
+
+    <string name="search_gru_title">todo</string>
+    <string name="search_gru_keyword">todo</string>
+    <string name="search_gru_keyword_placeholder">todo</string>
+    <string name="search_gru_objects">todo</string>
+    <string name="search_gru_tags">todo</string>
+    <string name="search_gru_level">todo</string>
+    <string name="search_gru_level_min">todo</string>
+    <string name="search_gru_level_max">todo</string>
+    <string name="search_gru_refer_count">todo</string>
+    <string name="search_gru_refer_count_min">todo</string>
+    <string name="search_gru_refer_count_max">todo</string>
+    <string name="search_gru_for_list">todo</string>
+    <string name="search_gru_for_alone">todo</string>
+    <string name="search_gru_for_cancel">todo</string>
+
 
     <string name="grudge_one">Slightly Annoyed</string>
     <string name="grudge_one_desc">I remember it, but I’m too lazy to be mad. You get a free pass… for now</string>

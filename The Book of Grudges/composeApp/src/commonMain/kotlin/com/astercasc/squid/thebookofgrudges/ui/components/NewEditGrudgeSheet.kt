@@ -91,7 +91,8 @@ fun NewEditGrudgeSheet(
                         state = gruTitleState,
                         lineLimits = TextFieldLineLimits.SingleLine,
                         label = { Text(stringResource(Res.string.gru_title)) },
-                        placeholder = { Text(stringResource(Res.string.gru_title_placeholder)) },
+                        placeholder = { Text( modifier = Modifier.alpha(0.35f),
+                            text = stringResource(Res.string.gru_title_placeholder)) },
                         shape = RoundedCornerShape(6.dp),
                     )
 
@@ -100,7 +101,8 @@ fun NewEditGrudgeSheet(
                         state = gruDescState,
                         lineLimits = TextFieldLineLimits.MultiLine(1, 3),
                         label = { Text(stringResource(Res.string.gru_desc)) },
-                        placeholder = { Text(stringResource(Res.string.gru_desc_placeholder)) },
+                        placeholder = { Text( modifier = Modifier.alpha(0.35f),
+                            text = stringResource(Res.string.gru_desc_placeholder)) },
                         shape = RoundedCornerShape(6.dp),
                     )
                 }

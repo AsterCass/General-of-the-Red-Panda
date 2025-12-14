@@ -23,7 +23,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.ReadGrudgeObj
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import thebookofgrudges.composeapp.generated.resources.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +64,7 @@ fun ReadGrudgeSheet(
             ) {
                 Text(
                     modifier = Modifier.alpha(0.7f),
-                    text = "记仇条目检索",
+                    text = stringResource(Res.string.search_gru_title),
                     style = MaterialTheme.typography.titleLarge,
                 )
             }
@@ -81,8 +83,13 @@ fun ReadGrudgeSheet(
                         modifier = Modifier.fillMaxWidth().height(58.dp),
                         state = searchKeyState,
                         lineLimits = TextFieldLineLimits.SingleLine,
-                        label = { Text("关键词") },
-                        placeholder = { Text("标题/描述") },
+                        label = { Text(stringResource(Res.string.search_gru_keyword)) },
+                        placeholder = {
+                            Text(
+                                modifier = Modifier.alpha(0.35f),
+                                text = stringResource(Res.string.search_gru_keyword_placeholder)
+                            )
+                        },
                         shape = RoundedCornerShape(6.dp),
                     )
                 }
@@ -91,7 +98,10 @@ fun ReadGrudgeSheet(
             Column(
                 modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Text("记仇对象筛选：", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    stringResource(Res.string.search_gru_objects),
+                    style = MaterialTheme.typography.bodyLarge
+                )
 
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -108,7 +118,7 @@ fun ReadGrudgeSheet(
                                 {
                                     Icon(
                                         imageVector = Icons.Filled.Done,
-                                        contentDescription = "Done icon",
+                                        contentDescription = "Selected",
                                         modifier = Modifier.size(FilterChipDefaults.IconSize)
                                     )
                                 }
@@ -132,7 +142,10 @@ fun ReadGrudgeSheet(
             Column(
                 modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Text("记仇标签筛选：", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    stringResource(Res.string.search_gru_tags),
+                    style = MaterialTheme.typography.bodyLarge
+                )
 
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -149,7 +162,7 @@ fun ReadGrudgeSheet(
                                 {
                                     Icon(
                                         imageVector = Icons.Filled.Done,
-                                        contentDescription = "Done icon",
+                                        contentDescription = "Selected",
                                         modifier = Modifier.size(FilterChipDefaults.IconSize)
                                     )
                                 }
@@ -173,7 +186,7 @@ fun ReadGrudgeSheet(
             Column(
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("记仇等级检索区间：", style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(Res.string.search_gru_level), style = MaterialTheme.typography.bodyLarge)
 
                 MaterialTheme(
                     typography = MaterialTheme.typography.copy(
@@ -189,8 +202,7 @@ fun ReadGrudgeSheet(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             inputTransformation = numericInputTransformation().then(InputTransformation.maxLength(2)),
                             lineLimits = TextFieldLineLimits.SingleLine,
-                            label = { Text("最小值") },
-                            placeholder = { Text("检索记仇等级最小值") },
+                            label = { Text(stringResource(Res.string.search_gru_level_min)) },
                             shape = RoundedCornerShape(6.dp),
                         )
 
@@ -200,8 +212,7 @@ fun ReadGrudgeSheet(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             inputTransformation = numericInputTransformation().then(InputTransformation.maxLength(2)),
                             lineLimits = TextFieldLineLimits.SingleLine,
-                            label = { Text("最大值") },
-                            placeholder = { Text("检索记仇等级最大值") },
+                            label = { Text(stringResource(Res.string.search_gru_level_max)) },
                             shape = RoundedCornerShape(6.dp),
                         )
                     }
@@ -215,7 +226,10 @@ fun ReadGrudgeSheet(
             Column(
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("提及次数检索区间：", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    stringResource(Res.string.search_gru_refer_count),
+                    style = MaterialTheme.typography.bodyLarge
+                )
 
                 MaterialTheme(
                     typography = MaterialTheme.typography.copy(
@@ -231,8 +245,7 @@ fun ReadGrudgeSheet(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             inputTransformation = numericInputTransformation().then(InputTransformation.maxLength(4)),
                             lineLimits = TextFieldLineLimits.SingleLine,
-                            label = { Text("最小值") },
-                            placeholder = { Text("提及次数最小值") },
+                            label = { Text(stringResource(Res.string.search_gru_refer_count_min)) },
                             shape = RoundedCornerShape(6.dp),
                         )
 
@@ -242,8 +255,7 @@ fun ReadGrudgeSheet(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             inputTransformation = numericInputTransformation().then(InputTransformation.maxLength(4)),
                             lineLimits = TextFieldLineLimits.SingleLine,
-                            label = { Text("最大值") },
-                            placeholder = { Text("提及次数最大值") },
+                            label = { Text(stringResource(Res.string.search_gru_refer_count_min)) },
                             shape = RoundedCornerShape(6.dp),
                         )
                     }
@@ -281,7 +293,7 @@ fun ReadGrudgeSheet(
                     },
                     shape = RoundedCornerShape(6.dp),
                 ) {
-                    Text("列表展示")
+                    Text(stringResource(Res.string.search_gru_for_list))
                 }
 
 
@@ -308,7 +320,7 @@ fun ReadGrudgeSheet(
                     },
                     shape = RoundedCornerShape(6.dp),
                 ) {
-                    Text("升堂细数")
+                    Text(stringResource(Res.string.search_gru_for_alone))
                 }
 
                 OutlinedButton(
@@ -334,7 +346,7 @@ fun ReadGrudgeSheet(
                     },
                     shape = RoundedCornerShape(6.dp),
                 ) {
-                    Text("先放一马")
+                    Text(stringResource(Res.string.search_gru_for_cancel))
                 }
             }
 
