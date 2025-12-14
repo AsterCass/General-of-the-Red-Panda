@@ -44,6 +44,16 @@
     <string name="search_gru_for_alone">升堂细数</string>
     <string name="search_gru_for_cancel">先放一马</string>
 
+    <string name="add_obj_title">新建针砭对象入围名额</string>
+    <string name="add_obj_name">名称</string>
+    <string name="add_obj_title_confirm">对象标记！</string>
+    <string name="add_obj_title_cancel">宽恕</string>
+    <string name="add_tag_title">新建事件标签</string>
+    <string name="add_tag_name">名称</string>
+    <string name="add_tag_title_confirm">确认</string>
+    <string name="add_tag_title_cancel">取消</string>
+    <string name="error_name_empty">名称不能为空</string>
+
     <string name="grudge_one">微微不爽</string>
     <string name="grudge_one_desc">虽然我记住了，但我懒得生气，先放你一马</string>
 

@@ -44,6 +44,16 @@
     <string name="search_gru_for_alone">todo</string>
     <string name="search_gru_for_cancel">todo</string>
 
+    <string name="add_obj_title">todo</string>
+    <string name="add_obj_name">todo</string>
+    <string name="add_obj_title_confirm">todo</string>
+    <string name="add_obj_title_cancel">todo</string>
+    <string name="add_tag_title">todo</string>
+    <string name="add_tag_name">todo</string>
+    <string name="add_tag_title_confirm">todo</string>
+    <string name="add_tag_title_cancel">todo</string>
+    <string name="error_name_empty">todo</string>
+
 
     <string name="grudge_one">Slightly Annoyed</string>
     <string name="grudge_one_desc">I remember it, but I’m too lazy to be mad. You get a free pass… for now</string>
