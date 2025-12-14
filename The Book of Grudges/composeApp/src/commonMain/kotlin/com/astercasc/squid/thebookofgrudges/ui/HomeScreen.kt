@@ -174,7 +174,8 @@ fun HomeScreen() {
 
                                     Text(
                                         modifier = Modifier.wrapContentWidth().alpha(0.35f),
-                                        text = "提及次数: ${gru.referCount}",
+                                        text = stringResource(Res.string.gru_refer_count) +
+                                                " ${gru.referCount}",
                                         style = MaterialTheme.typography.labelSmall
                                     )
 
@@ -292,7 +293,7 @@ fun HomeScreen() {
                                             shape = RoundedCornerShape(6.dp),
                                         ) {
                                             Text(
-                                                text = "编辑",
+                                                text =stringResource(Res.string.edit_gru),
                                                 style = MaterialTheme.typography.labelSmall
                                             )
                                         }
@@ -315,7 +316,7 @@ fun HomeScreen() {
                                             shape = RoundedCornerShape(6.dp),
                                         ) {
                                             Text(
-                                                text = "再次提及",
+                                                text = stringResource(Res.string.gru_refer),
                                                 style = MaterialTheme.typography.labelSmall
                                             )
                                         }
@@ -335,7 +336,7 @@ fun HomeScreen() {
                                             shape = RoundedCornerShape(6.dp),
                                         ) {
                                             Text(
-                                                text = "已报仇",
+                                                text = stringResource(Res.string.gru_done),
                                                 style = MaterialTheme.typography.labelSmall
                                             )
                                         }
@@ -373,7 +374,6 @@ fun HomeScreen() {
                     )
                     Text(stringResource(Res.string.add_gru))
                 }
-
             }
 
 
@@ -441,7 +441,7 @@ fun HomeScreen() {
                             },
                             shape = RoundedCornerShape(6.dp),
                         ) {
-                            Text("开始卧薪尝胆")
+                            Text(stringResource(Res.string.add_gru_confirm))
                         }
 
                         OutlinedButton(
@@ -455,7 +455,7 @@ fun HomeScreen() {
                             },
                             shape = RoundedCornerShape(6.dp),
                         ) {
-                            Text("算了，先放Ta一马")
+                            Text(stringResource(Res.string.add_gru_cancel))
                         }
                     }
                 }
@@ -506,7 +506,7 @@ fun HomeScreen() {
                             },
                             shape = RoundedCornerShape(6.dp),
                         ) {
-                            Text("确定保存")
+                            Text(stringResource(Res.string.system_confirm_save))
                         }
 
                         OutlinedButton(
@@ -520,7 +520,7 @@ fun HomeScreen() {
                             },
                             shape = RoundedCornerShape(6.dp),
                         ) {
-                            Text("放弃")
+                            Text(stringResource(Res.string.system_confirm_cancel))
                         }
                     }
                 }
@@ -557,7 +557,7 @@ fun HomeScreen() {
             // delete
             if (deleteGruDialog) {
                 SystemConfirm(
-                    title = "是否不再对【${currentDeleteGru.title}】记仇",
+                    title = stringResource(Res.string.delete_gru_confirm) + "【${currentDeleteGru.title}】",
                     onConfirmRequest = {
                         deleteGru(
                             globalDataModel = globalDataModel,
@@ -596,7 +596,7 @@ fun CardIcons(
     ) {
         Icon(
             imageVector = vectorResource(Res.drawable.trident),
-            contentDescription = null,
+            contentDescription = "Grudge level",
             modifier = Modifier.size(24.dp),
             tint = color,
         )

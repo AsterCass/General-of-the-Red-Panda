@@ -2,6 +2,8 @@
 
     <string name="app_name"> 喵喵记仇 </string>
     <string name="none"> </string>
+
+    <string name="system_confirm_save"> 记仇重刻 </string>
     <string name="system_confirm_ok"> 确定 </string>
     <string name="system_confirm_cancel"> 取消 </string>
 
@@ -9,8 +11,23 @@
     <string name="read_gru_title"> 猎杀时刻 </string>
 
     <string name="add_gru"> 添加记仇 </string>
+    <string name="edit_gru"> 编辑 </string>
 
+    <string name="gru_refer_count"> 提及次数： </string>
+    <string name="gru_refer"> 再次提及 </string>
+    <string name="gru_done"> 已报仇 </string>
+    <string name="add_gru_confirm"> 开始卧薪尝胆 </string>
+    <string name="add_gru_cancel"> 算了，先放Ta一马 </string>
+    <string name="delete_gru_confirm"> 是否不再记仇 </string>
     <string name="error_gru_title_empty"> 记仇标题不能为空 </string>
+
+    <string name="gru_title"> 标题 </string>
+    <string name="gru_title_placeholder"> 你完了，我要开始记了 </string>
+    <string name="gru_desc"> 事件记录 </string>
+    <string name="gru_desc_placeholder"> 首先！是犯下傲慢之罪的... </string>
+    <string name="gru_objects"> 针砭对象： </string>
+    <string name="gru_tags"> 事件标签： </string>
+    <string name="gru_level"> 记仇等级： </string>
 
     <string name="grudge_one">微微不爽</string>
     <string name="grudge_one_desc">虽然我记住了，但我懒得生气，先放你一马</string>

@@ -35,10 +35,10 @@ import com.astercasc.squid.thebookofgrudges.ui.EditGrudgeTagObj
 import com.astercasc.squid.thebookofgrudges.utils.getStringByName
 import com.astercasc.squid.thebookofgrudges.utils.interColorRange
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.koinInject
-import thebookofgrudges.composeapp.generated.resources.Res
-import thebookofgrudges.composeapp.generated.resources.devil
+import thebookofgrudges.composeapp.generated.resources.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,8 +90,8 @@ fun NewEditGrudgeSheet(
                         modifier = Modifier.fillMaxWidth().height(58.dp),
                         state = gruTitleState,
                         lineLimits = TextFieldLineLimits.SingleLine,
-                        label = { Text("todo 记仇标题") },
-                        placeholder = { Text("todo 标题占位符") },
+                        label = { Text(stringResource(Res.string.gru_title)) },
+                        placeholder = { Text(stringResource(Res.string.gru_title_placeholder)) },
                         shape = RoundedCornerShape(6.dp),
                     )
 
@@ -99,8 +99,8 @@ fun NewEditGrudgeSheet(
                         modifier = Modifier.fillMaxWidth().height(100.dp),
                         state = gruDescState,
                         lineLimits = TextFieldLineLimits.MultiLine(1, 3),
-                        label = { Text("todo 记仇描述") },
-                        placeholder = { Text("todo 描述占位符") },
+                        label = { Text(stringResource(Res.string.gru_desc)) },
+                        placeholder = { Text(stringResource(Res.string.gru_desc_placeholder)) },
                         shape = RoundedCornerShape(6.dp),
                     )
                 }
@@ -116,7 +116,7 @@ fun NewEditGrudgeSheet(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("TODO 记仇对象：", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(Res.string.gru_objects), style = MaterialTheme.typography.bodyLarge)
 
                     Box(
                         modifier = Modifier.size(22.dp)
@@ -141,7 +141,7 @@ fun NewEditGrudgeSheet(
                         Icon(
                             modifier = Modifier.size(16.dp),
                             imageVector = Icons.Filled.Edit,
-                            contentDescription = "todo something"
+                            contentDescription = "Edit Grudge Objects",
                         )
                     }
                 }
@@ -164,7 +164,7 @@ fun NewEditGrudgeSheet(
                                 {
                                     Icon(
                                         imageVector = Icons.Filled.Done,
-                                        contentDescription = "Done icon",
+                                        contentDescription = "Selected",
                                         modifier = Modifier.size(FilterChipDefaults.IconSize)
                                     )
                                 }
@@ -194,7 +194,7 @@ fun NewEditGrudgeSheet(
                         Icon(
                             modifier = Modifier.size(22.dp),
                             imageVector = Icons.Filled.AddCircle,
-                            contentDescription = "todo something"
+                            contentDescription = "Add Grudge Object",
                         )
                     }
 
@@ -211,7 +211,10 @@ fun NewEditGrudgeSheet(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("TODO 记仇标签：", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        stringResource(Res.string.gru_tags),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
 
                     Box(
                         modifier = Modifier.size(22.dp)
@@ -237,7 +240,7 @@ fun NewEditGrudgeSheet(
                         Icon(
                             modifier = Modifier.size(16.dp),
                             imageVector = Icons.Filled.Edit,
-                            contentDescription = "todo something"
+                            contentDescription = "Edit Grudge Tags",
                         )
                     }
                 }
@@ -260,7 +263,7 @@ fun NewEditGrudgeSheet(
                                 {
                                     Icon(
                                         imageVector = Icons.Filled.Done,
-                                        contentDescription = "Done icon",
+                                        contentDescription = "Selected",
                                         modifier = Modifier.size(FilterChipDefaults.IconSize)
                                     )
                                 }
@@ -292,7 +295,7 @@ fun NewEditGrudgeSheet(
                         Icon(
                             modifier = Modifier.size(22.dp),
                             imageVector = Icons.Filled.AddCircle,
-                            contentDescription = "todo something"
+                            contentDescription = "Add Grudge Tag",
                         )
                     }
 
@@ -304,7 +307,10 @@ fun NewEditGrudgeSheet(
 
 
                 Row {
-                    Text("TODO 记仇等级：", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        stringResource(Res.string.gru_level),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                     Text(
                         "${gruSliderPosition.toInt()}  ${
                             getStringByName(
@@ -345,7 +351,7 @@ fun NewEditGrudgeSheet(
                     thumb = {
                         Icon(
                             imageVector = vectorResource(Res.drawable.devil),
-                            contentDescription = null,
+                            contentDescription = "Slider thumb",
                             modifier = Modifier.size(24.dp),
                             tint = Color.Unspecified
                         )
