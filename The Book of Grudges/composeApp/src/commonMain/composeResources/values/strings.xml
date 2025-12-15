@@ -62,6 +62,9 @@
     <string name="edit_tag_title">todo</string>
     <string name="delete_tag_title">todo</string>
 
+    <string name="search_gru_pre">todo</string>
+    <string name="search_gru_next">todo</string>
+    <string name="search_gru_refer_count_plus">todo</string>
 
     <string name="grudge_one">Slightly Annoyed</string>
     <string name="grudge_one_desc">I remember it, but I’m too lazy to be mad. You get a free pass… for now</string>

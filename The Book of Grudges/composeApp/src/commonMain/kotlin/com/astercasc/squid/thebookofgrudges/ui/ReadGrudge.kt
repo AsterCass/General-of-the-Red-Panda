@@ -32,10 +32,10 @@ import com.astercasc.squid.thebookofgrudges.utils.LocalBgBrush
 import com.astercasc.squid.thebookofgrudges.utils.formatTimestamp
 import com.astercasc.squid.thebookofgrudges.utils.interColorRange
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.koinInject
-import thebookofgrudges.composeapp.generated.resources.Res
-import thebookofgrudges.composeapp.generated.resources.trident
+import thebookofgrudges.composeapp.generated.resources.*
 
 object ReadGrudgeObj : Screen {
 
@@ -68,7 +68,7 @@ fun ReadGrudge() {
     var deleteGruDialog by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
-            MainAppBar("todo title")
+            MainAppBar(stringResource(Res.string.read_gru_title))
         }, bottomBar = {}, floatingActionButton = {}, floatingActionButtonPosition = FabPosition.Start
     ) { padding ->
 
@@ -128,7 +128,7 @@ fun ReadGrudge() {
 
                                 Text(
                                     modifier = Modifier.wrapContentWidth().alpha(0.35f),
-                                    text = "提及次数: ${gru.referCount}",
+                                    text = stringResource(Res.string.gru_refer_count) + " ${gru.referCount}",
                                     style = MaterialTheme.typography.labelMedium
                                 )
 
@@ -183,14 +183,14 @@ fun ReadGrudge() {
 
                                 Text(
                                     modifier = Modifier.alpha(0.35f),
-                                    text = "记仇等级：",
+                                    text = stringResource(Res.string.gru_level),
                                     style = MaterialTheme.typography.labelMedium
                                 )
 
                                 repeat(gru.level) { index ->
                                     Icon(
                                         imageVector = vectorResource(Res.drawable.trident),
-                                        contentDescription = null,
+                                        contentDescription = "Grudge level",
                                         modifier = Modifier.size(24.dp).offset(x = (index * -4).dp),
                                         tint = mainColor,
                                     )
@@ -211,13 +211,15 @@ fun ReadGrudge() {
 
                                 Text(
                                     modifier = Modifier.alpha(0.35f),
-                                    text = "创建时间：${formatTimestamp(gru.createTime)}",
+                                    text = stringResource(Res.string.create_time) +
+                                            ": ${formatTimestamp(gru.createTime)}",
                                     style = MaterialTheme.typography.labelSmall
                                 )
 
                                 Text(
                                     modifier = Modifier.alpha(0.35f),
-                                    text = "更新时间：${formatTimestamp(gru.updateTime)}",
+                                    text = stringResource(Res.string.update_time) +
+                                            ": ${formatTimestamp(gru.updateTime)}",
                                     style = MaterialTheme.typography.labelSmall
                                 )
 
@@ -254,7 +256,7 @@ fun ReadGrudge() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("上一个记仇")
+                    Text(stringResource(Res.string.search_gru_pre))
                 }
 
             }
@@ -275,7 +277,7 @@ fun ReadGrudge() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("已报仇")
+                    Text(stringResource(Res.string.gru_done))
                 }
 
             }
@@ -297,7 +299,7 @@ fun ReadGrudge() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("提及 + 1")
+                    Text(stringResource(Res.string.search_gru_refer_count_plus))
                 }
 
             }
@@ -314,14 +316,14 @@ fun ReadGrudge() {
             ) {
                 Text(
                     modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
-                    text = "下一个记仇"
+                    text = stringResource(Res.string.search_gru_next)
                 )
             }
 
             // delete
             if (deleteGruDialog) {
                 SystemConfirm(
-                    title = "是否不再对【${gru.title}】记仇",
+                    title = stringResource(Res.string.delete_gru_confirm) + "【${gru.title}】",
                     onConfirmRequest = {
                         deleteGru(
                             globalDataModel = globalDataModel,
