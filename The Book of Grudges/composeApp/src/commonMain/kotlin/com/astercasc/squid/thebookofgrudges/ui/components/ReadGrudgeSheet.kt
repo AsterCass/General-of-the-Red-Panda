@@ -255,7 +255,7 @@ fun ReadGrudgeSheet(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             inputTransformation = numericInputTransformation().then(InputTransformation.maxLength(4)),
                             lineLimits = TextFieldLineLimits.SingleLine,
-                            label = { Text(stringResource(Res.string.search_gru_refer_count_min)) },
+                            label = { Text(stringResource(Res.string.search_gru_refer_count_max)) },
                             shape = RoundedCornerShape(6.dp),
                         )
                     }
