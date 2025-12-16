@@ -3,68 +3,74 @@
     <string name="app_name">Grudges</string>
     <string name="none"> </string>
 
-    <string name="system_confirm_save">Save</string>
+    <string name="system_confirm_save">Save Grudge</string>
     <string name="system_confirm_ok">OK</string>
     <string name="system_confirm_cancel">Cancel</string>
     <string name="system_delete">Delete</string>
-    <string name="create_time">Create Time</string>
-    <string name="update_time">Update Time</string>
+    <string name="create_time">Created At</string>
+    <string name="update_time">Last Updated</string>
 
     <string name="home_title">The Book of Grudges</string>
-    <string name="read_gru_title">Read Grudges</string>
+    <string name="read_gru_title">Grudge Time</string>
 
-    <string name="add_gru">Add Grudge</string>
-    <string name="edit_gru">todo</string>
+    <string name="add_gru">Add a Grudge</string>
+    <string name="edit_gru">Edit</string>
 
-    <string name="gru_refer_count">todo</string>
-    <string name="gru_refer">todo</string>
-    <string name="gru_done">todo</string>
-    <string name="add_gru_confirm">todo</string>
-    <string name="add_gru_cancel">todo</string>
-    <string name="delete_gru_confirm">todo</string>
-    <string name="error_gru_title_empty">todo</string>
+    <string name="gru_refer_count">Times Remembered:</string>
+    <string name="gru_refer">Up Again</string>
+    <string name="gru_done">Settled</string>
 
-    <string name="gru_title">todo</string>
-    <string name="gru_title_placeholder">todo</string>
-    <string name="gru_desc">todo</string>
-    <string name="gru_desc_placeholder">todo</string>
-    <string name="gru_objects">todo</string>
-    <string name="gru_tags">todo</string>
-    <string name="gru_level">todo</string>
+    <string name="add_gru_confirm">Let the Grudge Begin</string>
+    <string name="add_gru_cancel">Nah, Let It Slide</string>
+    <string name="delete_gru_confirm">Forgive and Forget?</string>
+    <string name="error_gru_title_empty">A grudge needs a title.</string>
 
-    <string name="search_gru_title">todo</string>
-    <string name="search_gru_keyword">todo</string>
-    <string name="search_gru_keyword_placeholder">todo</string>
-    <string name="search_gru_objects">todo</string>
-    <string name="search_gru_tags">todo</string>
-    <string name="search_gru_level">todo</string>
-    <string name="search_gru_level_min">todo</string>
-    <string name="search_gru_level_max">todo</string>
-    <string name="search_gru_refer_count">todo</string>
-    <string name="search_gru_refer_count_min">todo</string>
-    <string name="search_gru_refer_count_max">todo</string>
-    <string name="search_gru_for_list">todo</string>
-    <string name="search_gru_for_alone">todo</string>
-    <string name="search_gru_for_cancel">todo</string>
+    <string name="gru_title">Title</string>
+    <string name="gru_title_placeholder">This is where it all started...</string>
+    <string name="gru_desc">What Happened</string>
+    <string name="gru_desc_placeholder">First of all, the audacity...</string>
 
-    <string name="add_obj_title">todo</string>
-    <string name="add_obj_name">todo</string>
-    <string name="add_obj_title_confirm">todo</string>
-    <string name="add_obj_title_cancel">todo</string>
-    <string name="add_tag_title">todo</string>
-    <string name="add_tag_name">todo</string>
-    <string name="add_tag_title_confirm">todo</string>
-    <string name="add_tag_title_cancel">todo</string>
-    <string name="error_name_empty">todo</string>
+    <string name="gru_objects">Target:</string>
+    <string name="gru_tags">Tags:</string>
+    <string name="gru_level">Grudge Level:</string>
 
-    <string name="edit_obj_title">todo</string>
-    <string name="delete_obj_title">todo</string>
-    <string name="edit_tag_title">todo</string>
-    <string name="delete_tag_title">todo</string>
+    <string name="search_gru_title">Search Grudges</string>
+    <string name="search_gru_keyword">Keyword</string>
+    <string name="search_gru_keyword_placeholder">Title / Details</string>
 
-    <string name="search_gru_pre">todo</string>
-    <string name="search_gru_next">todo</string>
-    <string name="search_gru_refer_count_plus">todo</string>
+    <string name="search_gru_objects">Target:</string>
+    <string name="search_gru_tags">Tags:</string>
+    <string name="search_gru_level">Grudge Level Range:</string>
+    <string name="search_gru_level_min">Min</string>
+    <string name="search_gru_level_max">Max</string>
+
+    <string name="search_gru_refer_count">Times Remembered:</string>
+    <string name="search_gru_refer_count_min">Min</string>
+    <string name="search_gru_refer_count_max">Max</string>
+
+    <string name="search_gru_for_list">List View</string>
+    <string name="search_gru_for_alone">1 by 1</string>
+    <string name="search_gru_for_cancel">Cancel</string>
+
+    <string name="add_obj_title">Add a New Target</string>
+    <string name="add_obj_name">Name</string>
+    <string name="add_obj_title_confirm">Marked.</string>
+    <string name="add_obj_title_cancel">Spare Them</string>
+
+    <string name="add_tag_title">Add a New Tag</string>
+    <string name="add_tag_name">Name</string>
+    <string name="add_tag_title_confirm">Confirm</string>
+    <string name="add_tag_title_cancel">Cancel</string>
+    <string name="error_name_empty">Name cannot be empty.</string>
+
+    <string name="edit_obj_title">Manage Targets</string>
+    <string name="delete_obj_title">Stop Tracking This Target?</string>
+    <string name="edit_tag_title">Manage Tags</string>
+    <string name="delete_tag_title">Delete This Tag?</string>
+
+    <string name="search_gru_pre">Previous Grudge</string>
+    <string name="search_gru_next">Next Grudge</string>
+    <string name="search_gru_refer_count_plus">Remember +1</string>
 
     <string name="grudge_one">Slightly Annoyed</string>
     <string name="grudge_one_desc">I remember it, but I’m too lazy to be mad. You get a free pass… for now</string>

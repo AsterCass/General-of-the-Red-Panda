@@ -19,6 +19,7 @@
     <string name="gru_refer_count">提及次数：</string>
     <string name="gru_refer">再次提及</string>
     <string name="gru_done">已报仇</string>
+
     <string name="add_gru_confirm">开始卧薪尝胆</string>
     <string name="add_gru_cancel">算了，先放Ta一马</string>
     <string name="delete_gru_confirm">是否不再记仇</string>
@@ -28,6 +29,7 @@
     <string name="gru_title_placeholder">你完了，我要开始记了</string>
     <string name="gru_desc">事件记录</string>
     <string name="gru_desc_placeholder">首先！是犯下傲慢之罪的...</string>
+
     <string name="gru_objects">针砭对象：</string>
     <string name="gru_tags">事件标签：</string>
     <string name="gru_level">记仇等级：</string>
@@ -35,14 +37,17 @@
     <string name="search_gru_title">记仇条目检索</string>
     <string name="search_gru_keyword">关键词</string>
     <string name="search_gru_keyword_placeholder">标题/事件记录</string>
+
     <string name="search_gru_objects">针砭对象：</string>
     <string name="search_gru_tags">事件标签：</string>
     <string name="search_gru_level">记仇等级区间：</string>
     <string name="search_gru_level_min">最小值</string>
     <string name="search_gru_level_max">最大值</string>
+
     <string name="search_gru_refer_count">提及次数区间：</string>
     <string name="search_gru_refer_count_min">最小值</string>
     <string name="search_gru_refer_count_max">最大值</string>
+
     <string name="search_gru_for_list">列表展示</string>
     <string name="search_gru_for_alone">升堂细数</string>
     <string name="search_gru_for_cancel">先放一马</string>
@@ -51,6 +56,7 @@
     <string name="add_obj_name">名称</string>
     <string name="add_obj_title_confirm">对象标记！</string>
     <string name="add_obj_title_cancel">宽恕</string>
+
     <string name="add_tag_title">新建事件标签</string>
     <string name="add_tag_name">名称</string>
     <string name="add_tag_title_confirm">确认</string>
