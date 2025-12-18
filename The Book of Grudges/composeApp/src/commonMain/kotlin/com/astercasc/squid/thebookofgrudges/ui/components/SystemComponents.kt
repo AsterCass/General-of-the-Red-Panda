@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
@@ -41,10 +42,12 @@ fun MainAppBar(
 
             if (navigator.canPop) {
                 Box(
-                    modifier = Modifier.align(Alignment.CenterStart).padding(start = 12.dp),
+                    modifier = Modifier.align(Alignment.CenterStart).padding(start = 12.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .clickable(onClick = { navigator.pop() }),
                 ) {
                     Icon(
-                        modifier = Modifier.size(24.dp).clickable(onClick = { navigator.pop() }),
+                        modifier = Modifier.padding(3.dp).size(24.dp),
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
                     )
