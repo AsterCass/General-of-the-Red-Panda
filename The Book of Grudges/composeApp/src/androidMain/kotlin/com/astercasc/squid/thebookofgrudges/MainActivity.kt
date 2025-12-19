@@ -15,17 +15,6 @@ import org.koin.core.context.GlobalContext
 
 class MainActivity : ComponentActivity() {
 
-    private val thisContext: Context = this
-
-    companion object {
-        @SuppressLint("StaticFieldLeak")
-        var mainContext: Context? = null
-    }
-
-    init {
-        mainContext = thisContext
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -34,7 +23,7 @@ class MainActivity : ComponentActivity() {
         if (GlobalContext.getOrNull() == null) {
             KoinInit().init {
                 androidLogger()
-                androidContext(thisContext)
+                androidContext(applicationContext)
             }
         }
 
