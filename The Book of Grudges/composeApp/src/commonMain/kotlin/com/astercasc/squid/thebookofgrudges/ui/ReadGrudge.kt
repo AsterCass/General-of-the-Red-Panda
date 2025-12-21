@@ -57,6 +57,8 @@ fun ReadGrudge() {
     val dataStorageManager: DataStorageManager = koinInject()
     val scope = rememberCoroutineScope()
     val isDark = isSystemInDarkTheme()
+    // is single view for read grudge
+    val singleViewForGrudge = globalDataModel.singleViewForGrudge.collectAsState().value
     // search data
     val gruIdListSelected = globalDataModel.gruIdListSelected.collectAsState().value
     // gru data

@@ -315,6 +315,7 @@ fun ReadGrudgeSheet(
                             if (!searchSheetState.isVisible) {
                                 closeSheet()
                             }
+                            globalDataModel.resetSingleViewForGrudge(false)
                             navigator.push(ReadGrudgeObj)
                         }
                     },

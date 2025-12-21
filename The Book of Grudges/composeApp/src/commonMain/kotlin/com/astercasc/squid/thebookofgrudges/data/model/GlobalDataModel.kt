@@ -11,6 +11,13 @@ class GlobalDataModel(
     dataStorageManager: DataStorageManager
 ) {
 
+    // is single view for read grudge
+    private val _singleViewForGrudge = MutableStateFlow(false)
+    val singleViewForGrudge = _singleViewForGrudge.asStateFlow()
+    fun resetSingleViewForGrudge(isSingleView: Boolean) {
+        _singleViewForGrudge.value = isSingleView
+    }
+
     // tag
     private val _tagList = MutableStateFlow(initTagList(dataStorageManager))
     val tagList = _tagList.asStateFlow()
