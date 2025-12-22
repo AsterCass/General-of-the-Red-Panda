@@ -243,25 +243,28 @@ fun ReadGrudge() {
 
             val gru = gruIdMap[gruIdListSelected.getOrNull(pagerState.currentPage)] ?: return@Box
 
-            SmallFloatingActionButton(
-                onClick = {
-                    scope.launch {
-                        pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                    }
-                },
-                shape = RoundedCornerShape(6.dp),
-                elevation = FloatingActionButtonDefaults.elevation(2.dp),
-                modifier = Modifier.align(Alignment.BottomStart).padding(start = 16.dp, bottom = 16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+            if(!singleViewForGrudge) {
+                SmallFloatingActionButton(
+                    onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                        }
+                    },
+                    shape = RoundedCornerShape(6.dp),
+                    elevation = FloatingActionButtonDefaults.elevation(2.dp),
+                    modifier = Modifier.align(Alignment.BottomStart).padding(start = 16.dp, bottom = 16.dp)
                 ) {
-                    Text(stringResource(Res.string.search_gru_pre))
-                }
+                    Row(
+                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(stringResource(Res.string.search_gru_pre))
+                    }
 
+                }
             }
+
 
 
             SmallFloatingActionButton(
@@ -270,7 +273,8 @@ fun ReadGrudge() {
                 },
                 shape = RoundedCornerShape(6.dp),
                 elevation = FloatingActionButtonDefaults.elevation(2.dp),
-                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = 136.dp),
+                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp,
+                    bottom = if(singleViewForGrudge) 76.dp else 136.dp),
                 containerColor = MaterialTheme.colorScheme.errorContainer,
                 contentColor = MaterialTheme.colorScheme.onErrorContainer,
             ) {
@@ -294,7 +298,8 @@ fun ReadGrudge() {
                 },
                 shape = RoundedCornerShape(6.dp),
                 elevation = FloatingActionButtonDefaults.elevation(2.dp),
-                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = 76.dp)
+                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp,
+                    bottom = if(singleViewForGrudge) 16.dp else 76.dp)
             ) {
                 Row(
                     modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
@@ -306,21 +311,24 @@ fun ReadGrudge() {
 
             }
 
-            SmallFloatingActionButton(
-                onClick = {
-                    scope.launch {
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                    }
-                },
-                shape = RoundedCornerShape(6.dp),
-                elevation = FloatingActionButtonDefaults.elevation(2.dp),
-                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = 16.dp),
-            ) {
-                Text(
-                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
-                    text = stringResource(Res.string.search_gru_next)
-                )
+            if(!singleViewForGrudge) {
+                SmallFloatingActionButton(
+                    onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        }
+                    },
+                    shape = RoundedCornerShape(6.dp),
+                    elevation = FloatingActionButtonDefaults.elevation(2.dp),
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(end = 16.dp, bottom = 16.dp),
+                ) {
+                    Text(
+                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
+                        text = stringResource(Res.string.search_gru_next)
+                    )
+                }
             }
+
 
             // delete
             if (deleteGruDialog) {
