@@ -250,7 +250,7 @@ fun HomeScreen() {
                                 ) {
 
                                     Text(
-                                        modifier = Modifier.wrapContentWidth().alpha(0.35f),
+                                        modifier = Modifier.weight(1f).alpha(0.35f),
                                         text = gru.description,
                                         style = MaterialTheme.typography.labelSmall
                                     )
