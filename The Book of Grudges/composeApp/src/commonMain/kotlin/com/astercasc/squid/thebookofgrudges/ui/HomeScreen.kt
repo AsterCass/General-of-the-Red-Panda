@@ -2,6 +2,7 @@ package com.astercasc.squid.thebookofgrudges.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MAX
 import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MAX_COLOR
 import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN
@@ -58,6 +61,7 @@ fun HomeScreen() {
     // inject
     val globalDataModel : GlobalDataModel = koinInject()
     val dataStorageManager: DataStorageManager = koinInject()
+    val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
     val isDark = isSystemInDarkTheme()
     // read sheet
@@ -144,7 +148,10 @@ fun HomeScreen() {
 
                     item {
                         OutlinedCard(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().clickable {
+                                globalDataModel.resetSingleViewForGrudge(true)
+                                navigator.push(ReadGrudgeObj)
+                            },
                             shape = RoundedCornerShape(6.dp),
                             elevation = CardDefaults.cardElevation(
                                 defaultElevation = 3.dp
