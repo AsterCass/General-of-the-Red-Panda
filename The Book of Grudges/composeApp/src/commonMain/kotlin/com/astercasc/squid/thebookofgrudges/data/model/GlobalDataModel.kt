@@ -200,6 +200,9 @@ class GlobalDataModel(
 
         }.map { it.id }
     }
+    fun updateParamsForId(id: String) {
+        _gruIdListSelected.value = listOf(id)
+    }
 
 
     private val _objListSearch = MutableStateFlow<List<String>>(emptyList())

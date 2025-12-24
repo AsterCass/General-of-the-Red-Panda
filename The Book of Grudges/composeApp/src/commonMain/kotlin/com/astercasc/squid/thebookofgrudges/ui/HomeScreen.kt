@@ -149,6 +149,7 @@ fun HomeScreen() {
                     item {
                         OutlinedCard(
                             modifier = Modifier.fillMaxWidth().clickable {
+                                globalDataModel.updateParamsForId(gru.id)
                                 globalDataModel.resetSingleViewForGrudge(true)
                                 navigator.push(ReadGrudgeObj)
                             },

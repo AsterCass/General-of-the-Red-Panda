@@ -267,6 +267,7 @@ fun ReadGrudge() {
 
 
 
+            // todo is empty ? navigation back
             SmallFloatingActionButton(
                 onClick = {
                     deleteGruDialog = true
