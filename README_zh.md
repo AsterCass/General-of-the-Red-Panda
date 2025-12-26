@@ -6,6 +6,21 @@
 
 这里展示[@将军的鱿鱼炒面](https://www.astercasc.com/)发布所有用应用程序的源代码
 
+### 项目地址：
+
+* 玛丽亚内住户： https://gitee.com/astercass/general-of-the-red-panda
+* 调查兵团成员： https://github.com/AsterCass/General-of-the-Red-Panda （如果觉得项目有意思或者有帮到你，可以辛苦给个星星嘛 0. 0）
+
+### 下载地址：
+
+* 玛丽亚内住户： https://pan.baidu.com/s/5P4zJnQ1tJkycI24FEcJC4Q 
+* 调查兵团成员： https://github.com/AsterCass/General-of-the-Red-Panda/releases
+
+### bug反馈：
+
+* 玛丽亚内住户： https://gitee.com/astercass/general-of-the-red-panda/issues 或者 https://www.astercasc.com/board
+* 调查兵团成员： https://github.com/AsterCass/General-of-the-Red-Panda/issues
+
 ## 应用列表
 
 ### [喵喵记仇](The%20Book%20of%20Grudges)

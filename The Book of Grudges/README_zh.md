@@ -4,7 +4,10 @@
 
 ## 介绍
 
-todo
+### 浏览器版本地址：
+
+* https://www.astercasc.com/apps/grudgesWasmJs/ （注意，首次加载需要稍微等待一下加载核心包和字体）
+* 备用地址（部分老式浏览器无法正常访问上面的地址的时候）：https://www.astercasc.com/apps/grudgesJs/
 
 ## 平台支持
 
@@ -26,9 +29,13 @@ todo
 
 执行命令`./gradlew :composeApp:run`
 
+打包 `./gradlew packageDistributionForCurrentOS`
+
 ### 网页
 
 执行命令 `./gradlew :composeApp:jsBrowserDevelopmentRun` 或 `./gradlew :composeApp:wasmJsBrowserDevelopmentRun`
+
+打包 `./gradlew jsBrowserDistribution` 或 `./gradlew wasmJsBrowserDistribution`
 
 ### 苹果
 

@@ -4,7 +4,10 @@ English | [中文](README_zh.md)
 
 ## Introduction
 
-todo
+### Browser Version URLs:
+
+* https://www.astercasc.com/apps/grudgesWasmJs/ (Note: the first load may take a little while as the core package and fonts are being loaded.)
+* Backup URL (use this if some older browsers cannot access the address above): https://www.astercasc.com/apps/grudgesJs/
 
 ## Platforms Support
 
@@ -27,9 +30,13 @@ Open project in Android Studio and run
 
 Run command `./gradlew :composeApp:run`
 
+Release `./gradlew packageDistributionForCurrentOS`
+
 ### Web
 
 Run command `./gradlew :composeApp:jsBrowserDevelopmentRun` or `./gradlew :composeApp:wasmJsBrowserDevelopmentRun`
+
+Release `./gradlew jsBrowserDistribution` or `./gradlew wasmJsBrowserDistribution`
 
 ### IOS
 
