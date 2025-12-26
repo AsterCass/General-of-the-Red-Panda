@@ -6,6 +6,8 @@ English | [中文](README_zh.md)
 
 Here you can find all the source code of the app published by [@将军的鱿鱼炒面](https://www.astercasc.com/)
 
+If you have any suggestions or feedback, please leave a message on the message board of the author's personal website at https://www.astercasc.com
+
 ### Project Repositories
 
 * Residents within the Walls (Mainland China): https://gitee.com/astercass/general-of-the-red-panda

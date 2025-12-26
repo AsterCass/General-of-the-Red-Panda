@@ -6,6 +6,8 @@
 
 这里展示[@将军的鱿鱼炒面](https://www.astercasc.com/)发布所有用应用程序的源代码
 
+如果您有建议或者意见请在博主个人网站 https://www.astercasc.com 留言板中留言
+
 ### 项目地址：
 
 * 玛丽亚内住户： https://gitee.com/astercass/general-of-the-red-panda
