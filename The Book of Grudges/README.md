@@ -4,6 +4,17 @@ English | [中文](README_zh.md)
 
 ## Introduction
 
+It doesn’t just help us record every little detail from daily life and work, ensuring that nothing ever goes wrong or gets overlooked when it’s time to serve a client—it also supports custom tags and service targets, making retrieval faster and more efficient.
+
+We’ve also added a Grudge Level option, so keeping grudges is no longer monotonous and the intensity of our “service” is always under control.
+
+Even more user-friendly, when searching records you can choose “1 by 1”, making it easy to operate with one hand on your phone and the other hand “serving,” while strictly following the core principle:
+“Not a single thing that’s yours is missed; not a single thing that’s not yours is forced in.”
+
+When client feedback fails to meet expectations, you can use “Remember +1” to log it, clearly distinguishing how fresh each old grudge still is.
+
+And when you’re extremely satisfied with a client’s feedback, simply mark it as “Settled” to clear that service item.
+
 ### Browser Version URLs:
 
 * https://www.astercasc.com/apps/grudgesWasmJs/ (Note: the first load may take a little while as the core package and fonts are being loaded.)
