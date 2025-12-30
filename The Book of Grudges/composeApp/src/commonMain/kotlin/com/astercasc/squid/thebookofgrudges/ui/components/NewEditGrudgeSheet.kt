@@ -32,7 +32,6 @@ import com.astercasc.squid.thebookofgrudges.constant.enums.GrudgeLevelEnum
 import com.astercasc.squid.thebookofgrudges.data.model.GlobalDataModel
 import com.astercasc.squid.thebookofgrudges.ui.EditGrudgeObjectObj
 import com.astercasc.squid.thebookofgrudges.ui.EditGrudgeTagObj
-import com.astercasc.squid.thebookofgrudges.utils.getStringByName
 import com.astercasc.squid.thebookofgrudges.utils.interColorRange
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -315,8 +314,8 @@ fun NewEditGrudgeSheet(
                     )
                     Text(
                         "${gruSliderPosition.toInt()}  ${
-                            getStringByName(
-                                GrudgeLevelEnum.getEnumByCode(gruSliderPosition.toInt()).title
+                            stringResource(
+                                GrudgeLevelEnum.getEnumByCode(gruSliderPosition.toInt()).res
                             )
                         }",
                         style = MaterialTheme.typography.bodyLarge, color = interColorRange(
@@ -365,8 +364,8 @@ fun NewEditGrudgeSheet(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        getStringByName(
-                            GrudgeLevelEnum.getEnumByCode(gruSliderPosition.toInt()).desc
+                        stringResource(
+                            GrudgeLevelEnum.getEnumByCode(gruSliderPosition.toInt()).descRes
                         ),
                         modifier = Modifier.alpha(0.5f),
                         style = MaterialTheme.typography.labelMedium
