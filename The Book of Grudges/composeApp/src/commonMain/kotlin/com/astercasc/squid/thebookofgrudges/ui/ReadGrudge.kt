@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MAX
 import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MAX_COLOR
 import com.astercasc.squid.thebookofgrudges.constant.GRUDGE_LEVEL_MIN
@@ -57,6 +59,7 @@ fun ReadGrudge() {
     val dataStorageManager: DataStorageManager = koinInject()
     val scope = rememberCoroutineScope()
     val isDark = isSystemInDarkTheme()
+    val navigator = LocalNavigator.currentOrThrow
     // is single view for read grudge
     val singleViewForGrudge = globalDataModel.singleViewForGrudge.collectAsState().value
     // search data
@@ -266,8 +269,6 @@ fun ReadGrudge() {
             }
 
 
-
-            // todo is empty ? navigation back
             SmallFloatingActionButton(
                 onClick = {
                     deleteGruDialog = true
@@ -341,6 +342,10 @@ fun ReadGrudge() {
                             dataStorageManager = dataStorageManager,
                             id = gru.id,
                         )
+                        // 要么为空，要么就剩下马上要删除那一个id了，此时数据可能还没有刷新
+                        if ((gruIdMap.isEmpty() || (gruIdMap.size == 1 && gruIdMap.containsKey(gru.id))) && navigator.canPop) {
+                            navigator.pop()
+                        }
                     },
                     onDismissRequest = { deleteGruDialog = false },
                 )
