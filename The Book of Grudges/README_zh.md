@@ -23,13 +23,13 @@
 
 ## 截图
 
-<img src="img/phone1.jpg" />
+<img src="img/phone1.jpg" width="250"/>
 
-<img src="img/phone2.jpg" />
+<img src="img/phone2.jpg" width="250"/>
 
-<img src="img/desktop.jvm.jpg" />
+<img src="img/desktop.jvm.jpg" width="350"/>
 
-<img src="img/web.jpg" />
+<img src="img/web.jpg" width="350"/>
 
 ## 运行项目
 
