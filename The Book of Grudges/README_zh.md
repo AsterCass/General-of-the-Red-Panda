@@ -23,7 +23,13 @@
 
 ## 截图
 
-todo
+<img src="img/phone1.jpg" />
+
+<img src="img/phone2.jpg" />
+
+<img src="img/desktop.jvm.jpg" />
+
+<img src="img/web.jpg" />
 
 ## 运行项目
 
