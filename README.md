@@ -11,7 +11,7 @@ If you have any suggestions or feedback, please leave a message on the message b
 ### Project Repositories
 
 * Residents within the Walls (Mainland China): https://gitee.com/astercass/general-of-the-red-panda
-* Scout Regiment Members: https://github.com/AsterCass/General-of-the-Red-Panda (If you find the project interesting or helpful, please consider giving it a star ✨)
+* Scout Regiment Members: https://github.com/AsterCass/General-of-the-Red-Panda 
 
 ### Download Links
 

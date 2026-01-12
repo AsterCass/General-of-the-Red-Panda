@@ -11,7 +11,7 @@
 ### 项目地址：
 
 * 玛丽亚内住户： https://gitee.com/astercass/general-of-the-red-panda
-* 调查兵团成员： https://github.com/AsterCass/General-of-the-Red-Panda （如果觉得项目有意思或者有帮到你，可以辛苦给个星星嘛 0. 0）
+* 调查兵团成员： https://github.com/AsterCass/General-of-the-Red-Panda 
 
 ### 下载地址：
 
