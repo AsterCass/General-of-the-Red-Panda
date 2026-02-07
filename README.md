@@ -8,7 +8,9 @@ Here you can find all the source code and docs of the app published by [@将军�
 
 If you have any suggestions or feedback, please leave a message on the message board of the author's personal website at https://www.astercasc.com
 
-**For details on different video projects, please click the application list at the bottom**
+<span style="color:red; text-decoration: underline;">
+For details on different video projects, please click the application list at the bottom
+</span>
 
 ### Project Repositories
 

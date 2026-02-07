@@ -8,7 +8,9 @@
 
 如果您有建议或者意见请在博主个人网站 https://www.astercasc.com 留言板中留言
 
-**具体不同视频项目请点击最下方的应用列表进入**
+<span style="color:red; text-decoration: underline;">
+具体不同视频项目请点击最下方的应用列表进入
+</span>
 
 ### 项目地址：
 
