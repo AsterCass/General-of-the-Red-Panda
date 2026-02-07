@@ -10,7 +10,11 @@
 当客户的反馈没有达到我们预期，我们可以使用《提及+1》来记录，来区分不同旧账的新鲜程度。
 如果我们对客户的反馈非常满意，则可以使用《已报仇》来清除这个服务事项
 
-### 浏览器版本地址：
+## 相关资源下载地址
+
+[点击此处](https://pan.baidu.com/s/5P4zJnQ1tJkycI24FEcJC4Q)
+
+## 浏览器版本地址：
 
 * https://www.astercasc.com/apps/grudgesWasmJs/ （注意，首次加载需要稍微等待一下加载核心包和字体）
 * 备用地址（部分老式浏览器无法正常访问上面的地址的时候）：https://www.astercasc.com/apps/grudgesJs/

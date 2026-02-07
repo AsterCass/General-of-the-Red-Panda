@@ -15,7 +15,11 @@ When client feedback fails to meet expectations, you can use “Remember +1” t
 
 And when you’re extremely satisfied with a client’s feedback, simply mark it as “Settled” to clear that service item.
 
-### Browser Version URLs:
+## Download related resources
+
+[Click here](https://pan.baidu.com/s/5P4zJnQ1tJkycI24FEcJC4Q)
+
+## Browser Version URLs:
 
 * https://www.astercasc.com/apps/grudgesWasmJs/ (Note: the first load may take a little while as the core package and fonts are being loaded.)
 * Backup URL (use this if some older browsers cannot access the address above): https://www.astercasc.com/apps/grudgesJs/
