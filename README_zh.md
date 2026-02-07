@@ -8,6 +8,8 @@
 
 如果您有建议或者意见请在博主个人网站 https://www.astercasc.com 留言板中留言
 
+具体不同视频项目请点击最下方的应用列表进入
+
 ### 项目地址：
 
 * 玛丽亚内住户： https://gitee.com/astercass/general-of-the-red-panda
@@ -26,3 +28,5 @@
 ## 应用列表
 
 ### [喵喵记仇](The%20Book%20of%20Grudges)
+
+### [使用旧电脑搭NAS构建自己的家庭影院](NAS%20for%20Home%20Theater)

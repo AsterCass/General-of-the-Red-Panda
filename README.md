@@ -8,6 +8,8 @@ Here you can find all the source code of the app published by [@将军的鱿鱼�
 
 If you have any suggestions or feedback, please leave a message on the message board of the author's personal website at https://www.astercasc.com
 
+For details on different video projects, please click the application list at the bottom
+
 ### Project Repositories
 
 * Residents within the Walls (Mainland China): https://gitee.com/astercass/general-of-the-red-panda
@@ -26,3 +28,5 @@ If you have any suggestions or feedback, please leave a message on the message b
 ## App List
 
 ### [The Book of Grudges](The%20Book%20of%20Grudges)
+
+### [Using an Old PC as a NAS to Build Your Own Home Theater](NAS%20for%20Home%20Theater)
