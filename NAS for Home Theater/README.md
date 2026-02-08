@@ -7,13 +7,13 @@ English | [中文](README_zh.md)
 By repurposing an old computer at home into a NAS-based home theater, you can directly watch and manage videos from other devices in your household, such as smartphones, tablets, and computers.
 There is no need to manually download any virtual machines, no need to modify the operating system, and the hardware performance requirements are minimal. You only need to type a few commands during installation to get everything up and running easily.
 
-## 具体文档
+## Documentation
 
 For detailed documentation and more extended content, please visit:[Click here](https://www.astercasc.com/article/detail?articleId=AT199028468800214220)
 
 If you have any questions, you can also leave a comment at the bottom of that page.
 
-## 相关资源下载地址
+## Related Resources Download
 
 [Click here](https://pan.baidu.com/s/5P4zJnQ1tJkycI24FEcJC4Q)
 
