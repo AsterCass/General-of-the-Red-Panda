@@ -20,6 +20,8 @@
 
 ### WSL相关内容
 
+微软官网手动安装WSL：[点击此处](https://learn.microsoft.com/zh-cn/windows/wsl/install-manual)
+
 ```shell
 # 查看当前WSL版本
 wsl -v
@@ -42,7 +44,7 @@ wsl --import Ubuntu-jjdyycm C:\Users\astercasc X:\red.panda\new\jjdyycm.tar
 ### Linux 相关（即你使用的是原生Linux或者已经使用【WSL -d 指定容器名】进入容器）
 
 ```shell
-# 进入root身份，如果使用提供的镜像默认密码123456
+# 进入root身份，如果使用提供的镜像默认密码123456，如果是自己的容器就是你自己设置的密码
 sudo su
 # 安装docker
 apt remove $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1) \
