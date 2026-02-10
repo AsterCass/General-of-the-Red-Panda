@@ -8,6 +8,7 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    # 一般
     #"flask>=3.1.2", # HTTP 服务端
     #"httpx>=0.28.1", # Http 客户端
     "loguru>=0.7.3", # 日志
@@ -16,6 +17,11 @@ dependencies = [
     "python-dotenv>=1.2.1", # 加载环境变量
     #"redis>=7.1.0", # Redis
     #"rich>=14.3.2", # 终端渲染
+    # 额外
+    "numpy>=2.2.6", # 模型
+    "torch>=2.10.0", # 模型
+    "transformers>=5.1.0", # 模型
+    "sentencepiece>=0.2.1", # 分词
 ]
 
 [[tool.uv.index]]

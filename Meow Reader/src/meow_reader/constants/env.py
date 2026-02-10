@@ -17,7 +17,7 @@ def print_env():
     DEV_MODE = os.getenv("DEV_MODE", "false").lower() == "true"
 
     logger.info("Welcome {value}!", value=APP_NAME)
-    logger.info("Current model {value}!", value=DEV_MODE)
+    logger.info("Current mode {value}!", value=DEV_MODE)
 
 
 def print_config():
