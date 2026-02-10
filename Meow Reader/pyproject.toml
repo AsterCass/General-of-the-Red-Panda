@@ -17,6 +17,7 @@ dependencies = [
     "python-dotenv>=1.2.1", # 加载环境变量
     #"redis>=7.1.0", # Redis
     #"rich>=14.3.2", # 终端渲染
+    "pyside6>=6.10.2", # UI
     # 额外
     "numpy>=2.2.6", # 模型
     "torch>=2.10.0", # 模型

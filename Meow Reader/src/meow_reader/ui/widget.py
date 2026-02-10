@@ -1,37 +1,21 @@
-import tkinter as tk
-from tkinter import messagebox
+import random
+from PySide6 import QtCore, QtWidgets
 
-class MainWidget:
-    def __init__(self, root):
-        self.root = root
-        root.title("喵喵朗读")
-        root.geometry("600x300")
 
-        # 标签
-        tk.Label(root, text="请输入你的名字：", font=("Microsoft YaHei", 12)).pack(pady=10)
+class MainWidget(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.resize(400, 600)
 
-        # 输入框
-        self.entry = tk.Entry(root, width=30, font=("Microsoft YaHei", 12))
-        self.entry.pack(pady=5)
+        # Yi
+        self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
 
-        # 按钮
-        tk.Button(
-            root,
-            text="提交",
-            width=10,
-            command=self.on_submit,
-            bg="#4CAF50",
-            fg="white"
-        ).pack(pady=20)
+        self.button = QtWidgets.QPushButton("Click me!")
+        self.text = QtWidgets.QLabel("Hello World",
+                                     alignment=QtCore.Qt.AlignCenter)
 
-        # 多行文本显示区
-        self.result = tk.Text(root, height=5, width=40, font=("Microsoft YaHei", 11))
-        self.result.pack(pady=10)
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.addWidget(self.text)
+        self.layout.addWidget(self.button)
 
-    def on_submit(self):
-        name = self.entry.get().strip()
-        if name:
-            self.result.delete(1.0, tk.END)
-            self.result.insert(tk.END, f"你好，{name}！\n欢迎使用 Tkinter。")
-        else:
-            messagebox.showwarning("提示", "请输入名字哦～")
+        self.button.clicked.connect(self.magic)
