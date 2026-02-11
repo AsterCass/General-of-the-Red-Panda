@@ -1,3 +1,10 @@
+check_box_style = """
+    QCheckBox {
+        color: #303030;   
+        font-size: 12px;
+    }
+"""
+
 push_btn_style = """
 QPushButton {
     background-color: #2d2d2d;
@@ -29,7 +36,7 @@ QPushButton:disabled {
     color: #555;
     border: 1px solid #333;
 }
-        """
+"""
 
 text_label_style = """
 QLabel {
