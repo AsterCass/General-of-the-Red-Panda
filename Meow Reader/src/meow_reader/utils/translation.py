@@ -53,8 +53,9 @@ class MarianTranslator:
     def _translate_in_thread(self, text, cb):
         if " " not in text and len(text.split()) == 1:
             translated_text = query_dict(db_path, text)
-            cb(text, translated_text)
-            return
+            if translated_text:
+                cb(text, translated_text)
+                return
         # 纠正单字符翻译问题
         prompt = f"This is a test: {text}."
         tokens = self.tokenizer(prompt, return_tensors="pt", padding=True)

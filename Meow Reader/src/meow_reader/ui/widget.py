@@ -1,7 +1,8 @@
+import re
+
 from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import Slot, Signal
 from PySide6.QtGui import QIcon
-from loguru import logger
 
 from meow_reader.constants.path import default_speak_model_path, default_trans_model_path
 from meow_reader.constants.style import text_browser_style, text_label_style, push_btn_style, check_box_style
@@ -18,16 +19,13 @@ class MainWidget(QtWidgets.QWidget):
         self.setWindowTitle("喵喵朗读")
         self.setWindowIcon(QIcon("assets/logo.svg"))
         self.resize(400, 600)
+        # 记录上次文本
+        self.last_text = ""
 
         # 设置组件
         self.onlyEnCheckBox = QtWidgets.QCheckBox("只处理纯英文")
         self.onlyEnCheckBox.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.onlyEnCheckBox.setStyleSheet(check_box_style)
-        self.onlyEnCheckBox.toggled.connect(self._on_toggle_only_en)
-        self.autoTrim = QtWidgets.QCheckBox("自动去掉首尾空格换行符等")
-        self.autoTrim.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.autoTrim.setStyleSheet(check_box_style)
-        self.autoTrim.toggled.connect(self._on_toggle_auto_trim)
         self.topMost = QtWidgets.QCheckBox("固定在顶端")
         self.topMost.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.topMost.setStyleSheet(check_box_style)
@@ -38,7 +36,6 @@ class MainWidget(QtWidgets.QWidget):
         self.settingLayout = QtWidgets.QHBoxLayout(self.settingWidget)
         self.settingLayout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         self.settingLayout.addWidget(self.onlyEnCheckBox)
-        self.settingLayout.addWidget(self.autoTrim)
         self.settingLayout.addWidget(self.topMost)
         self.settingLayout.setContentsMargins(0, 0, 0, 0)
         self.settingLayout.setSpacing(4)
@@ -74,7 +71,6 @@ class MainWidget(QtWidgets.QWidget):
 
         # 设置值
         self.onlyEnCheckBox.setChecked(True)
-        self.autoTrim.setChecked(True)
         self.topMost.setChecked(True)
 
         # 信号
@@ -99,6 +95,12 @@ class MainWidget(QtWidgets.QWidget):
         self.translation_done.emit(text, output)
 
     def _on_clipboard_text_changed(self, text: str):
+        if self.onlyEnCheckBox.isChecked() and not text.isascii():
+            return
+        text = re.sub(r'\s+', ' ', text).strip()
+        if self.last_text == text:
+            return
+        self.last_text = text
         self.translator.translate(text, self._on_translated)
         self.reader.speak(text)
 
@@ -112,12 +114,6 @@ class MainWidget(QtWidgets.QWidget):
             self.setWindowFlag(QtCore.Qt.WindowType.WindowStaysOnTopHint, True)
             self.hide()
             self.show()
-
-    def _on_toggle_only_en(self, checked: bool):
-        logger.info(checked)
-
-    def _on_toggle_auto_trim(self, checked: bool):
-        logger.info(checked)
 
     @Slot()
     def _on_re_read(self):
