@@ -21,7 +21,7 @@ dependencies = [
     # 额外
     "numpy>=2.2.6", # 模型
     "torch>=2.10.0", # 模型
-    "transformers>=5.1.0", # 模型
+    "transformers>=5.1.0", # 模型推理
     "piper-tts>=1.4.1", # 朗读模型
     "sentencepiece>=0.2.1", # 分词
     "sounddevice>=0.5.5", # 朗读

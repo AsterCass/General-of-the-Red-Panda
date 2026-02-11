@@ -60,6 +60,7 @@ class MainWidget(QtWidgets.QWidget):
         # 重复朗读
         self.reReadBtn = QtWidgets.QPushButton("再次朗读")
         self.reReadBtn.setStyleSheet(push_btn_style)
+        self.reReadBtn.clicked.connect(self._on_re_read)
 
         # 布局
         self.layout = QtWidgets.QVBoxLayout(self)
@@ -117,3 +118,7 @@ class MainWidget(QtWidgets.QWidget):
 
     def _on_toggle_auto_trim(self, checked: bool):
         logger.info(checked)
+
+    @Slot()
+    def _on_re_read(self):
+        self.reader.speak(self.textInpout.toPlainText())

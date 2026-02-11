@@ -5,11 +5,15 @@ import torch
 from loguru import logger
 from transformers import MarianMTModel, MarianTokenizer
 
+from meow_reader.constants.path import db_path
+from meow_reader.utils.sqlite import query_dict
+
 
 class MarianTranslator:
     """
-    # https://www.modelscope.cn/organization/Helsinki-NLP?tab=model
-    # https://huggingface.co/Helsinki-NLP/models
+    # 翻译模型 https://www.modelscope.cn/organization/Helsinki-NLP?tab=model
+    # 翻译模型 https://huggingface.co/Helsinki-NLP/models
+    # 字典 https://github.com/skywind3000/ECDICT
     """
 
     def __init__(self, model_dir: Path, device: str = None):
@@ -47,10 +51,16 @@ class MarianTranslator:
             raise RuntimeError(f"加载模型失败: {e}")
 
     def _translate_in_thread(self, text, cb):
-        tokens = self.tokenizer(text, return_tensors="pt", padding=True)
+        if " " not in text and len(text.split()) == 1:
+            translated_text = query_dict(db_path, text)
+            cb(text, translated_text)
+            return
+        # 纠正单字符翻译问题
+        prompt = f"This is a test: {text}."
+        tokens = self.tokenizer(prompt, return_tensors="pt", padding=True)
         translated = self.model.generate(**tokens)
         translated_text = self.tokenizer.decode(translated[0], skip_special_tokens=True)
-        cb(text, translated_text)
+        cb(text, translated_text.split(':', 1)[-1].strip() if ':' in translated_text else translated_text.strip())
 
     def translate(self, text: str, cb):
         threading.Thread(target=self._translate_in_thread, args=(text, cb)).start()
