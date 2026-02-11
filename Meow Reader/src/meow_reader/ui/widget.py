@@ -1,15 +1,18 @@
 from PySide6 import QtCore, QtWidgets
+from PySide6.QtCore import Slot, Signal
 from PySide6.QtGui import QIcon
 from loguru import logger
 
 from meow_reader.constants.path import default_speak_model_path, default_trans_model_path
 from meow_reader.constants.style import text_browser_style, text_label_style, push_btn_style, check_box_style
 from meow_reader.utils.clipboard import ClipboardTextWatcher
-from meow_reader.utils.reader import  Reader
+from meow_reader.utils.reader import Reader
 from meow_reader.utils.translation import MarianTranslator
 
 
 class MainWidget(QtWidgets.QWidget):
+    translation_done = Signal(str, str)
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("喵喵朗读")
@@ -39,7 +42,6 @@ class MainWidget(QtWidgets.QWidget):
         self.settingLayout.addWidget(self.topMost)
         self.settingLayout.setContentsMargins(0, 0, 0, 0)
         self.settingLayout.setSpacing(4)
-
 
         # 输入
         self.textInputLabel = QtWidgets.QLabel("剪贴板内容")
@@ -74,6 +76,9 @@ class MainWidget(QtWidgets.QWidget):
         self.autoTrim.setChecked(True)
         self.topMost.setChecked(True)
 
+        # 信号
+        self.translation_done.connect(self._update_text_input_output)
+
         # 监视剪贴板文本变化
         self.watcher = ClipboardTextWatcher()
         self.watcher.textChanged.connect(self._on_clipboard_text_changed)
@@ -82,12 +87,18 @@ class MainWidget(QtWidgets.QWidget):
         self.reader = Reader(default_speak_model_path)
         self.translator  = MarianTranslator(default_trans_model_path)
 
-    def _on_clipboard_text_changed(self, text: str):
+    @Slot(str, str)
+    def _update_text_input_output(self, text: str, output: str):
         self.textInpout.clear()
         self.textInpout.insertPlainText(text)
-        ret = self.translator.translate(text)
         self.textOutput.clear()
-        self.textOutput.setText(ret)
+        self.textOutput.setText(output)
+
+    def _on_translated(self, text: str, output: str):
+        self.translation_done.emit(text, output)
+
+    def _on_clipboard_text_changed(self, text: str):
+        self.translator.translate(text, self._on_translated)
         self.reader.speak(text)
 
     def _on_toggle_topmost(self, checked: bool):

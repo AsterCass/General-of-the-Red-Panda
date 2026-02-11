@@ -1,8 +1,9 @@
-from transformers import MarianMTModel, MarianTokenizer
-from pathlib import Path
-from loguru import logger
-import torch
 import threading
+from pathlib import Path
+
+import torch
+from loguru import logger
+from transformers import MarianMTModel, MarianTokenizer
 
 
 class MarianTranslator:
@@ -18,27 +19,21 @@ class MarianTranslator:
         if not (model_dir / "config.json").is_file():
             raise FileNotFoundError(f"缺少 config.json: {model_dir}")
 
-        self._lock = threading.Lock()
-        self.model_dir = model_dir
-
         # 自动设备选择
         if device:
             self.device = device
         else:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-        self._load_model()
-
-
-    def _load_model(self):
+        # 加载模型
         try:
             self.tokenizer = MarianTokenizer.from_pretrained(
-                self.model_dir,
+                model_dir,
                 local_files_only=True,
             )
 
             self.model = MarianMTModel.from_pretrained(
-                self.model_dir,
+                model_dir,
                 local_files_only=True,
             )
 
@@ -46,25 +41,16 @@ class MarianTranslator:
             self.model.eval()
 
             logger.info(
-                f"翻译模型加载成功：{self.model_dir.name} | 设备: {self.device}"
+                f"翻译模型加载成功：{model_dir.name} | 设备: {self.device}"
             )
-
         except Exception as e:
             raise RuntimeError(f"加载模型失败: {e}")
 
+    def _translate_in_thread(self, text, cb):
+        tokens = self.tokenizer(text, return_tensors="pt", padding=True)
+        translated = self.model.generate(**tokens)
+        translated_text = self.tokenizer.decode(translated[0], skip_special_tokens=True)
+        cb(text, translated_text)
 
-    def translate(
-        self,
-        text: str,
-    ) -> str:
-
-        if not text.strip():
-            return ""
-
-        with self._lock:
-            with torch.no_grad():
-                tokens = self.tokenizer(text, return_tensors="pt", padding=True)
-                translated = self.model.generate(**tokens)
-                translated_text = self.tokenizer.decode(translated[0], skip_special_tokens=True)
-                return translated_text
-
+    def translate(self, text: str, cb):
+        threading.Thread(target=self._translate_in_thread, args=(text, cb)).start()

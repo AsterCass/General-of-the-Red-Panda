@@ -60,7 +60,7 @@ class Reader:
                         stream.start()
                     audio = np.frombuffer(chunk.audio_int16_bytes, dtype=np.int16)
                     stream.write(audio)
-                    logger.info("播放结束")
+                logger.info("播放结束")
             except Exception as e:
                 logger.error(f"播放错误: {e}")
             finally:
