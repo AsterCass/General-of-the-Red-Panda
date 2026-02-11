@@ -37,7 +37,7 @@ url = "https://mirrors.aliyun.com/pypi/simple/"
 
 [dependency-groups]
 dev = [
-    "hatchling>=1.28.0", # 打包工具
+    "hatchling>=1.28.0", # 构建引擎
     "pyinstaller>=6.18.0", # 打包
     "pytest>=9.0.2", # 测试
     "pytest-cov>=7.0.0", # 测试代码覆盖

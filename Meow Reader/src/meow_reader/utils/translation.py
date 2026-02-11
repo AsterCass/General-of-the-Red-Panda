@@ -57,11 +57,12 @@ class MarianTranslator:
                 cb(text, translated_text)
                 return
         # 纠正单字符翻译问题
-        prompt = f"This is a test: {text}."
+        # prompt = f"The translation of the entire sentence is: \n {text}."
+        prompt = text
         tokens = self.tokenizer(prompt, return_tensors="pt", padding=True)
         translated = self.model.generate(**tokens)
         translated_text = self.tokenizer.decode(translated[0], skip_special_tokens=True)
-        cb(text, translated_text.split(':', 1)[-1].strip() if ':' in translated_text else translated_text.strip())
+        cb(text, translated_text)
 
     def translate(self, text: str, cb):
         threading.Thread(target=self._translate_in_thread, args=(text, cb)).start()
