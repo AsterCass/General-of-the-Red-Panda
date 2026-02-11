@@ -2,9 +2,12 @@ from PySide6 import QtCore, QtWidgets
 from PySide6.QtGui import QIcon
 from loguru import logger
 
+from meow_reader.constants.path import default_speak_model_path, default_trans_model_path
 from meow_reader.constants.style import text_browser_style, text_label_style, push_btn_style, check_box_style
 from meow_reader.utils.clipboard import ClipboardTextWatcher
-from meow_reader.utils.translation import set_model_dir, trans
+from meow_reader.utils.reader import  Reader
+from meow_reader.utils.translation import MarianTranslator
+
 
 class MainWidget(QtWidgets.QWidget):
     def __init__(self):
@@ -66,19 +69,26 @@ class MainWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.reReadBtn)
         self.layout.setSpacing(12)
 
+        # 设置值
+        self.onlyEnCheckBox.setChecked(True)
+        self.autoTrim.setChecked(True)
+        self.topMost.setChecked(True)
+
         # 监视剪贴板文本变化
         self.watcher = ClipboardTextWatcher()
         self.watcher.textChanged.connect(self._on_clipboard_text_changed)
 
-        # 加载翻译模型
-        set_model_dir()
+        # 加载模型
+        self.reader = Reader(default_speak_model_path)
+        self.translator  = MarianTranslator(default_trans_model_path)
 
     def _on_clipboard_text_changed(self, text: str):
         self.textInpout.clear()
         self.textInpout.insertPlainText(text)
-        ret = trans(text)
+        ret = self.translator.translate(text)
         self.textOutput.clear()
         self.textOutput.setText(ret)
+        self.reader.speak(text)
 
     def _on_toggle_topmost(self, checked: bool):
         is_top = self.windowFlags() & QtCore.Qt.WindowType.WindowStaysOnTopHint
