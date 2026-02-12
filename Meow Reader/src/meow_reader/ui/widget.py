@@ -23,6 +23,8 @@ class MainWidget(QtWidgets.QWidget):
         self.last_text = ""
 
         # 设置组件
+        self.setObjectName("mainWidget")
+        self.setStyleSheet("#mainWidget {background-color: #f0f0f0;}")
         self.onlyEnCheckBox = QtWidgets.QCheckBox("只处理纯英文")
         self.onlyEnCheckBox.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.onlyEnCheckBox.setStyleSheet(check_box_style)
