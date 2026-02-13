@@ -1,3 +1,4 @@
-[server]
-host = "localhost"
-port = 8000
+[path]
+transModelPath="models/opus-mt-en-zh"
+speakModelPath="models/en_US-lessac-medium/en_US-lessac-medium.onnx"
+dictDbPath="models/dict/ecdict.db"

@@ -5,7 +5,7 @@ import torch
 from loguru import logger
 from transformers import MarianMTModel, MarianTokenizer
 
-from meow_reader.constants.path import db_path
+import meow_reader.constants.config as config
 from meow_reader.utils.sqlite import query_dict
 
 
@@ -52,7 +52,7 @@ class MarianTranslator:
 
     def _translate_in_thread(self, text, cb):
         if " " not in text and len(text.split()) == 1:
-            translated_text = query_dict(db_path, text)
+            translated_text = query_dict(config.db_path, text)
             if translated_text:
                 cb(text, translated_text)
                 return

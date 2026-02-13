@@ -4,7 +4,7 @@ from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import Slot, Signal
 from PySide6.QtGui import QIcon
 
-from meow_reader.constants.path import default_speak_model_path, default_trans_model_path
+import meow_reader.constants.config as config
 from meow_reader.constants.style import text_browser_style, text_label_style, push_btn_style, check_box_style
 from meow_reader.utils.clipboard import ClipboardTextWatcher
 from meow_reader.utils.reader import Reader
@@ -83,8 +83,8 @@ class MainWidget(QtWidgets.QWidget):
         self.watcher.textChanged.connect(self._on_clipboard_text_changed)
 
         # 加载模型
-        self.reader = Reader(default_speak_model_path)
-        self.translator  = MarianTranslator(default_trans_model_path)
+        self.reader = Reader(config.speak_model_path)
+        self.translator  = MarianTranslator(config.trans_model_path)
 
     @Slot(str, str)
     def _update_text_input_output(self, text: str, output: str):
