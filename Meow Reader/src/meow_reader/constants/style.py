@@ -1,3 +1,17 @@
+url_label_style = """
+QPushButton {
+    background: transparent;
+    border: none;
+    color: #303030;
+    text-decoration: underline;
+    font-size: 12px;
+    outline: none;
+}
+
+QPushButton:focus {
+    outline: none;
+}
+"""
 check_box_style = """
     QCheckBox {
         color: #303030;   

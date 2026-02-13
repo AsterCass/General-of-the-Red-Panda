@@ -1,11 +1,12 @@
 import re
 
 from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import Slot, Signal
-from PySide6.QtGui import QIcon
+from PySide6.QtCore import Slot, Signal, QUrl
+from PySide6.QtGui import QIcon, QDesktopServices
 
 import meow_reader.constants.config as config
-from meow_reader.constants.style import text_browser_style, text_label_style, push_btn_style, check_box_style
+from meow_reader.constants.style import text_browser_style, text_label_style, push_btn_style, check_box_style, \
+    url_label_style
 from meow_reader.utils.clipboard import ClipboardTextWatcher
 from meow_reader.utils.reader import Reader
 from meow_reader.utils.resource import resource_path
@@ -62,6 +63,14 @@ class MainWidget(QtWidgets.QWidget):
         self.reReadBtn.setStyleSheet(push_btn_style)
         self.reReadBtn.clicked.connect(self._on_re_read)
 
+        # Copyright
+        self.copyrightLabel = QtWidgets.QPushButton("版权所有：将军的鱿鱼炒面 AsterCasc")
+        self.copyrightLabel.setStyleSheet(url_label_style)
+        self.copyrightLabel.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        self.copyrightLabel.clicked.connect(
+            lambda: QDesktopServices.openUrl(QUrl("https://www.astercasc.com"))
+        )
+
         # 布局
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.settingWidget)
@@ -70,6 +79,7 @@ class MainWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.textOutputLabel)
         self.layout.addWidget(self.textOutput)
         self.layout.addWidget(self.reReadBtn)
+        self.layout.addWidget(self.copyrightLabel, alignment=QtCore.Qt.AlignmentFlag.AlignRight)
         self.layout.setSpacing(12)
 
         # 设置值
