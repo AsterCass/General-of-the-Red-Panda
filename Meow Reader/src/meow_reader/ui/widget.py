@@ -8,6 +8,7 @@ import meow_reader.constants.config as config
 from meow_reader.constants.style import text_browser_style, text_label_style, push_btn_style, check_box_style
 from meow_reader.utils.clipboard import ClipboardTextWatcher
 from meow_reader.utils.reader import Reader
+from meow_reader.utils.resource import resource_path
 from meow_reader.utils.translation import MarianTranslator
 
 
@@ -17,7 +18,7 @@ class MainWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("喵喵朗读")
-        self.setWindowIcon(QIcon("assets/logo.svg"))
+        self.setWindowIcon(QIcon(resource_path("assets/logo.svg")))
         self.resize(400, 600)
         # 记录上次文本
         self.last_text = ""
