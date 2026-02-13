@@ -20,7 +20,9 @@
 后续可能会根据使用体验慢慢调整功能，或者适配其他语言（比如支持直接在UI界面中切换目标翻译语言）
 
 目前的翻译模型以及朗读模型是中和衡量资源占用和文件大小以及效果，
-如果你的机器性能比较好，也不在意占用更大存储空间，可以使用[TranslateGemma](https://huggingface.co/google/translategemma-4b-it)或者[HY-MT](https://github.com/Tencent-Hunyuan/HY-MT)或者[]()等等模型
+如果你的机器性能比较好，也不在意占用更大存储空间，
+可以使用[TranslateGemma](https://huggingface.co/google/translategemma-4b-it)
+或者[HY-MT](https://github.com/Tencent-Hunyuan/HY-MT)等等模型（可能需要修改部分源代码）
 
 ## 具体文档
 
