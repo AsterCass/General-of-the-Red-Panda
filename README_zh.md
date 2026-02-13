@@ -30,3 +30,5 @@
 ### [喵喵记仇](The%20Book%20of%20Grudges)
 
 ### [使用旧电脑搭NAS构建自己的家庭影院](NAS%20for%20Home%20Theater)
+
+### [喵喵朗读（复制文本自动翻译朗读）](Meow%20Reader)
