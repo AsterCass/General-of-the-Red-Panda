@@ -1,3 +1,13 @@
+splash_window_style = """
+#container {
+    background-color: rgba(255, 255, 255, 180);
+    border-radius: 8px;
+}
+QLabel {
+    color: #303030;
+    font-size: 14px;
+}
+"""
 url_label_style = """
 QPushButton {
     background: transparent;
