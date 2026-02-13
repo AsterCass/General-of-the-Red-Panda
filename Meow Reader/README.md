@@ -28,6 +28,10 @@ If your machine has better performance and you don’t mind larger storage usage
 * [HY-MT](https://github.com/Tencent-Hunyuan/HY-MT)
 * Or other models
 
+### Screenshots
+
+<img src="img/img.jpg" width="250"/>
+
 ## Documentation
 
 For detailed documentation and extended information, please visit:

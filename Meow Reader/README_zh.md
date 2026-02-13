@@ -24,6 +24,10 @@
 可以使用[TranslateGemma](https://huggingface.co/google/translategemma-4b-it)
 或者[HY-MT](https://github.com/Tencent-Hunyuan/HY-MT)等等模型（可能需要修改部分源代码）
 
+### 截图
+
+<img src="img/img.jpg" width="250"/>
+
 ## 具体文档
 
 具体文档以及相关拓展更多内容可以访问：[点击此处](https://www.astercasc.com/article/detail?articleId=AT196496468516617011)
