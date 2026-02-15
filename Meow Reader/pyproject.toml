@@ -1,7 +1,7 @@
 [project]
 name = "meow-reader"
 version = "0.1.0"
-description = ""
+description = "It automatically reads English text from your clipboard, translates it into Chinese, and plays the English pronunciation."
 authors = [
     { name = "AsterCasc", email = "astercass@qq.com" }
 ]
