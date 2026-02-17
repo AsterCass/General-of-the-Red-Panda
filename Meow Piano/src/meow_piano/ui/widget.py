@@ -2,8 +2,8 @@ from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QIcon, QDesktopServices
 
-from meow_piano.constants.style import text_browser_style, text_label_style, push_btn_style, check_box_style, \
-    url_label_style
+from meow_piano.constants.style import text_label_style, push_btn_style, url_label_style
+from meow_piano.utils.audio import AudioEngine
 from meow_piano.utils.resource import resource_path
 
 
@@ -11,47 +11,23 @@ class MainWidget(QtWidgets.QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("喵喵朗读")
+        self.setWindowTitle("喵喵钢琴")
         self.setWindowIcon(QIcon(resource_path("assets/logo.svg")))
-        self.resize(400, 600)
-        # 记录上次文本
-        self.last_text = ""
+        self.resize(400, 300)
 
         # 设置组件
         self.setObjectName("mainWidget")
         self.setStyleSheet("#mainWidget {background-color: #f0f0f0;}")
-        self.onlyEnCheckBox = QtWidgets.QCheckBox("只处理纯英文")
-        self.onlyEnCheckBox.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.onlyEnCheckBox.setStyleSheet(check_box_style)
-        self.topMost = QtWidgets.QCheckBox("固定在顶端")
-        self.topMost.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.topMost.setStyleSheet(check_box_style)
 
-        # 设置布局
-        self.settingWidget = QtWidgets.QWidget()
-        self.settingLayout = QtWidgets.QHBoxLayout(self.settingWidget)
-        self.settingLayout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
-        self.settingLayout.addWidget(self.onlyEnCheckBox)
-        self.settingLayout.addWidget(self.topMost)
-        self.settingLayout.setContentsMargins(0, 0, 0, 0)
-        self.settingLayout.setSpacing(4)
+        # 键位提示
+        self.keyBindLabel = QtWidgets.QLabel("键位绑定（DEMO版本暂不支持修改）")
+        self.keyBindLabel.setStyleSheet(text_label_style)
 
-        # 输入
-        self.textInputLabel = QtWidgets.QLabel("剪贴板内容")
-        self.textInputLabel.setStyleSheet(text_label_style)
-        self.textInpout = QtWidgets.QTextBrowser()
-        self.textInpout.contextMenuPolicy = QtCore.Qt.ContextMenuPolicy.NoContextMenu
-        self.textInpout.setStyleSheet(text_browser_style)
+        # 键位内容
 
-        # 输出
-        self.textOutputLabel = QtWidgets.QLabel("翻译")
-        self.textOutputLabel.setStyleSheet(text_label_style)
-        self.textOutput = QtWidgets.QTextBrowser()
-        self.textOutput.contextMenuPolicy = QtCore.Qt.ContextMenuPolicy.NoContextMenu
-        self.textOutput.setStyleSheet(text_browser_style)
 
         # 重复朗读
-        self.reReadBtn = QtWidgets.QPushButton("再次朗读")
+        self.reReadBtn = QtWidgets.QPushButton("开始")
         self.reReadBtn.setStyleSheet(push_btn_style)
 
         # Copyright
@@ -64,15 +40,47 @@ class MainWidget(QtWidgets.QWidget):
 
         # 布局
         self.layout = QtWidgets.QVBoxLayout(self)
-        self.layout.addWidget(self.settingWidget)
-        self.layout.addWidget(self.textInputLabel)
-        self.layout.addWidget(self.textInpout)
-        self.layout.addWidget(self.textOutputLabel)
-        self.layout.addWidget(self.textOutput)
+        self.layout.addWidget(self.keyBindLabel)
         self.layout.addWidget(self.reReadBtn)
         self.layout.addWidget(self.copyrightLabel, alignment=QtCore.Qt.AlignmentFlag.AlignRight)
         self.layout.setSpacing(12)
 
-        # 设置值
-        self.onlyEnCheckBox.setChecked(True)
-        self.topMost.setChecked(True)
+        # 加载
+        self.audio = AudioEngine("assets/wav")
+
+    # https://www.xiwnn.com/piano/
+    def keyPressEvent(self, event):
+        if event.isAutoRepeat():
+            return
+        key_map = {
+            QtCore.Qt.Key.Key_Z: "C3",
+            QtCore.Qt.Key.Key_X: "D3",
+            QtCore.Qt.Key.Key_C: "E3",
+            QtCore.Qt.Key.Key_V: "F3",
+            QtCore.Qt.Key.Key_B: "G3",
+            QtCore.Qt.Key.Key_N: "A3",
+            QtCore.Qt.Key.Key_M: "B3",
+
+            QtCore.Qt.Key.Key_S: "C#3",
+            QtCore.Qt.Key.Key_D: "D#3",
+            QtCore.Qt.Key.Key_G: "F#3",
+            QtCore.Qt.Key.Key_H: "G#3",
+            QtCore.Qt.Key.Key_J: "A#3",
+
+            QtCore.Qt.Key.Key_Q: "C4",
+            QtCore.Qt.Key.Key_W: "D4",
+            QtCore.Qt.Key.Key_E: "E4",
+            QtCore.Qt.Key.Key_R: "F4",
+            QtCore.Qt.Key.Key_T: "G4",
+            QtCore.Qt.Key.Key_Y: "A4",
+            QtCore.Qt.Key.Key_U: "B4",
+
+            QtCore.Qt.Key.Key_2: "C#4",
+            QtCore.Qt.Key.Key_3: "D#4",
+            QtCore.Qt.Key.Key_5: "F#4",
+            QtCore.Qt.Key.Key_6: "G#4",
+            QtCore.Qt.Key.Key_7: "A#4",
+        }
+
+        if event.key() in key_map:
+            self.audio.note_on(key_map[event.key()])

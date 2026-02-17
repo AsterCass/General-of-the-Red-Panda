@@ -19,6 +19,9 @@ dependencies = [
     #"rich>=14.3.2", # 终端渲染
     "pyside6>=6.10.2", # UI
     # 额外
+    "sounddevice>=0.5.5", # 声音
+    "soundfile>=0.13.1", # 声音
+    "numpy>=2.2.6", # 计算
 ]
 
 [[tool.uv.index]]
