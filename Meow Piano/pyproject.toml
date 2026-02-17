@@ -1,0 +1,46 @@
+[project]
+name = "meow-piano"
+version = "0.1.0"
+description = "It automatically reads English text from your clipboard, translates it into Chinese, and plays the English pronunciation."
+authors = [
+    { name = "AsterCasc", email = "astercass@qq.com" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    # 一般
+    #"flask>=3.1.2", # HTTP 服务端
+    #"httpx>=0.28.1", # Http 客户端
+    "loguru>=0.7.3", # 日志
+    #"polars>=1.38.1", # 数据处理
+    #"pydantic>=2.12.5", # Json 序列化/反序列化
+    "python-dotenv>=1.2.1", # 加载环境变量
+    #"redis>=7.1.0", # Redis
+    #"rich>=14.3.2", # 终端渲染
+    "pyside6>=6.10.2", # UI
+    # 额外
+]
+
+[[tool.uv.index]]
+name = "tuna"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+
+[[tool.uv.index]]
+name = "aliyun"
+url = "https://mirrors.aliyun.com/pypi/simple/"
+
+[dependency-groups]
+dev = [
+    "hatchling>=1.28.0", # 构建引擎
+    "pyinstaller>=6.19.0", # 打包
+    "pytest>=9.0.2", # 测试
+    "pytest-cov>=7.0.0", # 测试代码覆盖
+    "ruff>=0.15.1", # 代码格式化
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.scripts]
+app = "meow_piano.__main__:main"
