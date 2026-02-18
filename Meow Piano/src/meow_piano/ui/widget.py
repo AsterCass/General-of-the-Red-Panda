@@ -53,33 +53,7 @@ class MainWidget(QtWidgets.QWidget):
         if event.isAutoRepeat():
             return
         key_map = {
-            QtCore.Qt.Key.Key_Z: "C3",
-            QtCore.Qt.Key.Key_X: "D3",
-            QtCore.Qt.Key.Key_C: "E3",
-            QtCore.Qt.Key.Key_V: "F3",
-            QtCore.Qt.Key.Key_B: "G3",
-            QtCore.Qt.Key.Key_N: "A3",
-            QtCore.Qt.Key.Key_M: "B3",
 
-            QtCore.Qt.Key.Key_S: "C#3",
-            QtCore.Qt.Key.Key_D: "D#3",
-            QtCore.Qt.Key.Key_G: "F#3",
-            QtCore.Qt.Key.Key_H: "G#3",
-            QtCore.Qt.Key.Key_J: "A#3",
-
-            QtCore.Qt.Key.Key_Q: "C4",
-            QtCore.Qt.Key.Key_W: "D4",
-            QtCore.Qt.Key.Key_E: "E4",
-            QtCore.Qt.Key.Key_R: "F4",
-            QtCore.Qt.Key.Key_T: "G4",
-            QtCore.Qt.Key.Key_Y: "A4",
-            QtCore.Qt.Key.Key_U: "B4",
-
-            QtCore.Qt.Key.Key_2: "C#4",
-            QtCore.Qt.Key.Key_3: "D#4",
-            QtCore.Qt.Key.Key_5: "F#4",
-            QtCore.Qt.Key.Key_6: "G#4",
-            QtCore.Qt.Key.Key_7: "A#4",
         }
 
         if event.key() in key_map:
