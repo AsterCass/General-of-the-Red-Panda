@@ -1,5 +1,6 @@
 import os
 import threading
+
 import numpy as np
 import sounddevice as sd
 import soundfile as sf
@@ -20,45 +21,38 @@ class AudioEngine:
 
     # 预加载 + 标准化
     def _load_samples(self):
-        print("Loading samples...")
-
+        raw = {}
         global_peak = 0
 
-        # 先读一遍找最大峰值
         for file in os.listdir(self.sample_folder):
             if file.endswith(".wav"):
                 path = os.path.join(self.sample_folder, file)
                 data, sr = sf.read(path, dtype="float32")
 
                 if sr != self.samplerate:
-                    raise ValueError(f"{file} 采样率不一致")
-
-                peak = np.max(np.abs(data))
-                if peak > global_peak:
-                    global_peak = peak
-
-        # 再加载并统一标准化
-        for file in os.listdir(self.sample_folder):
-            if file.endswith(".wav"):
-                note = file.replace(".wav", "")
-                path = os.path.join(self.sample_folder, file)
-                data, _ = sf.read(path, dtype="float32")
+                    raise ValueError("采样率不一致")
 
                 if data.ndim > 1:
-                    data = data.mean(axis=1)  # 转单声道
+                    data = data.mean(axis=1)
 
-                if global_peak > 0:
-                    data = data / global_peak
+                peak = np.max(np.abs(data))
+                global_peak = max(global_peak, peak)
 
-                self.samples[note] = data
+                raw[file.replace(".wav", "")] = data
+
+        for note, data in raw.items():
+            if global_peak > 0:
+                data = data / global_peak
+            self.samples[note] = data
 
         print(f"Loaded {len(self.samples)} samples.")
 
 
     # 播放接口
-    def note_on(self, note):
+    def note_on(self, note, velocity=127):
         if note not in self.samples:
             return
+        gain = (velocity / 127.0) ** 1.4
 
         with self.lock:
             if len(self.active_notes) >= self.max_polyphony:
@@ -66,7 +60,8 @@ class AudioEngine:
 
             self.active_notes.append({
                 "data": self.samples[note],
-                "pos": 0
+                "pos": 0,
+                "gain": gain
             })
 
 
@@ -74,27 +69,29 @@ class AudioEngine:
     def _audio_callback(self, out_data, frames, time, status):
         buffer = np.zeros(frames, dtype=np.float32)
 
-        with self.lock:
-            finished = []
+        notes = self.active_notes[:]  # 不加锁读取
 
-            for note in self.active_notes:
-                start = note["pos"]
-                end = start + frames
-                data = note["data"]
+        still_active = []
 
-                if start < len(data):
-                    chunk = data[start:end]
-                    buffer[:len(chunk)] += chunk
-                    note["pos"] += frames
-                else:
-                    finished.append(note)
+        for note in notes:
+            start = note["pos"]
+            end = start + frames
+            data = note["data"]
 
-            for note in finished:
-                self.active_notes.remove(note)
+            if start >= len(data):
+                continue
 
-        # 防止爆音 clipping
-        buffer = np.clip(buffer, -1.0, 1.0)
+            chunk = data[start:end] * note["gain"]
+            buffer[:len(chunk)] += chunk
+            note["pos"] += len(chunk)
 
+            if note["pos"] < len(data):
+                still_active.append(note)
+
+        self.active_notes = still_active
+
+        # soft clip
+        buffer = np.tanh(buffer)
         out_data[:] = buffer.reshape(-1, 1)
 
 
