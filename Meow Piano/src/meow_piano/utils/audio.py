@@ -4,6 +4,7 @@ import threading
 import numpy as np
 import sounddevice as sd
 import soundfile as sf
+from loguru import logger
 
 
 class AudioEngine:
@@ -30,7 +31,7 @@ class AudioEngine:
                 data, sr = sf.read(path, dtype="float32")
 
                 if sr != self.samplerate:
-                    raise ValueError("采样率不一致")
+                    raise ValueError("Inconsistent sampling rate")
 
                 if data.ndim > 1:
                     data = data.mean(axis=1)
@@ -43,9 +44,9 @@ class AudioEngine:
         for note, data in raw.items():
             if global_peak > 0:
                 data = data / global_peak
-            self.samples[note] = data
+            self.samples[int(note)] = data
 
-        print(f"Loaded {len(self.samples)} samples.")
+        logger.info(f"Loaded {len(self.samples)} samples.")
 
 
     # 播放接口

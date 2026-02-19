@@ -3,7 +3,6 @@ from PySide6.QtCore import QUrl
 from PySide6.QtGui import QIcon, QDesktopServices
 
 from meow_piano.constants.style import text_label_style, push_btn_style, url_label_style
-from meow_piano.utils.audio import AudioEngine
 from meow_piano.utils.resource import resource_path
 
 
@@ -45,16 +44,14 @@ class MainWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.copyrightLabel, alignment=QtCore.Qt.AlignmentFlag.AlignRight)
         self.layout.setSpacing(12)
 
-        # 加载
-        self.audio = AudioEngine("assets/wav")
+
 
     # https://www.xiwnn.com/piano/
     def keyPressEvent(self, event):
         if event.isAutoRepeat():
             return
-        key_map = {
 
+        key_map = {
+            QtCore.Qt.Key.Key_J: "39",
         }
 
-        if event.key() in key_map:
-            self.audio.note_on(key_map[event.key()])
