@@ -102,9 +102,9 @@ class AudioEngine:
             samplerate=self.samplerate,
             channels=1,
             callback=self._audio_callback,
-            blocksize=128,
-            latency="low",
-            dtype="float32"
+            blocksize=64,
+            latency=0.025,
+            dtype="float32",
         )
         self.stream.start()
 

@@ -223,10 +223,16 @@ class PianoKeyboard:
         # 当前基础音调
         self.current_left_start = LEFT_START
         self.current_right_start = RIGHT_START
+        # 长按不重复触发
+        self.pressed_keys = set()
 
     def _on_key(self, vk, is_down):
-        if is_down:
+        if not is_down:
+            self.pressed_keys.remove(vk)
             return
+        if vk in self.pressed_keys:
+            return
+        self.pressed_keys.add(vk)
         if vk in PIANO_BASE_LEFT_MAP:
             self.audio.note_on(PIANO_BASE_LEFT_MAP[vk] + self.current_left_start)
         if vk in PIANO_BASE_RIGHT_MAP:
