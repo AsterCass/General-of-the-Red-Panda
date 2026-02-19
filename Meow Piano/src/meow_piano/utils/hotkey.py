@@ -152,7 +152,7 @@ def vk_to_string(vk):
 
 # 初始键位和最低\高键位
 LOWEST_START = 3
-HIGHEST_START = 75
+HIGHEST_START = 63
 LEFT_START = 15
 RIGHT_START = 39
 
@@ -228,11 +228,19 @@ class PianoKeyboard:
 
     def _on_key(self, vk, is_down):
         if not is_down:
-            self.pressed_keys.remove(vk)
+            self.pressed_keys.discard(vk)
             return
         if vk in self.pressed_keys:
             return
         self.pressed_keys.add(vk)
+        if vk == 160 and self.current_left_start < HIGHEST_START:  # Left Shift
+            self.current_left_start = self.current_left_start + 12
+        if vk == 162 and self.current_left_start > LOWEST_START:  # Left Ctrl
+            self.current_left_start = self.current_left_start - 12
+        if vk == 161 and self.current_right_start < HIGHEST_START:  # Right Shift
+            self.current_right_start = self.current_right_start + 12
+        if vk == 163 and self.current_right_start > LOWEST_START:  # Right Ctrl
+            self.current_right_start = self.current_right_start - 12
         if vk in PIANO_BASE_LEFT_MAP:
             self.audio.note_on(PIANO_BASE_LEFT_MAP[vk] + self.current_left_start)
         if vk in PIANO_BASE_RIGHT_MAP:
