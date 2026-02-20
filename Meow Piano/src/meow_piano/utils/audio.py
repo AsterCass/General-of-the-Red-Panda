@@ -92,8 +92,18 @@ class AudioEngine:
         self.active_notes = still_active
 
         # soft clip
+        # 1.平滑压缩，超出部分渐变，但是稍慢，而且融音不太好
         buffer = np.tanh(buffer)
-        out_data[:] = buffer.reshape(-1, 1)
+        out_data[:, 0] = buffer
+        # 2.按音符数缩放，避免后加入的音压制先加入的，融音效果最好，但是听起来怪怪的
+        # n = max(len(still_active), 1)
+        # buffer *= (1.0 / np.sqrt(n))
+        # buffer /= (1.0 + np.abs(buffer))
+        # out_data[:, 0] = buffer
+        # 3. 同时播放多个可能会有爆音，但是融音效果稍好，速度快
+        # buffer *= 0.8 # 防止爆音
+        # np.clip(buffer, -1, 1, out=buffer)
+        # out_data[:, 0] = buffer
 
 
     # 启动音频流
@@ -102,7 +112,7 @@ class AudioEngine:
             samplerate=self.samplerate,
             channels=1,
             callback=self._audio_callback,
-            blocksize=64,
+            blocksize=32,
             latency=0.025,
             dtype="float32",
         )

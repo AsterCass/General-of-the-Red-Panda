@@ -62,6 +62,47 @@ QPushButton:disabled {
 }
 """
 
+
+text_label_style_piano_map_black = """
+QLabel {
+    color: #f8f8f8;
+    background-color: #303030;           
+    font-size: 12px;
+    min-width: 100px; 
+    min-height: 30px;
+    max-height: 30px; 
+    border-radius: 4px;
+    border: 2px solid #555555;
+}
+"""
+
+text_label_style_piano_map_black_sp = """
+QLabel {
+    color: #f8f8f8;
+    background-color: #303030;           
+    font-size: 12px;
+    min-width: 100px; 
+    min-height: 30px;
+    max-height: 30px; 
+    border-radius: 4px;
+    border: 2px solid #555555;
+    margin-left: 100px
+}
+"""
+
+text_label_style_piano_map_white = """
+QLabel {
+    color: #303030;
+    background-color: #f8f8f8;               
+    font-size: 12px;
+    min-width: 100px; 
+    min-height: 30px; 
+    max-height: 30px; 
+    border-radius: 4px;
+    border: 2px solid #aaaaaa;
+}
+"""
+
 text_label_style = """
 QLabel {
     color: #303030;                  

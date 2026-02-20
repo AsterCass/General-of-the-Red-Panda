@@ -71,6 +71,7 @@ user32.GetMessageW.argtypes = (
 
 # =========================
 # Keyboard Hook 类
+# https://www.xiwnn.com/piano/
 # =========================
 
 class KeyboardHook:
