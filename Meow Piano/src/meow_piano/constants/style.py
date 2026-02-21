@@ -110,6 +110,13 @@ QLabel {
 }
 """
 
+text_label_style_desc = """
+QLabel {
+    color: #808080;                  
+    font-size: 12px;              
+}
+"""
+
 text_browser_style = """
 QTextBrowser {
     background-color: #f8f8f8; 

@@ -3,7 +3,8 @@ from PySide6.QtCore import QUrl
 from PySide6.QtGui import QIcon, QDesktopServices
 
 from meow_piano.constants.style import text_label_style, url_label_style, check_box_style, \
-    text_label_style_piano_map_black, text_label_style_piano_map_white, text_label_style_piano_map_black_sp
+    text_label_style_piano_map_black, text_label_style_piano_map_white, text_label_style_piano_map_black_sp, \
+    text_label_style_desc
 from meow_piano.utils.resource import resource_path
 
 
@@ -97,6 +98,15 @@ class MainWidget(QtWidgets.QWidget):
         self.keysLayout1.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         self.keysLayout1.setContentsMargins(0, 0, 0, 0)
         self.keysLayout1.setSpacing(4)
+
+        # 键位说明
+        self.keyBindDesc = QtWidgets.QLabel("上方总共四排键位（一排分割为黑键排和白键排），一般上两排左手“弹奏”触发，下两排右手“弹奏”触发。"
+                                            "使用左Shift和左Ctrl对上两排进行升八度（Octave Up）或者减八度（Octave Down）。"
+                                            "使用右Shift和右Ctrl对下两排进行升八度（Octave Up）或者减八度（Octave Down）。"
+                                            "左右手（即上两排和下两排）音区相互不影响。")
+        self.keyBindDesc.setWordWrap(True)
+        self.keyBindDesc.setStyleSheet(text_label_style_desc)
+        self.layout.addWidget(self.keyBindDesc)
 
         # Copyright
         self.copyrightLabel = QtWidgets.QPushButton("版权所有：将军的鱿鱼炒面 AsterCasc")
