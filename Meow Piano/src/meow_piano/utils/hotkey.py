@@ -2,6 +2,7 @@ import ctypes
 import threading
 from ctypes import wintypes
 
+from PySide6.QtCore import QObject, Signal
 from loguru import logger
 
 from meow_piano.utils.audio import AudioEngine
@@ -215,8 +216,12 @@ PIANO_BASE_RIGHT_MAP = {
 }
 
 
-class PianoKeyboard:
+class PianoKeyboard(QObject):
+    keyPress = Signal(bool, int)
+    octaveUpDown = Signal(bool ,bool)
+
     def __init__(self):
+        super().__init__()
         # 加载音频
         self.audio = AudioEngine("assets/wav")
         # 键盘钩子
@@ -230,18 +235,24 @@ class PianoKeyboard:
     def _on_key(self, vk, is_down):
         if not is_down:
             self.pressed_keys.discard(vk)
+            self.keyPress.emit(False, vk)
             return
         if vk in self.pressed_keys:
             return
         self.pressed_keys.add(vk)
+        self.keyPress.emit(True, vk)
         if vk == 160 and self.current_left_start < HIGHEST_START:  # Left Shift
             self.current_left_start = self.current_left_start + 12
+            self.octaveUpDown.emit(True, False)
         if vk == 162 and self.current_left_start > LOWEST_START:  # Left Ctrl
             self.current_left_start = self.current_left_start - 12
+            self.octaveUpDown.emit(True, True)
         if vk == 161 and self.current_right_start < HIGHEST_START:  # Right Shift
             self.current_right_start = self.current_right_start + 12
+            self.octaveUpDown.emit(False, False)
         if vk == 163 and self.current_right_start > LOWEST_START:  # Right Ctrl
             self.current_right_start = self.current_right_start - 12
+            self.octaveUpDown.emit(False, True)
         if vk in PIANO_BASE_LEFT_MAP:
             self.audio.note_on(PIANO_BASE_LEFT_MAP[vk] + self.current_left_start)
         if vk in PIANO_BASE_RIGHT_MAP:

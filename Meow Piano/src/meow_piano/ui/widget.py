@@ -1,19 +1,22 @@
 from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import QUrl
+from PySide6.QtCore import QUrl, Slot
 from PySide6.QtGui import QIcon, QDesktopServices
 
 from meow_piano.constants.style import text_label_style, url_label_style, check_box_style, \
     text_label_style_piano_map_black, text_label_style_piano_map_white, text_label_style_piano_map_black_sp, \
-    text_label_style_desc
+    text_label_style_desc, text_label_style_piano_map_white_press, text_label_style_piano_map_black_sp_press, \
+    text_label_style_piano_map_black_press
+from meow_piano.utils.hotkey import PianoKeyboard, vk_to_string
 from meow_piano.utils.resource import resource_path
 
 
 class MainWidget(QtWidgets.QWidget):
 
-    def __init__(self):
+    def __init__(self, piano: PianoKeyboard):
         super().__init__()
         self.setWindowTitle("喵喵钢琴")
         self.setWindowIcon(QIcon(resource_path("assets/logo.svg")))
+        self.piano = piano
 
         # 总布局
         self.layout = QtWidgets.QVBoxLayout(self)
@@ -71,6 +74,7 @@ class MainWidget(QtWidgets.QWidget):
             else:
                 rowLayout.setContentsMargins(0, 0, 0, 10)
             rowLayout.setSpacing(4)
+            keysLabelRow = []
 
             for j, key in enumerate(row):
                 keyLabel = QtWidgets.QLabel()
@@ -90,6 +94,9 @@ class MainWidget(QtWidgets.QWidget):
                     keyLabel.setStyleSheet(text_label_style_piano_map_white)
                 keyLabel.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
                 rowLayout.addWidget(keyLabel)
+                keysLabelRow.append(keyLabel)
+
+            self.allKeysLabel.append(keysLabelRow)
 
             self.layout.addLayout(rowLayout)
 
@@ -120,6 +127,68 @@ class MainWidget(QtWidgets.QWidget):
         # 设置值
         self.playPiano.setChecked(True)
         self.playWave.setChecked(True)
+
+        # 信号
+        self.piano.keyPress.connect(self._on_key_press)
+        self.piano.octaveUpDown.connect(self._on_octave_up_down)
+
+    def _update_label_text(self):
+        for i, row in enumerate(self.allKeys):
+            for j, key in enumerate(row):
+                if i % 2 == 0:
+                    if i <= 3:
+                        self.allKeysLabel[i][j].setText(
+                            f"{key} --> {self.baseBlackUP[j]}{self.currentLeftBase + (i // 2)}")
+                    else:
+                        self.allKeysLabel[i][j].setText(
+                            f"{key} --> {self.baseBlackUP[j]}{self.currentRightBase + ((i - 4) // 2)}")
+                else:
+                    if i <= 3:
+                        self.allKeysLabel[i][j].setText(
+                            f"{key} --> {self.baseWhiteUP[j]}{self.currentLeftBase + (i // 2)}")
+                    else:
+                        self.allKeysLabel[i][j].setText(
+                            f"{key} --> {self.baseWhiteUP[j]}{self.currentRightBase + ((i - 4) // 2)}")
+
+    def _update_label_style(self, is_press, key_str):
+        for i, row in enumerate(self.allKeys):
+            for j, key in enumerate(row):
+                if key == key_str or key[:3] == key_str[:3]:
+                    if is_press:
+                        if i % 2 == 0:
+                            self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_map_black_press)
+                            if j == 2:
+                                self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_map_black_sp_press)
+                        else:
+                            self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_map_white_press)
+                    else:
+                        if i % 2 == 0:
+                            self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_map_black)
+                            if j == 2:
+                                self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_map_black_sp)
+                        else:
+                            self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_map_white)
+
+    @Slot(bool, int)
+    def _on_key_press(self, is_press, vk):
+        self._update_label_style(is_press, vk_to_string(vk))
+        return
+
+    @Slot(bool, bool)
+    def _on_octave_up_down(self, is_left, is_down):
+        if is_left:
+            if is_down:
+                self.currentLeftBase -= 1
+            else:
+                self.currentLeftBase += 1
+        else:
+            if is_down:
+                self.currentRightBase -= 1
+            else:
+                self.currentRightBase += 1
+
+        self._update_label_text()
+        return
 
     def _on_toggle_play_piano(self):
         # todo

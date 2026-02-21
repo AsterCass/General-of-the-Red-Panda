@@ -20,7 +20,7 @@ def main():
     piano.start()
     # 初始化UI
     app = QtWidgets.QApplication([])
-    widget = MainWidget()
+    widget = MainWidget(piano)
     widget.show()
     sys.exit(app.exec())
 
