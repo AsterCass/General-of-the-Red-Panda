@@ -119,6 +119,7 @@ class MainWidget(QtWidgets.QWidget):
         self.copyrightLabel = QtWidgets.QPushButton("版权所有：将军的鱿鱼炒面 AsterCasc")
         self.copyrightLabel.setStyleSheet(url_label_style)
         self.copyrightLabel.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        self.copyrightLabel.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.copyrightLabel.clicked.connect(
             lambda: QDesktopServices.openUrl(QUrl("https://www.astercasc.com"))
         )
