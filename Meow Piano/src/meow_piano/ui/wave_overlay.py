@@ -1,13 +1,26 @@
 import math
+import random
+import time
 
 from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtCore import Qt, Slot
 
-from meow_piano.constants.style import text_label_style_desc
 from meow_piano.utils.hotkey import PianoKeyboard
 
 
+class Wave:
+    def __init__(self, amplitude, ver_speed, color, width, hor_speed):
+        self.amplitude = amplitude
+        self.color = color
+        self.width = width
+        self.hor_speed = hor_speed
+        self.ver_speed = ver_speed
+        self.last_time = time.time()
+        self.phase = 0
+
 class WaveOverlay(QtWidgets.QWidget):
+    MAX_WAVES = 4
+
     def __init__(self, piano: PianoKeyboard):
         super().__init__()
         self.piano = piano
@@ -33,94 +46,108 @@ class WaveOverlay(QtWidgets.QWidget):
         self.piano.keyPress.connect(self._on_key_press)
 
         # 波浪参数
-        self.phase = 0.0
-        self.amplitude = 0.0
-        self.target_amplitude = 0.0
         self.frequency = 0.02
-        self.speed = 0.15
-        self.line_width = 3
+        self.waves = []
 
-        # 计时器（60FPS）
+        # 计时器
         self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self._update_animation)
-        self.timer.start(16)
-
+        self.timer.timeout.connect(self.update_animation)
+        self.timer.start(30)
 
 
     @Slot(bool, int)
     def _on_key_press(self, is_press, vk):
         if not is_press:
             return
-        self.trigger()
+        rng = random.Random(vk)
+        color_int = rng.randint(0, 0xFFFFFF)
+        r = (color_int >> 16) & 0xFF
+        g = (color_int >> 8) & 0xFF
+        b = color_int & 0xFF
+        self.trigger(
+            color=QtGui.QColor(r, g, b, 120),
+            hor_speed=rng.uniform(0.2, 0.35),
+            width=rng.randint(2, 5),
+            ver_speed=rng.randint(15, 25),
+            amplitude=rng.randint(30, 50),
+        )
         return
 
+    def trigger(self, amplitude=40, ver_speed=20, color=QtGui.QColor(0, 255, 255, 120), width=3, hor_speed=0.4):
 
-    def trigger(self, strength=1.0):
-        self.target_amplitude += 20 * strength
-        self.target_amplitude = min(self.target_amplitude, 80)
+        if len(self.waves) < self.MAX_WAVES:
+            self.waves.append(Wave(amplitude, ver_speed, color, width, hor_speed))
+            return
 
-    def _update_animation(self):
-        # 平滑振幅衰减（阻尼）
-        self.amplitude += (self.target_amplitude - self.amplitude) * 0.15
-        self.target_amplitude *= 0.92
-        # 相位推进
-        self.phase += self.speed
+        update = min(self.waves, key=lambda w: w.amplitude)
+        update.amplitude = min(update.amplitude + update.amplitude * 0.5, 100)
+        update.color = color
+        update.width = width
+        update.hor_speed = hor_speed
+
+    def update_animation(self):
+        now = time.time()
+        alive_waves = []
+
+        for wave in self.waves:
+            dur = now - wave.last_time
+            wave.last_time = now
+            if wave.amplitude <= 1.0:
+                continue
+            wave.amplitude = wave.amplitude - dur * wave.ver_speed
+            wave.phase += wave.hor_speed
+            alive_waves.append(wave)
+
+        self.waves = alive_waves
         self.update()
 
 
     def paintEvent(self, event):
-        if self.amplitude < 0.5:
+        if not self.waves:
             return
 
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
 
-        pen = QtGui.QPen(QtGui.QColor(0, 255, 180, 200))
-        pen.setWidth(self.line_width)
-        painter.setPen(pen)
+        for wave in self.waves:
+            pen = QtGui.QPen(wave.color)
+            pen.setWidth(wave.width)
+            painter.setPen(pen)
+            self.draw_edges(painter, wave)
 
+    def draw_edges(self, painter, wave):
         w = self.width()
         h = self.height()
 
-        self._draw_horizontal_wave(painter, 0, True)
-        self._draw_horizontal_wave(painter, h, False)
-        self._draw_vertical_wave(painter, 0, True)
-        self._draw_vertical_wave(painter, w, False)
+        self.draw_horizontal_wave(painter, 0, True, wave)
+        self.draw_horizontal_wave(painter, h, False, wave)
+        self.draw_vertical_wave(painter, 0, True, wave)
+        self.draw_vertical_wave(painter, w, False, wave)
 
-
-    def _draw_horizontal_wave(self, painter, y_base, top=True):
+    def draw_horizontal_wave(self, painter, y_base, top, wave):
         path = QtGui.QPainterPath()
         step = 8
-
         for x in range(0, self.width(), step):
-            y = self.amplitude * math.sin(x * self.frequency + self.phase)
+            y = wave.amplitude * math.sin(x * self.frequency + wave.phase)
             if not top:
                 y = -y
-
             final_y = y_base + y
-
             if x == 0:
                 path.moveTo(x, final_y)
             else:
                 path.lineTo(x, final_y)
-
         painter.drawPath(path)
 
-
-    def _draw_vertical_wave(self, painter, x_base, left=True):
+    def draw_vertical_wave(self, painter, x_base, left, wave):
         path = QtGui.QPainterPath()
         step = 8
-
         for y in range(0, self.height(), step):
-            x = self.amplitude * math.sin(y * self.frequency + self.phase)
+            x = wave.amplitude * math.sin(y * self.frequency + wave.phase)
             if not left:
                 x = -x
-
             final_x = x_base + x
-
             if y == 0:
                 path.moveTo(final_x, y)
             else:
                 path.lineTo(final_x, y)
-
         painter.drawPath(path)
