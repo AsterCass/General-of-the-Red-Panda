@@ -218,11 +218,13 @@ PIANO_BASE_RIGHT_MAP = {
 
 class PianoKeyboard(QObject):
     keyPress = Signal(bool, int)
+    keyPressWave = Signal(bool, int)
     octaveUpDown = Signal(bool ,bool)
 
     def __init__(self):
         super().__init__()
-        self.enable = True
+        self.audio_enable = True
+        self.wave_enable = True
         # 加载音频
         self.audio = AudioEngine("assets/wav")
         # 键盘钩子
@@ -233,12 +235,13 @@ class PianoKeyboard(QObject):
         # 长按不重复触发
         self.pressed_keys = set()
 
-    def enable_piano(self, enable: bool):
-        self.enable = enable
+    def enable_audio(self, enable: bool):
+        self.audio_enable = enable
+
+    def enable_wave(self, enable: bool):
+        self.wave_enable = enable
 
     def _on_key(self, vk, is_down):
-        if not self.enable:
-            return
         if not is_down:
             self.pressed_keys.discard(vk)
             self.keyPress.emit(False, vk)
@@ -246,6 +249,11 @@ class PianoKeyboard(QObject):
         if vk in self.pressed_keys:
             return
         self.pressed_keys.add(vk)
+        # 触发
+        if self.wave_enable:
+            self.keyPressWave.emit(True, vk)
+        if not self.audio_enable:
+            return
         self.keyPress.emit(True, vk)
         if vk == 160 and self.current_left_start < HIGHEST_START:  # Left Shift
             self.current_left_start = self.current_left_start + 12
