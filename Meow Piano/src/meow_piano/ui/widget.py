@@ -192,7 +192,7 @@ class MainWidget(QtWidgets.QWidget):
         return
 
     def _on_toggle_play_piano(self):
-        # todo
+        self.piano.enable_piano(self.playPiano.isChecked())
         return
 
     def _on_toggle_play_wav(self):

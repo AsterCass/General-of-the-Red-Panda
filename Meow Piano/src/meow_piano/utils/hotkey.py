@@ -222,6 +222,7 @@ class PianoKeyboard(QObject):
 
     def __init__(self):
         super().__init__()
+        self.enable = True
         # 加载音频
         self.audio = AudioEngine("assets/wav")
         # 键盘钩子
@@ -232,7 +233,12 @@ class PianoKeyboard(QObject):
         # 长按不重复触发
         self.pressed_keys = set()
 
+    def enable_piano(self, enable: bool):
+        self.enable = enable
+
     def _on_key(self, vk, is_down):
+        if not self.enable:
+            return
         if not is_down:
             self.pressed_keys.discard(vk)
             self.keyPress.emit(False, vk)
