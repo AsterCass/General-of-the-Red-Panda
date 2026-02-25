@@ -19,7 +19,9 @@ class Wave:
         self.phase = 0
 
 class WaveOverlay(QtWidgets.QWidget):
+    # todo 支持自定义
     MAX_WAVES = 4
+    MAX_HEIGHT = 100
 
     def __init__(self, piano: PianoKeyboard):
         super().__init__()
@@ -65,7 +67,7 @@ class WaveOverlay(QtWidgets.QWidget):
         g = (color_int >> 8) & 0xFF
         b = color_int & 0xFF
         self.trigger(
-            color=QtGui.QColor(r, g, b, 120),
+            color=QtGui.QColor(r, g, b, 180),
             hor_speed=rng.uniform(0.2, 0.35),
             width=rng.randint(2, 5),
             ver_speed=rng.randint(15, 25),
@@ -80,7 +82,7 @@ class WaveOverlay(QtWidgets.QWidget):
             return
 
         update = min(self.waves, key=lambda w: w.amplitude)
-        update.amplitude = min(update.amplitude + update.amplitude * 0.5, 100)
+        update.amplitude = min(update.amplitude + update.amplitude, self.MAX_HEIGHT)
         update.color = color
         update.width = width
         update.hor_speed = hor_speed
