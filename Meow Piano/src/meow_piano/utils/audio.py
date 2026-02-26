@@ -50,7 +50,7 @@ class AudioEngine:
 
 
     # 播放接口
-    def note_on(self, note, velocity=127):
+    def note_on(self, note, velocity=50):
         if note not in self.samples:
             return
         gain = (velocity / 127.0) ** 1.4

@@ -227,6 +227,7 @@ class PianoKeyboard(QObject):
         self.wave_enable = True
         # 加载音频
         self.audio = AudioEngine("assets/wav")
+        self.audio_velocity = 50
         # 键盘钩子
         self.hook = KeyboardHook(self._on_key)
         # 当前基础音调
@@ -234,6 +235,9 @@ class PianoKeyboard(QObject):
         self.current_right_start = RIGHT_START
         # 长按不重复触发
         self.pressed_keys = set()
+
+    def set_audio_velocity(self, value):
+        self.audio_velocity = value
 
     def enable_audio(self, enable: bool):
         self.audio_enable = enable
@@ -268,9 +272,9 @@ class PianoKeyboard(QObject):
             self.current_right_start = self.current_right_start - 12
             self.octaveUpDown.emit(False, True)
         if vk in PIANO_BASE_LEFT_MAP:
-            self.audio.note_on(PIANO_BASE_LEFT_MAP[vk] + self.current_left_start)
+            self.audio.note_on(PIANO_BASE_LEFT_MAP[vk] + self.current_left_start, self.audio_velocity)
         if vk in PIANO_BASE_RIGHT_MAP:
-            self.audio.note_on(PIANO_BASE_RIGHT_MAP[vk] + self.current_right_start)
+            self.audio.note_on(PIANO_BASE_RIGHT_MAP[vk] + self.current_right_start, self.audio_velocity)
 
     def start(self):
         self.hook.start()

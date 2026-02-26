@@ -1,11 +1,12 @@
 from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import QUrl, Slot
 from PySide6.QtGui import QIcon, QDesktopServices
+from PySide6.QtWidgets import QSlider
 
-from meow_piano.constants.style import text_label_style, url_label_style, check_box_style, \
+from meow_piano.constants.style import url_label_style, check_box_style, \
     text_label_style_piano_map_black, text_label_style_piano_map_white, text_label_style_piano_map_black_sp, \
     text_label_style_desc, text_label_style_piano_map_white_press, text_label_style_piano_map_black_sp_press, \
-    text_label_style_piano_map_black_press
+    text_label_style_piano_map_black_press, slider_style, text_label_style_mini
 from meow_piano.utils.hotkey import PianoKeyboard, vk_to_string
 from meow_piano.utils.resource import resource_path
 
@@ -44,9 +45,31 @@ class MainWidget(QtWidgets.QWidget):
         self.settingLayout.setSpacing(4)
         self.layout.addWidget(self.settingWidget)
 
+        # 滑动设置
+        self.pianoVolLayout = QtWidgets.QHBoxLayout()
+        self.pianoVolLayout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.pianoVolLabel = QtWidgets.QLabel("钢琴率律动音量：")
+        self.pianoVolLabel.setStyleSheet(text_label_style_mini)
+        self.pianoVolNumLabel = QtWidgets.QLabel("（50）")
+        self.pianoVolNumLabel.setStyleSheet(text_label_style_mini)
+        self.pianoVol = QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.pianoVol.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.pianoVol.setStyleSheet(slider_style)
+        self.pianoVol.setMinimum(0)
+        self.pianoVol.setMaximum(100)
+        self.pianoVol.setValue(50)
+        self.pianoVol.setSingleStep(1)
+        self.pianoVolLayout.addWidget(self.pianoVolLabel)
+        self.pianoVolLayout.addWidget(self.pianoVol)
+        self.pianoVolLayout.addWidget(self.pianoVolNumLabel)
+        self.pianoVolLayout.addStretch()
+        self.pianoVolLayout.setContentsMargins(0, 0, 0, 0)
+        self.pianoVolLayout.setSpacing(2)
+        self.layout.addLayout(self.pianoVolLayout)
+
         # 键位提示
-        self.keyBindLabel = QtWidgets.QLabel("钢琴律动键位绑定（Demo版本暂不支持修改）")
-        self.keyBindLabel.setStyleSheet(text_label_style)
+        self.keyBindLabel = QtWidgets.QLabel("钢琴律动键位绑定（Demo版本暂不支持修改）：")
+        self.keyBindLabel.setStyleSheet(text_label_style_mini)
         self.layout.addWidget(self.keyBindLabel)
 
         # 键位内容
@@ -132,6 +155,12 @@ class MainWidget(QtWidgets.QWidget):
         # 信号
         self.piano.keyPress.connect(self._on_key_press)
         self.piano.octaveUpDown.connect(self._on_octave_up_down)
+        self.pianoVol.valueChanged.connect(self._update_piano_vol)
+
+    def _update_piano_vol(self, value):
+        self.piano.set_audio_velocity(value)
+        self.pianoVolNumLabel.setText(f"（{value}）")
+        return
 
     def _update_label_text(self):
         for i, row in enumerate(self.allKeys):

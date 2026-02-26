@@ -19,7 +19,7 @@ class Wave:
         self.phase = 0
 
 class WaveOverlay(QtWidgets.QWidget):
-    # todo 支持自定义
+    # todo 支持自定义最大波数量
     # todo 考虑打字越快，水平速度越快，而不是只增加振幅
     MAX_WAVES = 4
     MAX_HEIGHT = 100
