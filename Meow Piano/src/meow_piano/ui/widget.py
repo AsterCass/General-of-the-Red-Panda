@@ -1,5 +1,5 @@
 from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import QUrl, Slot
+from PySide6.QtCore import QUrl, Slot, Signal
 from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QSlider
 
@@ -12,6 +12,8 @@ from meow_piano.utils.resource import resource_path
 
 
 class MainWidget(QtWidgets.QWidget):
+    maxWaveNumberSignal = Signal(int)
+    maxWaveHeightSignal = Signal(int)
 
     def __init__(self, piano: PianoKeyboard):
         super().__init__()
@@ -48,7 +50,7 @@ class MainWidget(QtWidgets.QWidget):
         # 滑动设置
         self.pianoVolLayout = QtWidgets.QHBoxLayout()
         self.pianoVolLayout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
-        self.pianoVolLabel = QtWidgets.QLabel("钢琴率律动音量：")
+        self.pianoVolLabel = QtWidgets.QLabel("钢琴律动音量：")
         self.pianoVolLabel.setStyleSheet(text_label_style_mini)
         self.pianoVolNumLabel = QtWidgets.QLabel("（50）")
         self.pianoVolNumLabel.setStyleSheet(text_label_style_mini)
@@ -66,6 +68,50 @@ class MainWidget(QtWidgets.QWidget):
         self.pianoVolLayout.setContentsMargins(0, 0, 0, 0)
         self.pianoVolLayout.setSpacing(2)
         self.layout.addLayout(self.pianoVolLayout)
+        
+        # 滑动设置
+        self.maxHeightLayout = QtWidgets.QHBoxLayout()
+        self.maxHeightLayout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.maxHeightLabel = QtWidgets.QLabel("屏幕律动最大同时存在数量：")
+        self.maxHeightLabel.setStyleSheet(text_label_style_mini)
+        self.maxHeightNumLabel = QtWidgets.QLabel("（4）")
+        self.maxHeightNumLabel.setStyleSheet(text_label_style_mini)
+        self.maxHeight = QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.maxHeight.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.maxHeight.setStyleSheet(slider_style)
+        self.maxHeight.setMinimum(1)
+        self.maxHeight.setMaximum(10)
+        self.maxHeight.setValue(4)
+        self.maxHeight.setSingleStep(1)
+        self.maxHeightLayout.addWidget(self.maxHeightLabel)
+        self.maxHeightLayout.addWidget(self.maxHeight)
+        self.maxHeightLayout.addWidget(self.maxHeightNumLabel)
+        self.maxHeightLayout.addStretch()
+        self.maxHeightLayout.setContentsMargins(0, 0, 0, 0)
+        self.maxHeightLayout.setSpacing(2)
+        self.layout.addLayout(self.maxHeightLayout)
+        
+        # 滑动设置
+        self.maxWaveNumberLayout = QtWidgets.QHBoxLayout()
+        self.maxWaveNumberLayout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.maxWaveNumberLabel = QtWidgets.QLabel("屏幕律动最大高度：")
+        self.maxWaveNumberLabel.setStyleSheet(text_label_style_mini)
+        self.maxWaveNumberNumLabel = QtWidgets.QLabel("（100）")
+        self.maxWaveNumberNumLabel.setStyleSheet(text_label_style_mini)
+        self.maxWaveNumber = QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.maxWaveNumber.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.maxWaveNumber.setStyleSheet(slider_style)
+        self.maxWaveNumber.setMinimum(50)
+        self.maxWaveNumber.setMaximum(200)
+        self.maxWaveNumber.setValue(100)
+        self.maxWaveNumber.setSingleStep(1)
+        self.maxWaveNumberLayout.addWidget(self.maxWaveNumberLabel)
+        self.maxWaveNumberLayout.addWidget(self.maxWaveNumber)
+        self.maxWaveNumberLayout.addWidget(self.maxWaveNumberNumLabel)
+        self.maxWaveNumberLayout.addStretch()
+        self.maxWaveNumberLayout.setContentsMargins(0, 0, 0, 0)
+        self.maxWaveNumberLayout.setSpacing(2)
+        self.layout.addLayout(self.maxWaveNumberLayout)
 
         # 键位提示
         self.keyBindLabel = QtWidgets.QLabel("钢琴律动键位绑定（Demo版本暂不支持修改）：")
@@ -156,6 +202,19 @@ class MainWidget(QtWidgets.QWidget):
         self.piano.keyPress.connect(self._on_key_press)
         self.piano.octaveUpDown.connect(self._on_octave_up_down)
         self.pianoVol.valueChanged.connect(self._update_piano_vol)
+        self.maxHeight.valueChanged.connect(self._update_max_height)
+        self.maxWaveNumber.valueChanged.connect(self._update_max_wave_number)
+
+
+    def _update_max_height(self, value):
+        self.maxWaveHeightSignal.emit(value)
+        self.maxHeightNumLabel.setText(f"（{value}）")
+        return
+
+    def _update_max_wave_number(self, value):
+        self.maxWaveNumberSignal.emit(value)
+        self.maxWaveNumberNumLabel.setText(f"（{value}）")
+        return
 
     def _update_piano_vol(self, value):
         self.piano.set_audio_velocity(value)

@@ -5,6 +5,7 @@ import time
 from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtCore import Qt, Slot
 
+from meow_piano.ui.widget import MainWidget
 from meow_piano.utils.hotkey import PianoKeyboard
 
 
@@ -19,14 +20,14 @@ class Wave:
         self.phase = 0
 
 class WaveOverlay(QtWidgets.QWidget):
-    # todo 支持自定义最大波数量
     # todo 考虑打字越快，水平速度越快，而不是只增加振幅
-    MAX_WAVES = 4
-    MAX_HEIGHT = 100
 
-    def __init__(self, piano: PianoKeyboard):
+    def __init__(self, main_widget: MainWidget, piano: PianoKeyboard):
         super().__init__()
         self.piano = piano
+        self.main_widget = main_widget
+        self.max_waves = 4
+        self.max_height = 100
 
         # 样式
         self.setWindowFlags(
@@ -47,6 +48,8 @@ class WaveOverlay(QtWidgets.QWidget):
 
         # 信号
         self.piano.keyPressWave.connect(self._on_key_press)
+        self.main_widget.maxWaveNumberSignal.connect(self._reset_max_wave_height)
+        self.main_widget.maxWaveHeightSignal.connect(self._reset_max_wave_number)
 
         # 波浪参数
         self.frequency = 0.02
@@ -56,7 +59,17 @@ class WaveOverlay(QtWidgets.QWidget):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_animation)
         self.timer.start(30)
-
+        
+        
+    @Slot(int)
+    def _reset_max_wave_height(self, value):
+        self.max_height = value
+        return
+    
+    @Slot(int)
+    def _reset_max_wave_number(self, value):
+        self.max_waves = value
+        return
 
     @Slot(bool, int)
     def _on_key_press(self, is_press, vk):
@@ -78,12 +91,12 @@ class WaveOverlay(QtWidgets.QWidget):
 
     def trigger(self, amplitude=40, ver_speed=20, color=QtGui.QColor(0, 255, 255, 120), width=3, hor_speed=0.4):
 
-        if len(self.waves) < self.MAX_WAVES:
+        if len(self.waves) < self.max_waves:
             self.waves.append(Wave(amplitude, ver_speed, color, width, hor_speed))
             return
 
         update = min(self.waves, key=lambda w: w.amplitude)
-        update.amplitude = min(update.amplitude + update.amplitude, self.MAX_HEIGHT)
+        update.amplitude = min(update.amplitude + update.amplitude, self.max_height)
         update.color = color
         update.width = width
         update.hor_speed = hor_speed

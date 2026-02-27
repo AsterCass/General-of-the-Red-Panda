@@ -24,7 +24,7 @@ def main():
     widget = MainWidget(piano)
     widget.show()
     # 波浪窗口
-    overlay = WaveOverlay(piano)
+    overlay = WaveOverlay(widget, piano)
     overlay.show()
     # 程序
     sys.exit(app.exec())
