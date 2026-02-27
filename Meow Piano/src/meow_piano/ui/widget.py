@@ -5,8 +5,8 @@ from PySide6.QtWidgets import QSlider
 
 from meow_piano.constants.style import url_label_style, check_box_style, \
     text_label_style_piano_map_black, text_label_style_piano_map_white, text_label_style_piano_map_black_sp, \
-    text_label_style_desc, text_label_style_piano_map_white_press, text_label_style_piano_map_black_sp_press, \
-    text_label_style_piano_map_black_press, slider_style, text_label_style_mini
+    text_label_style_desc, slider_style, text_label_style_mini, text_label_style_piano_press, \
+    text_label_style_piano_press_sp
 from meow_piano.utils.hotkey import PianoKeyboard, vk_to_string
 from meow_piano.utils.resource import resource_path
 
@@ -245,11 +245,14 @@ class MainWidget(QtWidgets.QWidget):
                 if key == key_str or key[:3] == key_str[:3]:
                     if is_press:
                         if i % 2 == 0:
-                            self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_map_black_press)
+                            # self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_map_black_press)
+                            self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_press)
                             if j == 2:
-                                self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_map_black_sp_press)
+                                # self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_map_black_sp_press)
+                                self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_press_sp)
                         else:
-                            self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_map_white_press)
+                            # self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_map_white_press)
+                            self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_press)
                     else:
                         if i % 2 == 0:
                             self.allKeysLabel[i][j].setStyleSheet(text_label_style_piano_map_black)

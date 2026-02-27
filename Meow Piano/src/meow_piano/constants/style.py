@@ -93,6 +93,32 @@ QPushButton:disabled {
 }
 """
 
+text_label_style_piano_press = """
+QLabel {
+    color: #f8f8f8;
+    background-color: #f27f2e;           
+    font-size: 12px;
+    min-width: 100px; 
+    min-height: 30px;
+    max-height: 30px; 
+    border-radius: 4px;
+    border: 2px solid #8f4e30;
+}
+"""
+
+text_label_style_piano_press_sp = """
+QLabel {
+    color: #f8f8f8;
+    background-color: #f27f2e;           
+    font-size: 12px;
+    min-width: 100px; 
+    min-height: 30px;
+    max-height: 30px; 
+    border-radius: 4px;
+    border: 2px solid #8f4e30;
+    margin-left: 100px
+}
+"""
 
 text_label_style_piano_map_black = """
 QLabel {
