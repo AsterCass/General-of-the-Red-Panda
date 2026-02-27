@@ -17,7 +17,7 @@ class MainWidget(QtWidgets.QWidget):
 
     def __init__(self, piano: PianoKeyboard):
         super().__init__()
-        self.setWindowTitle("喵喵钢琴")
+        self.setWindowTitle("喵喵律动")
         self.setWindowIcon(QIcon(resource_path("assets/logo.svg")))
         self.piano = piano
 
