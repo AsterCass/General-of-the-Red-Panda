@@ -35,7 +35,6 @@
 不进行开发修改的小伙伴略过这个部分
 
 1. 安装[uv](https://docs.astral.sh/uv/)以及[python](https://www.python.org/)环境
-2. 将上方【下载】的内容中的 models 文件夹复制到项目根目录下
 
 ```shell
 # 安装运行
