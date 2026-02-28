@@ -6,12 +6,13 @@ from pathlib import Path
 def setup_logging(save_file: bool = True):
     logger.remove()
 
-    logger.add(
-        sys.stderr,
-        level="INFO",
-        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name: <20}</cyan> | <level>{message}</level>",
-        colorize=True,
-    )
+    if sys.stderr is not None:
+        logger.add(
+            sys.stderr,
+            level="INFO",
+            format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name: <20}</cyan> | <level>{message}</level>",
+            colorize=True,
+        )
 
     if save_file:
         log_dir = Path("logs")

@@ -113,7 +113,7 @@ class AudioEngine:
             channels=1,
             callback=self._audio_callback,
             blocksize=32,
-            latency=0.05,
+            latency=0.075,
             dtype="float32",
         )
         self.stream.start()
