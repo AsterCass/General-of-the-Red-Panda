@@ -14,6 +14,11 @@ English | [中文](README_zh.md)
 
 ## Documentation
 
+For detailed documentation and extended information, please visit:
+[Click here](https://www.astercasc.com/article/detail?articleId=AT202776160889761382)
+
+If you have any questions, you can leave a comment at the bottom of that page.
+
 
 ## Download
 
