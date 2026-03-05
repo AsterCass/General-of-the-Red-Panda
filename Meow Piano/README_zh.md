@@ -22,11 +22,13 @@
 
 具体文档以及相关拓展更多内容可以访问：[点击此处](https://www.astercasc.com/article/detail?articleId=AT202776160889761382)
 
+或者：[点击此处](https://www.astercasc.com/article/detail?articleId=AT202946490116003020)
+
 如果有任何问题也可在该链接网址的最下方留言
 
 ## 软件下载
 
-默认环境下所需的模型文件以及主程序的下载（提供给不同需求用户，选择其一即可）：
+主程序的下载（提供给不同需求用户，选择其一即可）：
 
 玛丽亚内居民：[点击此处](https://pan.baidu.com/s/5P4zJnQ1tJkycI24FEcJC4Q)
 
@@ -47,7 +49,4 @@ uv run pyinstaller --onefile --noconsole --icon=assets/logo.ico --name 喵喵律
 uv lock --no-cache
 uv sync
 ```
-
-
-## 技术栈
 
