@@ -36,6 +36,10 @@ class MainWidget(QtWidgets.QWidget):
         self.playWave.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.playWave.setStyleSheet(check_box_style)
         self.playWave.toggled.connect(self._on_toggle_play_wav)
+        self.disableOctave = QtWidgets.QCheckBox("禁用Shift和Ctrl的调整音阶功能")
+        self.disableOctave.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.disableOctave.setStyleSheet(check_box_style)
+        self.disableOctave.toggled.connect(self._on_toggle_disable_octave)
 
         # 设置布局
         self.settingWidget = QtWidgets.QWidget()
@@ -43,6 +47,7 @@ class MainWidget(QtWidgets.QWidget):
         self.settingLayout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         self.settingLayout.addWidget(self.playPiano)
         self.settingLayout.addWidget(self.playWave)
+        self.settingLayout.addWidget(self.disableOctave)
         self.settingLayout.setContentsMargins(0, 0, 0, 0)
         self.settingLayout.setSpacing(4)
         self.layout.addWidget(self.settingWidget)
@@ -197,6 +202,7 @@ class MainWidget(QtWidgets.QWidget):
         # 设置值
         self.playPiano.setChecked(True)
         self.playWave.setChecked(True)
+        self.disableOctave.setChecked(False)
 
         # 信号
         self.piano.keyPress.connect(self._on_key_press)
@@ -288,4 +294,8 @@ class MainWidget(QtWidgets.QWidget):
 
     def _on_toggle_play_wav(self):
         self.piano.enable_wave(self.playWave.isChecked())
+        return
+
+    def _on_toggle_disable_octave(self):
+        self.piano.disable_octave(self.disableOctave.isChecked())
         return

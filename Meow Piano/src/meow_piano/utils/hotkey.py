@@ -225,6 +225,7 @@ class PianoKeyboard(QObject):
         super().__init__()
         self.audio_enable = True
         self.wave_enable = True
+        self.octave_disable = False
         # 加载音频
         self.audio = AudioEngine("assets/wav")
         self.audio_velocity = 50
@@ -245,6 +246,9 @@ class PianoKeyboard(QObject):
     def enable_wave(self, enable: bool):
         self.wave_enable = enable
 
+    def disable_octave(self, disable: bool):
+        self.octave_disable = disable
+
     def _on_key(self, vk, is_down):
         if not is_down:
             self.pressed_keys.discard(vk)
@@ -259,16 +263,16 @@ class PianoKeyboard(QObject):
         if not self.audio_enable:
             return
         self.keyPress.emit(True, vk)
-        if vk == 160 and self.current_left_start < HIGHEST_START:  # Left Shift
+        if vk == 160 and self.current_left_start < HIGHEST_START and (not self.octave_disable):  # Left Shift
             self.current_left_start = self.current_left_start + 12
             self.octaveUpDown.emit(True, False)
-        if vk == 162 and self.current_left_start > LOWEST_START:  # Left Ctrl
+        if vk == 162 and self.current_left_start > LOWEST_START and (not self.octave_disable):  # Left Ctrl
             self.current_left_start = self.current_left_start - 12
             self.octaveUpDown.emit(True, True)
-        if vk == 161 and self.current_right_start < HIGHEST_START:  # Right Shift
+        if vk == 161 and self.current_right_start < HIGHEST_START and (not self.octave_disable):  # Right Shift
             self.current_right_start = self.current_right_start + 12
             self.octaveUpDown.emit(False, False)
-        if vk == 163 and self.current_right_start > LOWEST_START:  # Right Ctrl
+        if vk == 163 and self.current_right_start > LOWEST_START and (not self.octave_disable):  # Right Ctrl
             self.current_right_start = self.current_right_start - 12
             self.octaveUpDown.emit(False, True)
         if vk in PIANO_BASE_LEFT_MAP:
