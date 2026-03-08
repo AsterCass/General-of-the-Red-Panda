@@ -26,8 +26,8 @@ class WaveOverlay(QtWidgets.QWidget):
         super().__init__()
         self.piano = piano
         self.main_widget = main_widget
-        self.max_waves = 4
-        self.max_height = 100
+        self.max_waves = 5
+        self.max_height = 80
 
         # 样式
         self.setWindowFlags(
