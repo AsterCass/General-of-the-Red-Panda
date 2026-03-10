@@ -14,14 +14,13 @@ dependencies = [
     "loguru>=0.7.3", # 日志
     #"polars>=1.38.1", # 数据处理
     #"pydantic>=2.12.5", # Json 序列化/反序列化
-    "python-dotenv>=1.2.1", # 加载环境变量
+    "python-dotenv>=1.2.2", # 加载环境变量
     #"redis>=7.1.0", # Redis
     #"rich>=14.3.2", # 终端渲染
     "pyside6>=6.10.2", # UI
     # 额外
     "sounddevice>=0.5.5", # 声音
     "soundfile>=0.13.1", # 声音
-    "numpy>=2.2.6", # 计算
 ]
 
 [[tool.uv.index]]
@@ -34,11 +33,11 @@ url = "https://mirrors.aliyun.com/pypi/simple/"
 
 [dependency-groups]
 dev = [
-    "hatchling>=1.28.0", # 构建引擎
+    "hatchling>=1.29.0", # 构建引擎
     "pyinstaller>=6.19.0", # 打包
     "pytest>=9.0.2", # 测试
     "pytest-cov>=7.0.0", # 测试代码覆盖
-    "ruff>=0.15.1", # 代码格式化
+    "ruff>=0.15.5", # 代码格式化
 ]
 
 [build-system]
