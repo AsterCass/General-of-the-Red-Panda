@@ -37,11 +37,11 @@ url = "https://mirrors.aliyun.com/pypi/simple/"
 
 [dependency-groups]
 dev = [
-    "hatchling>=1.28.0", # 构建引擎
-    "pyinstaller>=6.18.0", # 打包
+    "hatchling>=1.29.0", # 构建引擎
+    "pyinstaller>=6.19.0", # 打包
     "pytest>=9.0.2", # 测试
     "pytest-cov>=7.0.0", # 测试代码覆盖
-    "ruff>=0.15.0", # 代码格式化
+    "ruff>=0.15.5", # 代码格式化
 ]
 
 [build-system]
