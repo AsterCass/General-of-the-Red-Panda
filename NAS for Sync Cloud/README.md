@@ -1,4 +1,4 @@
-# NAS for Home Theater
+# NAS for Home Sync Cloud
 
 English | [中文](README_zh.md)
 
