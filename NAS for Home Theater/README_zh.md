@@ -10,6 +10,8 @@
 
 具体文档以及相关拓展更多内容可以访问：[点击此处](https://www.astercasc.com/article/detail?articleId=AT199028468800214220)
 
+以及[家用网络下构建外网可访问的内网服务器（续篇）](https://www.astercasc.com/article/detail?articleId=AT203391896848146841)
+
 如果有任何问题也可在该链接网址的最下方留言
 
 ## 相关资源下载地址
