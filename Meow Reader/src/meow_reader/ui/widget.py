@@ -34,6 +34,9 @@ class MainWidget(QtWidgets.QWidget):
         self.topMost.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.topMost.setStyleSheet(check_box_style)
         self.topMost.toggled.connect(self._on_toggle_topmost)
+        self.needMute = QtWidgets.QCheckBox("静音")
+        self.needMute.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.needMute.setStyleSheet(check_box_style)
 
         # 设置布局
         self.settingWidget = QtWidgets.QWidget()
@@ -41,6 +44,7 @@ class MainWidget(QtWidgets.QWidget):
         self.settingLayout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         self.settingLayout.addWidget(self.onlyEnCheckBox)
         self.settingLayout.addWidget(self.topMost)
+        self.settingLayout.addWidget(self.needMute)
         self.settingLayout.setContentsMargins(0, 0, 0, 0)
         self.settingLayout.setSpacing(4)
 
@@ -85,6 +89,7 @@ class MainWidget(QtWidgets.QWidget):
         # 设置值
         self.onlyEnCheckBox.setChecked(True)
         self.topMost.setChecked(True)
+        self.needMute.setChecked(False)
 
         # 信号
         self.translation_done.connect(self._update_text_input_output)
@@ -115,6 +120,8 @@ class MainWidget(QtWidgets.QWidget):
             return
         self.last_text = text
         self.translator.translate(text, self._on_translated)
+        if self.needMute.isChecked():
+            return
         self.reader.speak(text)
 
     def _on_toggle_topmost(self, checked: bool):
