@@ -8,7 +8,7 @@
 
 ## 具体文档
 
-具体文档以及相关拓展更多内容可以访问：[点击此处](https://www.astercasc.com/article/detail?articleId=AT199028468800214220)
+具体文档以及相关拓展更多内容可以访问：[构建完全自定义的全屋智能系统（四）（娱乐篇-使用旧电脑构建NAS用于家庭影院）](https://www.astercasc.com/article/detail?articleId=AT199028468800214220)
 
 以及[家用网络下构建外网可访问的内网服务器（续篇）](https://www.astercasc.com/article/detail?articleId=AT203391896848146841)
 

@@ -11,6 +11,8 @@ There is no need to manually download any virtual machines, no need to modify th
 
 For detailed documentation and more extended content, please visit:[Click here](https://www.astercasc.com/article/detail?articleId=AT199028468800214220)
 
+and [Click here](https://www.astercasc.com/article/detail?articleId=AT203391896848146841)
+
 If you have any questions, you can also leave a comment at the bottom of that page.
 
 ## Related Resources Download
