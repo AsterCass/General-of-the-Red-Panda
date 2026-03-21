@@ -8,7 +8,7 @@
 
 ## 具体文档
 
-具体文档以及相关拓展更多内容可以访问：[构建完全自定义的全屋智能系统（六）（娱乐篇-使用旧电脑构建NAS用于私有云）]()
+具体文档以及相关拓展更多内容可以访问：[构建完全自定义的全屋智能系统（六）（娱乐篇-使用旧电脑构建NAS用于私有云）](https://www.astercasc.com/article/detail?articleId=AT203530254536227635)
 
 以及[家用网络下构建外网可访问的内网服务器（续篇）](https://www.astercasc.com/article/detail?articleId=AT203391896848146841)
 
