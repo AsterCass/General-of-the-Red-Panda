@@ -383,14 +383,14 @@ if (-not (Get-NetFirewallRule -DisplayName "WSL 50011" -ErrorAction SilentlyCont
       -Action Allow
 }
 '@
-$path = "C:\Scripts\wsl-portproxy.ps1"
+$path = "C:\Scripts\wsl-portproxy-50011.ps1"
 New-Item -ItemType Directory -Path C:\Scripts -Force | Out-Null
 Set-Content -Path $path -Value $script -Encoding UTF8
 
 # 设置开机启动
 schtasks /create `
   /tn "WSL PortProxy 50011" `
-  /tr "powershell.exe -ExecutionPolicy Bypass -File C:\scripts\wsl-portproxy.ps1" `
+  /tr "powershell.exe -ExecutionPolicy Bypass -File C:\scripts\wsl-portproxy-50011.ps1" `
   /sc onlogon `
   /rl HIGHEST `
   /it `
