@@ -344,6 +344,12 @@ http {
 EOF
 systemctl enable nginx
 systemctl restart nginx
+
+
+# 查看信任域名
+docker exec -u www-data nextcloud-app-1 php occ config:system:get trusted_domains
+# 添加信任域名，192.168.55.105 改为你服务所在的内网IP地址（其中 trusted_domains 1 中的【1】为序号，从0开始（0一般已经被本机地址占用，所以这里是1），所以如果下次再添加其他，需要改为【2】）
+docker exec -u www-data nextcloud-app-1 php occ config:system:set trusted_domains 1 --value=192.168.55.105
 ```
 
 ### Windows相关命令
