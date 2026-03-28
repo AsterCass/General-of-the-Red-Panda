@@ -10,20 +10,6 @@
 
 <u>⚠️ **具体不同项目请点击最下方的应用列表进入**</u>
 
-### 项目地址：
-
-* 玛丽亚内住户： https://gitee.com/astercass/general-of-the-red-panda
-* 调查兵团成员： https://github.com/AsterCass/General-of-the-Red-Panda 
-
-### 下载地址：
-
-* 玛丽亚内住户： https://pan.baidu.com/s/5P4zJnQ1tJkycI24FEcJC4Q 
-* 调查兵团成员： https://github.com/AsterCass/General-of-the-Red-Panda/releases
-
-### bug反馈：
-
-* 玛丽亚内住户： https://gitee.com/astercass/general-of-the-red-panda/issues 或者 https://www.astercasc.com/board
-* 调查兵团成员： https://github.com/AsterCass/General-of-the-Red-Panda/issues
 
 ## 应用列表
 
@@ -36,3 +22,20 @@
 ### [喵喵律动](Meow%20Piano)
 
 ### [使用旧电脑搭NAS构建自己的私有云](NAS%20for%20Sync%20Cloud)
+
+
+## 项目地址：
+
+* 玛丽亚内住户： https://gitee.com/astercass/general-of-the-red-panda
+* 调查兵团成员： https://github.com/AsterCass/General-of-the-Red-Panda 
+
+## 下载地址：
+
+* 玛丽亚内住户： https://pan.baidu.com/s/5P4zJnQ1tJkycI24FEcJC4Q 
+* 调查兵团成员： https://github.com/AsterCass/General-of-the-Red-Panda/releases
+
+## bug反馈：
+
+* 玛丽亚内住户： https://gitee.com/astercass/general-of-the-red-panda/issues 或者 https://www.astercasc.com/board
+* 调查兵团成员： https://github.com/AsterCass/General-of-the-Red-Panda/issues
+
