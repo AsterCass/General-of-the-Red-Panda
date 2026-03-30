@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>喵喵记仇</title>
+    <link rel="icon" href="/logo.svg">
+    <link type="text/css" rel="stylesheet" href="styles.css">
+    <script type="application/javascript" src="composeApp.js"></script>
+</head>
+<body>
+<div id="loading">
+    <div>
+        <p id="loading-text">项目正在初始化，请稍等.</p>
+        <p id="loading-text-en">The project is initializing, please wait a moment.</p>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const textEl = document.getElementById("loading-text");
+        const baseText = "项目正在初始化，请稍等";
+        const textElEn = document.getElementById("loading-text-en");
+        const baseTextEn = "The project is initializing, please wait a moment";
+        let dotCount = 1;
+
+        const interval = setInterval(() => {
+            dotCount = (dotCount % 3) + 1;
+            textEl.textContent = baseText + ".".repeat(dotCount);
+            textElEn.textContent = baseTextEn + ".".repeat(dotCount);
+        }, 500);
+
+        // 10 秒后停止动画
+        setTimeout(() => {
+            clearInterval(interval);
+            textEl.textContent = baseText + "...";
+            textElEn.textContent = baseTextEn + "...";
+        }, 10_000);
+    })();
+</script>
+</body>
+</html>

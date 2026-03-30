@@ -1,0 +1,106 @@
+<resources>
+
+    <string name="app_name">Meow Fitness</string>
+    <string name="none"> </string>
+
+    <string name="system_confirm_save">Save Grudge</string>
+    <string name="system_confirm_ok">OK</string>
+    <string name="system_confirm_cancel">Cancel</string>
+    <string name="system_delete">Delete</string>
+    <string name="create_time">Created At</string>
+    <string name="update_time">Last Updated</string>
+
+    <string name="home_title">Meow Fitness</string>
+    <string name="read_gru_title">Grudge Time</string>
+
+    <string name="add_gru">Add a Grudge</string>
+    <string name="edit_gru">Edit</string>
+
+    <string name="gru_refer_count">Times Remembered:</string>
+    <string name="gru_refer">Up Again</string>
+    <string name="gru_done">Settled</string>
+
+    <string name="add_gru_confirm">Let the Grudge Begin</string>
+    <string name="add_gru_cancel">Nah, Let It Slide</string>
+    <string name="delete_gru_confirm">Forgive and Forget?</string>
+    <string name="error_gru_title_empty">A grudge needs a title.</string>
+
+    <string name="gru_title">Title</string>
+    <string name="gru_title_placeholder">This is where it all started...</string>
+    <string name="gru_desc">What Happened</string>
+    <string name="gru_desc_placeholder">First of all, the audacity...</string>
+
+    <string name="gru_objects">Target:</string>
+    <string name="gru_tags">Tags:</string>
+    <string name="gru_level">Grudge Level:</string>
+
+    <string name="search_gru_title">Search Grudges</string>
+    <string name="search_gru_keyword">Keyword</string>
+    <string name="search_gru_keyword_placeholder">Title / Details</string>
+
+    <string name="search_gru_objects">Target:</string>
+    <string name="search_gru_tags">Tags:</string>
+    <string name="search_gru_level">Grudge Level Range:</string>
+    <string name="search_gru_level_min">Min</string>
+    <string name="search_gru_level_max">Max</string>
+
+    <string name="search_gru_refer_count">Times Remembered:</string>
+    <string name="search_gru_refer_count_min">Min</string>
+    <string name="search_gru_refer_count_max">Max</string>
+
+    <string name="search_gru_for_list">List View</string>
+    <string name="search_gru_for_alone">1 by 1</string>
+    <string name="search_gru_for_cancel">Cancel</string>
+
+    <string name="add_obj_title">Add a New Target</string>
+    <string name="add_obj_name">Name</string>
+    <string name="add_obj_title_confirm">Marked.</string>
+    <string name="add_obj_title_cancel">Spare Them</string>
+
+    <string name="add_tag_title">Add a New Tag</string>
+    <string name="add_tag_name">Name</string>
+    <string name="add_tag_title_confirm">Confirm</string>
+    <string name="add_tag_title_cancel">Cancel</string>
+    <string name="error_name_empty">Name cannot be empty.</string>
+
+    <string name="edit_obj_title">Manage Targets</string>
+    <string name="delete_obj_title">Stop Tracking This Target?</string>
+    <string name="edit_tag_title">Manage Tags</string>
+    <string name="delete_tag_title">Delete This Tag?</string>
+
+    <string name="search_gru_pre">Previous Grudge</string>
+    <string name="search_gru_next">Next Grudge</string>
+    <string name="search_gru_refer_count_plus">Remember +1</string>
+
+    <string name="grudge_one">Slightly Annoyed</string>
+    <string name="grudge_one_desc">I remember it, but I’m too lazy to be mad. You get a free pass… for now</string>
+
+    <string name="grudge_two">Raised Eyebrow</string>
+    <string name="grudge_two_desc">Your action wrinkled my soul a little, but it’s not grudge-worthy yet</string>
+
+    <string name="grudge_three">Logging It</string>
+    <string name="grudge_three_desc">I’ll jot this down. When I’m free, I’ll decide whether to be angry</string>
+
+    <string name="grudge_four">Slightly Offended</string>
+    <string name="grudge_four_desc">This caused a ripple in my heart. Mildly offended</string>
+
+    <string name="grudge_five">Thinking About It Tonight</string>
+    <string name="grudge_five_desc">The kind of thing I’ll remember before sleep and go “Hmph.”</string>
+
+    <string name="grudge_six">Entering the Grudge Notebook</string>
+    <string name="grudge_six_desc">Officially recorded. You have entered the notebook</string>
+
+    <string name="grudge_seven">Mental Explosion</string>
+    <string name="grudge_seven_desc">You upset me enough to hold an internal meeting about you</string>
+
+    <string name="grudge_eight">Hate +999</string>
+    <string name="grudge_eight_desc">Keep going and I’ll need to download the “Hate Expansion Pack.”</string>
+
+    <string name="grudge_nine">Blacklist Candidate</string>
+    <string name="grudge_nine_desc">You’re now waiting at the entrance of my blacklist</string>
+
+    <string name="grudge_ten">Ancestral Arch-Nemesis</string>
+    <string name="grudge_ten_desc">Not only do I hold this grudge—I'm passing it down to future generations</string>
+
+
+</resources>

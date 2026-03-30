@@ -1,0 +1,108 @@
+<resources>
+
+    <string name="app_name">喵喵记仇</string>
+    <string name="none"> </string>
+
+    <string name="system_confirm_save">记仇重刻</string>
+    <string name="system_confirm_ok">确定</string>
+    <string name="system_confirm_cancel">取消</string>
+    <string name="system_delete">删除</string>
+    <string name="create_time">创建时间</string>
+    <string name="update_time">更新时间</string>
+
+    <string name="home_title">喵喵记仇</string>
+    <string name="read_gru_title">猎杀时刻</string>
+
+    <string name="add_gru">添加记仇</string>
+    <string name="edit_gru">编辑</string>
+
+    <string name="gru_refer_count">提及次数：</string>
+    <string name="gru_refer">再次提及</string>
+    <string name="gru_done">已报仇</string>
+
+    <string name="add_gru_confirm">开始卧薪尝胆</string>
+    <string name="add_gru_cancel">算了，先放Ta一马</string>
+    <string name="delete_gru_confirm">是否不再记仇</string>
+    <string name="error_gru_title_empty">记仇标题不能为空</string>
+
+    <string name="gru_title">标题</string>
+    <string name="gru_title_placeholder">你完了，我要开始记了</string>
+    <string name="gru_desc">事件记录</string>
+    <string name="gru_desc_placeholder">首先！是犯下傲慢之罪的...</string>
+
+    <string name="gru_objects">针砭对象：</string>
+    <string name="gru_tags">事件标签：</string>
+    <string name="gru_level">记仇等级：</string>
+
+    <string name="search_gru_title">记仇条目检索</string>
+    <string name="search_gru_keyword">关键词</string>
+    <string name="search_gru_keyword_placeholder">标题/事件记录</string>
+
+    <string name="search_gru_objects">针砭对象：</string>
+    <string name="search_gru_tags">事件标签：</string>
+    <string name="search_gru_level">记仇等级区间：</string>
+    <string name="search_gru_level_min">最小值</string>
+    <string name="search_gru_level_max">最大值</string>
+
+    <string name="search_gru_refer_count">提及次数区间：</string>
+    <string name="search_gru_refer_count_min">最小值</string>
+    <string name="search_gru_refer_count_max">最大值</string>
+
+    <string name="search_gru_for_list">列表展示</string>
+    <string name="search_gru_for_alone">升堂细数</string>
+    <string name="search_gru_for_cancel">先放一马</string>
+
+    <string name="add_obj_title">新建针砭对象入围名额</string>
+    <string name="add_obj_name">名称</string>
+    <string name="add_obj_title_confirm">对象标记！</string>
+    <string name="add_obj_title_cancel">宽恕</string>
+
+    <string name="add_tag_title">新建事件标签</string>
+    <string name="add_tag_name">名称</string>
+    <string name="add_tag_title_confirm">确认</string>
+    <string name="add_tag_title_cancel">取消</string>
+    <string name="error_name_empty">名称不能为空</string>
+
+    <string name="edit_obj_title">对象管理</string>
+    <string name="delete_obj_title">是否不再记录该对象相关内容</string>
+    <string name="edit_tag_title">标签管理</string>
+    <string name="delete_tag_title">是否删除标签</string>
+
+    <string name="search_gru_pre">上一个记仇</string>
+    <string name="search_gru_next">下一个记仇</string>
+    <string name="search_gru_refer_count_plus">提及 + 1</string>
+
+    <string name="grudge_one">微微不爽</string>
+    <string name="grudge_one_desc">虽然我记住了，但我懒得生气，先放你一马</string>
+
+    <string name="grudge_two">眉头一皱</string>
+    <string name="grudge_two_desc">你这操作让我精神皱了一下，但还不至于上升到仇</string>
+
+    <string name="grudge_three">记一下先</string>
+    <string name="grudge_three_desc">先记着，等我有空了再决定要不要生气</string>
+
+    <string name="grudge_four">我开始介意了</string>
+    <string name="grudge_four_desc">这个事情让我心情波澜了一下，是介意的程度</string>
+
+    <string name="grudge_five">今晚睡前要想一想</string>
+    <string name="grudge_five_desc">属于那种睡前突然回想起来，然后“哼”一声的程度</string>
+
+    <string name="grudge_six">记仇小本本上线</string>
+    <string name="grudge_six_desc">开始认真记录了，已经进小本本</string>
+
+    <string name="grudge_seven">精神小爆炸</string>
+    <string name="grudge_seven_desc">气到要在心里开个短会讨论一下你</string>
+
+    <string name="grudge_eight">仇恨值+999</string>
+    <string name="grudge_eight_desc">再这样下去我可能要开“仇恨积累器”DLC了</string>
+
+    <string name="grudge_nine">社交黑名单候选人</string>
+    <string name="grudge_nine_desc">你已经在黑名单门口排队取号了</string>
+
+    <string name="grudge_ten">祖传大仇人</string>
+    <string name="grudge_ten_desc">不仅我记仇，我准备把这个仇代代相传</string>
+
+
+
+
+</resources>
