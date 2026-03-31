@@ -17,7 +17,7 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         icon = painterResource("logo.png"),
-        title = "喵喵记仇",
+        title = "喵喵健身",
     ) {
         App()
     }
