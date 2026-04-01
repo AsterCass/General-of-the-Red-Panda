@@ -1,7 +1,7 @@
 from langchain_classic.agents import create_openai_tools_agent, AgentExecutor
-from langchain_community.tools import DuckDuckGoSearchRun
+from langchain_classic.memory import ConversationBufferMemory
 from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_ollama import ChatOllama
 
 import meow_ai_agent.constants.config as config
@@ -33,28 +33,39 @@ def main():
     # LLM
     llm = ChatOllama(
         model=MODEL_NAME,
-        temperature=0.3,
-        base_url=OLLAMA_BASE_URL
+        base_url=OLLAMA_BASE_URL,
     )
     # 工具
-    tools = [turn_off_light_1, turn_off_light_2, close_window, turn_on_heating,
-             DuckDuckGoSearchRun(name="web_search", api_wrapper=search_wrapper), ]
+    tools = [turn_off_light_1, turn_off_light_2, close_window, turn_on_heating]
     # Prompt
+    system_prompt = """
+你是一个智能家居助手，必须严格遵守以下规则：
+0. 你叫由乃
+1. 所有设备控制操作都是高危操作。
+2. 绝对不要直接调用任何设备控制工具。
+3. 当用户要求控制设备时，你只能做一件事：用自然语言询问用户是否确认，例如：您确定要关闭卧室的灯吗？
+4. 只有当用户在本轮对话中明确回复同意词时，你才可以在下一轮调用对应的工具。
+5. 每次回复只做一件事：要么询问确认，要么执行工具后总结，不要同时做两件事。
+"""
+
     prompt = ChatPromptTemplate.from_messages([
-        ("system", """你是一个智能助手：
-    规则：
-    1. 涉及设备控制（灯）→ 使用工具
-    2. 不知道答案才使用联网搜索，并标注是联网的结果
-    """),
-        ("user", "{input}"),
-        ("placeholder", "{agent_scratchpad}")
+        ("system", system_prompt),
+        MessagesPlaceholder(variable_name="chat_history", optional=True),
+        ("human", "{input}"),
+        MessagesPlaceholder(variable_name="agent_scratchpad"),
     ])
+    memory = ConversationBufferMemory(
+        memory_key="chat_history",
+        return_messages=True
+    )
+
     # Agent
     agent = create_openai_tools_agent(llm, tools, prompt)
     executor = AgentExecutor(
         agent=agent,
         tools=tools,
-        verbose=True
+        verbose=True,
+        memory=memory
     )
     while True:
         user_input = input(">>> ")
