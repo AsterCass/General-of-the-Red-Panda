@@ -26,6 +26,7 @@ dependencies = [
     "llama-index>=0.14.19",
     "langchain>=1.2.14",
     "ddgs>=9.12.0",
+    "langgraph-checkpoint-sqlite>=3.0.3",
 ]
 
 [[tool.uv.index]]

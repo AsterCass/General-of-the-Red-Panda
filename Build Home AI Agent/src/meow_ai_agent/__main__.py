@@ -1,13 +1,21 @@
-from langchain_classic.agents import create_openai_tools_agent, AgentExecutor
-from langchain_classic.memory import ConversationBufferMemory
+from typing import TypedDict, Annotated, Optional
+
 from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import ChatOllama
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.constants import END
+from langgraph.graph import StateGraph
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode
+from loguru import logger
 
 import meow_ai_agent.constants.config as config
 from meow_ai_agent.config.logging import setup_logging
 from meow_ai_agent.constants.env import print_env
-from meow_ai_agent.utils.light import close_window, turn_on_heating, turn_off_light_2, turn_off_light_1
+from meow_ai_agent.utils.light import turn_off_light_bedroom, turn_off_light_living_room, close_window_living_room, \
+    turn_on_heating_bedroom
 
 OLLAMA_BASE_URL = "http://localhost:11434"
 MODEL_NAME = "qwen2.5:7b"
@@ -16,12 +24,125 @@ QDRANT_PORT = 6333
 COLLECTION_NAME = "docs"
 
 search_wrapper = DuckDuckGoSearchAPIWrapper(
-    # backend="bing",        # 推荐先试 bing（对中文和时效性内容通常更稳）
-    # backend="html",      # 纯 DuckDuckGo html 页面
     backend="html",  # 轻量版，速度快但结果可能少
     region="cn-zh",  # 全球（推荐）
     safesearch="moderate",
 )
+
+
+# ====================== 1. 定义状态 ======================
+class AgentState(TypedDict):
+    messages: Annotated[list, add_messages]  # 自动合并消息历史
+    pending_action: Optional[AIMessage] | None
+    confirmed: Optional[bool] | None
+
+
+# ====================== 2. LLM 与 Tools ======================
+llm = ChatOllama(
+    model=MODEL_NAME,
+    base_url=OLLAMA_BASE_URL,
+)
+
+tools = [turn_off_light_bedroom, turn_off_light_living_room, close_window_living_room, turn_on_heating_bedroom]
+tool_node = ToolNode(tools=tools)
+tool_map = {t.name: t for t in tools}
+llm_with_tools = llm.bind_tools(tools)
+
+system_prompt = """
+你是一个智能家居助手，必须严格遵守以下规则：
+0. 你叫由乃。
+1. 当需要执行设备操作时，必须使用 tool_call，不允许模拟 tool_call ，不允许在文本中输出 JSON
+"""
+prompt = ChatPromptTemplate.from_messages([("system", system_prompt), ("placeholder", "{messages}"), ])
+
+
+# 节点定义
+# todo 优化《您确定要执行。。。操作吗？》改为中文支持
+def agent_node(state: AgentState):
+    messages = state["messages"]
+    logger.info(f"messages: {messages}")
+    logger.info(state.get("pending_action"))
+    # 如果已经有待办，则不需要调用LLM，也就不用返回值更新状态
+    if state.get("pending_action"):
+        return {"confirmed": False}
+    response = llm_with_tools.invoke(prompt.format(messages=messages))
+    if hasattr(response, "tool_calls") and response.tool_calls:
+        this_tool = response.tool_calls[0]
+        tool_name = this_tool["name"]
+        tool = tool_map.get(tool_name)
+        logger.info(f"tool_name: {tool}")
+        return {
+            "pending_action": response,
+            "messages": [
+                AIMessage(content=f"您确定要执行{tool.description}操作吗？")
+            ]
+        }
+    return {"messages": [response]}
+
+
+# todo 使用轻量分类模型
+def confirm_node(state: AgentState):
+    logger.info("To confirm a node")
+    text = state["messages"][-1].content.lower()
+    confirm_words = ["是", "好的", "确认", "ok", "yes", "sure", "嗯", "可以", "行"]
+    if text in confirm_words:
+        return {"confirmed": True}
+    return {"pending_action": None, "confirmed": None}
+
+
+def prepare_tool_node(state: AgentState):
+    logger.info("Preparing tool node")
+    return {
+        "messages": [state["pending_action"]],
+        "pending_action": None,
+        "confirmed": None
+    }
+
+
+def route_after_agent(state: AgentState):
+    logger.info("Route after agent")
+    if (state.get("pending_action")) and (state.get("confirmed") is not None):
+        return "confirm"
+    return END
+
+
+def route_after_confirm(state: AgentState):
+    if state.get("confirmed"):
+        return "action"
+    return "agent"
+
+
+# 节点
+builder = StateGraph(AgentState)
+builder.add_node("agent", agent_node)
+builder.add_node("confirm", confirm_node)
+builder.add_node("prepare_action", prepare_tool_node)
+builder.add_node("action", tool_node)
+
+# 图
+builder.set_entry_point("agent")
+builder.add_conditional_edges(
+    "agent",
+    route_after_agent,
+    {
+        "confirm": "confirm",
+        END: END,
+    }
+)
+builder.add_conditional_edges(
+    "confirm",
+    route_after_confirm,
+    {
+        "agent": "agent",
+        "action": "prepare_action",
+    }
+)
+builder.add_edge("prepare_action", "action")
+builder.add_edge("action", END)
+
+# 编译
+memory = MemorySaver()
+app = builder.compile(checkpointer=memory)
 
 
 def main():
@@ -30,50 +151,20 @@ def main():
     setup_logging(False)
     print_env()
     config.load_config()
-    # LLM
-    llm = ChatOllama(
-        model=MODEL_NAME,
-        base_url=OLLAMA_BASE_URL,
-    )
-    # 工具
-    tools = [turn_off_light_1, turn_off_light_2, close_window, turn_on_heating]
-    # Prompt
-    system_prompt = """
-你是一个智能家居助手，必须严格遵守以下规则：
-0. 你叫由乃
-1. 所有设备控制操作都是高危操作。
-2. 绝对不要直接调用任何设备控制工具。
-3. 当用户要求控制设备时，你只能做一件事：用自然语言询问用户是否确认，例如：您确定要关闭卧室的灯吗？
-4. 只有当用户在本轮对话中明确回复同意词时，你才可以在下一轮调用对应的工具。
-5. 每次回复只做一件事：要么询问确认，要么执行工具后总结，不要同时做两件事。
-"""
 
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", system_prompt),
-        MessagesPlaceholder(variable_name="chat_history", optional=True),
-        ("human", "{input}"),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
-    ])
-    memory = ConversationBufferMemory(
-        memory_key="chat_history",
-        return_messages=True
-    )
-
-    # Agent
-    agent = create_openai_tools_agent(llm, tools, prompt)
-    executor = AgentExecutor(
-        agent=agent,
-        tools=tools,
-        verbose=True,
-        memory=memory
-    )
+    thread_config = {"configurable": {"thread_id": "home_assistant_001"}}
+    print("由乃智能家居助手已启动（LangGraph 版），输入 exit 退出。")
     while True:
         user_input = input(">>> ")
         if user_input == "exit":
             break
 
-        result = executor.invoke({"input": user_input})
-        print(result["output"])
+        result = app.invoke(
+            {"messages": [HumanMessage(content=user_input)]},
+            config=thread_config
+        )
+
+        print(result["messages"][-1].content)
 
 
 if __name__ == "__main__":
