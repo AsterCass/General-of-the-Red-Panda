@@ -5,10 +5,11 @@ from loguru import logger
 
 load_dotenv()
 
+QDRANT_URL = "http://localhost:6333"
 OLLAMA_BASE_URL = "http://localhost:11434"
 MODEL_NAME = "qwen2.5:7b"
 MODEL_NAME_LIGHT = "qwen2.5:0.5b"
-EMBED_TEXT_MODEL_NAME = "nomic-embed-text"
+EMBED_TEXT_MODEL_NAME = "bge-m3"
 
 def get_app_name():
     return os.getenv("APP_NAME")
