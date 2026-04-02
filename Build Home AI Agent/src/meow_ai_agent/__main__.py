@@ -1,3 +1,4 @@
+import re
 from typing import TypedDict, Annotated, Optional
 
 from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
@@ -15,7 +16,7 @@ import meow_ai_agent.constants.config as config
 from meow_ai_agent.config.logging import setup_logging
 from meow_ai_agent.constants.env import print_env
 from meow_ai_agent.utils.light import turn_off_light_bedroom, turn_off_light_living_room, close_window_living_room, \
-    turn_on_heating_bedroom
+    turn_on_heating_bedroom, open_curtain_living_room, close_curtain_living_room
 
 OLLAMA_BASE_URL = "http://localhost:11434"
 MODEL_NAME = "qwen2.5:7b"
@@ -43,7 +44,8 @@ llm = ChatOllama(
     base_url=OLLAMA_BASE_URL,
 )
 
-tools = [turn_off_light_bedroom, turn_off_light_living_room, close_window_living_room, turn_on_heating_bedroom]
+tools = [turn_off_light_bedroom, turn_off_light_living_room, close_window_living_room,
+         turn_on_heating_bedroom, open_curtain_living_room, close_curtain_living_room]
 tool_node = ToolNode(tools=tools)
 tool_map = {t.name: t for t in tools}
 llm_with_tools = llm.bind_tools(tools)
@@ -51,13 +53,15 @@ llm_with_tools = llm.bind_tools(tools)
 system_prompt = """
 你是一个智能家居助手，必须严格遵守以下规则：
 0. 你叫由乃。
-1. 当需要执行设备操作时，必须使用 tool_call，不允许模拟 tool_call ，不允许在文本中输出 JSON
+1. 工具调用必须通过系统提供的 function calling 机制完成。
+2. 当需要执行设备或者工具操作时，必须使用 tool_call，不允许模拟 tool_call ，不允许在文本中输出 JSON
+3. 如果不能调用工具，就正常回答.
+4. 不要自问自答。
 """
 prompt = ChatPromptTemplate.from_messages([("system", system_prompt), ("placeholder", "{messages}"), ])
 
 
 # 节点定义
-# todo 优化《您确定要执行。。。操作吗？》改为中文支持
 def agent_node(state: AgentState):
     messages = state["messages"]
     logger.info(f"messages: {messages}")
@@ -66,17 +70,55 @@ def agent_node(state: AgentState):
     if state.get("pending_action"):
         return {"confirmed": False}
     response = llm_with_tools.invoke(prompt.format(messages=messages))
+    # Tool 匹配
     if hasattr(response, "tool_calls") and response.tool_calls:
+        logger.info(f"tool_calls: {response.tool_calls}")
         this_tool = response.tool_calls[0]
         tool_name = this_tool["name"]
+        logger.info(f"tool_name: {tool_name}")
         tool = tool_map.get(tool_name)
-        logger.info(f"tool_name: {tool}")
-        return {
-            "pending_action": response,
-            "messages": [
-                AIMessage(content=f"您确定要执行{tool.description}操作吗？")
-            ]
-        }
+        need_confirm = tool.metadata.get("need_confirm", True)
+        if need_confirm:
+            return {
+                "pending_action": response,
+                "messages": [
+                    AIMessage(content=f"您确定要执行{tool.description}操作吗？")
+                ]
+            }
+        else:
+            return {
+                "pending_action": response,
+                "confirmed": True,
+            }
+    # 这里可以防止AI自己自创一个方法然后幻觉执行
+    # 但是也有问题，如果你问类似你能支持什么操作，他可能会把所有的支持打印出来，此时也会执行
+    for te in tool_map:
+        pattern = rf'["\']name["\']:\s*["\']{te}["\']'
+        if re.search(pattern, response.content):
+            logger.info(f"Illusion match")
+            tool = tool_map.get(te)
+            need_confirm = tool.metadata.get("need_confirm", True)
+            fake_message = AIMessage(
+                content="",
+                tool_calls=[{
+                    "name": te,
+                    "args": {},
+                    "type": "tool_call",
+                    "id": "fallback",
+                }]
+            )
+            if need_confirm:
+                return {
+                    "pending_action": fake_message,
+                    "messages": [
+                        AIMessage(content=f"您确定要执行{tool.description}操作吗？")
+                    ]
+                }
+            else:
+                return {
+                    "pending_action": fake_message,
+                    "confirmed": True,
+                }
     return {"messages": [response]}
 
 
@@ -102,13 +144,16 @@ def prepare_tool_node(state: AgentState):
 def route_after_agent(state: AgentState):
     logger.info("Route after agent")
     if (state.get("pending_action")) and (state.get("confirmed") is not None):
-        return "confirm"
+        if state["confirmed"]:
+            return "prepare_action"
+        else:
+            return "confirm"
     return END
 
 
 def route_after_confirm(state: AgentState):
     if state.get("confirmed"):
-        return "action"
+        return "prepare_action"
     return "agent"
 
 
@@ -126,6 +171,7 @@ builder.add_conditional_edges(
     route_after_agent,
     {
         "confirm": "confirm",
+        "prepare_action": "prepare_action",
         END: END,
     }
 )
@@ -134,7 +180,7 @@ builder.add_conditional_edges(
     route_after_confirm,
     {
         "agent": "agent",
-        "action": "prepare_action",
+        "prepare_action": "prepare_action",
     }
 )
 builder.add_edge("prepare_action", "action")
