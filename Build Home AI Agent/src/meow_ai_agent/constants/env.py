@@ -5,6 +5,11 @@ from loguru import logger
 
 load_dotenv()
 
+OLLAMA_BASE_URL = "http://localhost:11434"
+MODEL_NAME = "qwen2.5:7b"
+MODEL_NAME_LIGHT = "qwen2.5:0.5b"
+EMBED_TEXT_MODEL_NAME = "nomic-embed-text"
+
 def get_app_name():
     return os.getenv("APP_NAME")
 
