@@ -5,6 +5,7 @@ from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import ChatOllama
+from langchain_ollama import OllamaEmbeddings
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import END
 from langgraph.graph import StateGraph
@@ -20,6 +21,8 @@ from meow_ai_agent.utils.light import turn_off_light_bedroom, turn_off_light_liv
 
 OLLAMA_BASE_URL = "http://localhost:11434"
 MODEL_NAME = "qwen2.5:7b"
+MODEL_NAME_LIGHT = "qwen2.5:0.5b"
+EMBED_TEXT_MODEL_NAME = "nomic-embed-text"
 QDRANT_HOST = "localhost"
 QDRANT_PORT = 6333
 COLLECTION_NAME = "docs"
@@ -31,18 +34,59 @@ search_wrapper = DuckDuckGoSearchAPIWrapper(
 )
 
 
-# ====================== 1. 定义状态 ======================
+# ====================== 状态 ======================
 class AgentState(TypedDict):
     messages: Annotated[list, add_messages]  # 自动合并消息历史
     pending_action: Optional[AIMessage] | None
     confirmed: Optional[bool] | None
 
 
-# ====================== 2. LLM 与 Tools ======================
+# ====================== 模型 ======================
 llm = ChatOllama(
     model=MODEL_NAME,
     base_url=OLLAMA_BASE_URL,
 )
+
+emb = OllamaEmbeddings(
+    model=EMBED_TEXT_MODEL_NAME,
+    base_url=OLLAMA_BASE_URL
+)
+
+llml = ChatOllama(
+    model=MODEL_NAME_LIGHT,
+    base_url=OLLAMA_BASE_URL,
+    temperature=0
+)
+
+# ====================== 语义 ======================
+
+
+system_prompt_l = """
+你是一个分类器，只能回答 YES 或 NO。
+
+判断输入内容是否表示肯定含义
+
+常见肯定含义词：
+- 好的
+- 好的呢
+- 好呀
+- 可以
+- 行
+- 嗯
+- 嗯嗯
+- ok
+- yes
+
+规则：
+- 表示同意、确认、肯定、认同 → YES
+- 表示拒绝、取消 → NO
+- 不确定、无关 → NO
+
+只输出 YES 或 NO：
+"""
+prompt_l = ChatPromptTemplate.from_messages([("system", system_prompt_l), ("placeholder", "{messages}"), ])
+
+# ====================== 工具 ======================
 
 tools = [turn_off_light_bedroom, turn_off_light_living_room, close_window_living_room,
          turn_on_heating_bedroom, open_curtain_living_room, close_curtain_living_room]
@@ -122,14 +166,27 @@ def agent_node(state: AgentState):
     return {"messages": [response]}
 
 
-# todo 使用轻量分类模型
+# todo 优化方向：1. 制作了一个 Intent 分类专门判断用户意图，比如确认、拒绝、新指令、聊天等等
+#  BGE 建 embedding 类似方式实现，放在 《手动指定》和 《小模型兜底》之间
+# 2. 找找这个意图判断是否有比较好的专门的模型，或者自己训练（成本较大）
 def confirm_node(state: AgentState):
+    # 手动指定
     logger.info("To confirm a node")
     text = state["messages"][-1].content.lower()
-    confirm_words = ["是", "好的", "确认", "ok", "yes", "sure", "嗯", "可以", "行"]
+    confirm_words = ["是", "好的", "确认", "ok", "yes", "sure", "嗯", "可以", "行", "行", "是的", "确定"]
     if text in confirm_words:
         return {"confirmed": True}
-    return {"pending_action": None, "confirmed": None}
+    # 小模型兜底
+    result = llml.invoke(
+        prompt_l.format_messages(
+            messages=[HumanMessage(content=text)]
+        )
+    ).content.strip().upper()
+    logger.info(f"confirm classify result: {result}")
+    if "YES" in result:
+        return {"confirmed": True}
+    else:
+        return {"pending_action": None, "confirmed": None}
 
 
 def prepare_tool_node(state: AgentState):
