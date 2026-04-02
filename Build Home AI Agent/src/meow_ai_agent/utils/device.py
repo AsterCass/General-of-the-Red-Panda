@@ -1,9 +1,6 @@
 from langchain.tools import tool
 from loguru import logger
 
-
-# todo 支持设置是否二次验证，以及其他属性
-
 def smart_tool(**meta):
     def wrapper(func):
         t = tool(func)
