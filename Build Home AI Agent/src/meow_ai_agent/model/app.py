@@ -8,6 +8,7 @@ from loguru import logger
 import meow_ai_agent.model.base as base
 import meow_ai_agent.model.intent as intent
 import meow_ai_agent.model.tools as tools
+import meow_ai_agent.model.rag as rag
 from meow_ai_agent.constants.enums import IntentStatus
 
 # ==================== !!! 因为要接入多种功能,方便测试起见，这里简化语义路由，并且单次对话不再更换确定的路由 !!! ====================
@@ -57,7 +58,7 @@ def intent_chat_node(state: base.AgentState):
 
 def route_after_intent_single_node(state: base.AgentState):
     if state.get("intent") and state.get("intent") == IntentStatus.RAG.value:
-        return "not_support_node"
+        return "intent_rag_node"
     if state.get("intent") and state.get("intent") == IntentStatus.WEB.value:
         return "not_support_node"
     if state.get("intent") and state.get("intent") == IntentStatus.TOOL.value:
@@ -93,6 +94,8 @@ builder.add_node("prepare_tool_node", tools.prepare_tool_node)
 builder.add_node("tool_node", tools.tool_node)
 # 聊天
 builder.add_node("intent_chat_node", intent_chat_node)
+# 检索
+builder.add_node("intent_rag_node", rag.intent_rag_node)
 
 # 连接
 builder.set_entry_point("intent_single_node")
@@ -102,7 +105,8 @@ builder.add_conditional_edges(
     {
         "not_support_node": "not_support_node",
         "intent_chat_node": "intent_chat_node",
-        "intent_tool_node": "intent_tool_node"
+        "intent_tool_node": "intent_tool_node",
+        "intent_rag_node": "intent_rag_node",
     }
 )
 builder.add_conditional_edges(
@@ -127,6 +131,7 @@ builder.add_edge("prepare_tool_node", "tool_node")
 builder.add_edge("tool_node", END)
 builder.add_edge("not_support_node", END)
 builder.add_edge("intent_chat_node", END)
+builder.add_edge("intent_rag_node", END)
 
 # ==================== 编译 ====================
 

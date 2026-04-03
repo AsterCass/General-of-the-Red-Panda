@@ -46,30 +46,11 @@ qdrant_cli = QdrantClient(
     url=env.QDRANT_URL
 )
 
-knowledge_base = "knowledge_base"
 intent_router = "intent_router"
 
 # 临时测试，每次清空
-if qdrant_cli.collection_exists(knowledge_base):
-    qdrant_cli.delete_collection(knowledge_base)
 if qdrant_cli.collection_exists(intent_router):
     qdrant_cli.delete_collection(intent_router)
-
-# 知识库
-if not qdrant_cli.collection_exists(knowledge_base):
-    qdrant_cli.create_collection(
-        collection_name=knowledge_base,
-        vectors_config=VectorParams(
-            size=1024,
-            distance=Distance.COSINE
-        )
-    )
-
-vectorstore_knowledge_base = QdrantVectorStore(
-    client=qdrant_cli,
-    collection_name=knowledge_base,
-    embedding=emb
-)
 
 # 意图库
 if not qdrant_cli.collection_exists(intent_router):
@@ -89,14 +70,14 @@ vectorstore_intent_router = QdrantVectorStore(
 
 # ==================== 检索器 ====================
 
-retriever_knowledge_base = vectorstore_knowledge_base.as_retriever(
-    search_kwargs={
-        "k": 3
-    }
-)
-
-retriever_intent_router = vectorstore_intent_router.as_retriever(
-    search_kwargs={
-        "k": 3
-    }
-)
+# retriever_knowledge_base = vectorstore_knowledge_base.as_retriever(
+#     search_kwargs={
+#         "k": 3
+#     }
+# )
+#
+# retriever_intent_router = vectorstore_intent_router.as_retriever(
+#     search_kwargs={
+#         "k": 3
+#     }
+# )
