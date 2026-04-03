@@ -2,7 +2,7 @@ from langchain_core.messages import HumanMessage
 
 import meow_ai_agent.constants.config as config
 import meow_ai_agent.constants.env as env
-import meow_ai_agent.model.llm as local_llm
+import meow_ai_agent.model.app as app
 from meow_ai_agent.config.logging import setup_logging
 
 
@@ -20,7 +20,7 @@ def main():
         if user_input == "exit":
             break
 
-        result = local_llm.app.invoke(
+        result = app.app.invoke(
             {"messages": [HumanMessage(content=user_input)]},
             config=thread_config
         )

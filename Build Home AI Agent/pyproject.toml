@@ -20,7 +20,7 @@ dependencies = [
     #"pyside6>=6.10.2", # UI
     # 额外
     "langchain-community>=0.4.1",
-    "langchain-core>=1.2.23",
+    "langchain-core>=1.2.25",
     "langchain-ollama>=1.0.1",
     "llama-index>=0.14.19",
     "langchain>=1.2.14",
