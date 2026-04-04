@@ -7,6 +7,7 @@ load_dotenv()
 
 QDRANT_URL = "http://localhost:6333"
 OLLAMA_BASE_URL = "http://localhost:11434"
+REDIS_URL = "redis://localhost:6379"
 MODEL_NAME = "qwen2.5:7b"
 MODEL_NAME_LIGHT = "qwen2.5:1.5b"
 EMBED_TEXT_MODEL_NAME = "bge-m3"

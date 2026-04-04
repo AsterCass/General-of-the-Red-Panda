@@ -31,7 +31,7 @@ llm = ChatOllama(
 
 emb = OllamaEmbeddings(
     model=env.EMBED_TEXT_MODEL_NAME,
-    base_url=env.OLLAMA_BASE_URL
+    base_url=env.OLLAMA_BASE_URL,
 )
 
 llm_l = ChatOllama(

@@ -32,6 +32,8 @@ dependencies = [
     "pypdf>=6.9.2",
     "python-docx>=1.2.0",
     "docx2txt>=0.9",
+    "redis>=7.4.0",
+    "langgraph-checkpoint-redis>=0.4.0",
 ]
 
 [[tool.uv.index]]

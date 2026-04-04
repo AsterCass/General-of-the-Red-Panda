@@ -1,14 +1,13 @@
 from langchain_core.messages import AIMessage
 from langchain_core.prompts import ChatPromptTemplate
-from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import END
 from langgraph.graph import StateGraph
 from loguru import logger
 
 import meow_ai_agent.model.base as base
 import meow_ai_agent.model.intent as intent
-import meow_ai_agent.model.tools as tools
 import meow_ai_agent.model.rag as rag
+import meow_ai_agent.model.tools as tools
 from meow_ai_agent.constants.enums import IntentStatus
 
 # ==================== !!! 因为要接入多种功能,方便测试起见，这里简化语义路由，并且单次对话不再更换确定的路由 !!! ====================
@@ -135,6 +134,5 @@ builder.add_edge("intent_rag_node", END)
 
 # ==================== 编译 ====================
 
-# todo 替换为 redis 或者其他
-memory = MemorySaver()
-app = builder.compile(checkpointer=memory)
+# memory = MemorySaver()
+# app = builder.compile(checkpointer=memory)
