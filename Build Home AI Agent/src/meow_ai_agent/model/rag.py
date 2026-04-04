@@ -1,6 +1,11 @@
 import os
 
 import jieba
+from langchain_community.document_loaders import (
+    TextLoader,
+    PyPDFLoader,
+    Docx2txtLoader
+)
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_qdrant import QdrantVectorStore
@@ -41,15 +46,30 @@ import meow_ai_agent.model.base as base
 
 # ==================== 文档加载 ====================
 
-# todo support pdf
 def load_docs():
     docs = []
+
     for file in os.listdir("data/docs"):
-        with open(f"data/docs/{file}", "r", encoding="utf-8") as f:
-            docs.append({
-                "text": f.read(),
-                "source": file
-            })
+        path = os.path.join("data/docs", file)
+
+        try:
+            if file.endswith((".txt", ".md")):
+                loader = TextLoader(path, encoding="utf-8")
+
+            elif file.endswith(".pdf"):
+                loader = PyPDFLoader(path)
+
+            elif file.endswith(".docx"):
+                loader = Docx2txtLoader(path)
+
+            else:
+                continue
+
+            docs.extend(loader.load())
+
+        except Exception as e:
+            logger.error(f"{file} Parse failed: {e}")
+
     return docs
 
 
@@ -64,7 +84,7 @@ splitter = RecursiveCharacterTextSplitter(
 def split_docs(docs):
     chunks = []
     for doc in docs:
-        splits = splitter.split_text(doc["text"])
+        splits = splitter.split_text(doc.page_content)
         for i, s in enumerate(splits):
             chunks.append(
                 Document(
@@ -72,7 +92,7 @@ def split_docs(docs):
                     # todo 这里可以丰富metadata的细节，然后查询的时候利用轻量的筛选（这里还是老三层，字符串+Embedding+轻量LLM兜底），
                     #  并利用 from qdrant_client.models import Filter 写入 retriever 在向量搜索前加一层过滤
                     metadata={
-                        "source": doc["source"],
+                        "source": doc.metadata.get("source", "unknown"),
                         "chunk_id": i
                     }
                 )
