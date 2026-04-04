@@ -1,11 +1,13 @@
 import os
 
+import jieba
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_qdrant import QdrantVectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from loguru import logger
 from qdrant_client.models import Distance, VectorParams
+from rank_bm25 import BM25Okapi
 
 import meow_ai_agent.model.base as base
 
@@ -27,7 +29,7 @@ import meow_ai_agent.model.base as base
 # 3. Hybrid Retrieval（向量相似度 + 关键词搜索），召回较多候选（top 20-50）（元数据过滤、时间衰减等）
 # 4. 重排序（Reranking）用专用 Reranker 模型（BGE-Reranker 等）对召回的 chunks 重新打分，只保留 top 3-6 个最相关的
 # 5. 压缩（Context Compression），去除冗余、总结长上下文、或用 LLM 提取关键信息
-# 6. 合并相似 chunks，避免 token 浪费
+# 6. 合并相似 chunks，避免计算量浪费（需要先于 reranking ）
 # 7. 构建提示词，比如明确指示 LLM：“只基于以下上下文回答，如果不确定就说不知道”
 # 8. 可加入 Self-Check / Guardrails（生成后验证是否 grounded）
 # 9. 流式（Streaming）输出
@@ -39,6 +41,7 @@ import meow_ai_agent.model.base as base
 
 # ==================== 文档加载 ====================
 
+# todo support pdf
 def load_docs():
     docs = []
     for file in os.listdir("data/docs"):
@@ -66,6 +69,8 @@ def split_docs(docs):
             chunks.append(
                 Document(
                     page_content=s,
+                    # todo 这里可以丰富metadata的细节，然后查询的时候利用轻量的筛选（这里还是老三层，字符串+Embedding+轻量LLM兜底），
+                    #  并利用 from qdrant_client.models import Filter 写入 retriever 在向量搜索前加一层过滤
                     metadata={
                         "source": doc["source"],
                         "chunk_id": i
@@ -103,13 +108,26 @@ vectorstore_knowledge_base = QdrantVectorStore(
 
 retriever_knowledge_base = vectorstore_knowledge_base.as_retriever(
     search_kwargs={
-        "k": 5
+        "k": 5,
+        # match=MatchValue(value="xxx.md")
     }
 )
 
 # ==================== 添加文档 ====================
 
-vectorstore_knowledge_base.add_documents(split_docs(load_docs()))
+# 文档
+documents = split_docs(load_docs())
+
+# BM25
+tokenized_corpus = [
+    jieba.lcut(doc.page_content)
+    for doc in documents
+]
+
+bm25 = BM25Okapi(tokenized_corpus)
+
+# Embedding
+vectorstore_knowledge_base.add_documents(documents)
 
 # ==================== 模型配置 ====================
 
@@ -127,15 +145,54 @@ system_prompt_rag = """
 prompt_rag = ChatPromptTemplate.from_messages([("system", system_prompt_rag), ("placeholder", "{messages}"), ])
 
 
+# ==================== 额外方法 ====================
+
+def bm25_search(query, top_k=10):
+    tokenized_query = jieba.lcut(query)
+
+    scores = bm25.get_scores(tokenized_query)
+
+    top_k_idx = sorted(
+        range(len(scores)),
+        key=lambda i: scores[i],
+        reverse=True
+    )[:top_k]
+
+    return [documents[i] for i in top_k_idx]
+
+
+def merge_docs(vec_docs, bm25_docs):
+    seen = set()
+    results = []
+
+    for d in vec_docs + bm25_docs:
+        key = d.page_content
+        if key not in seen:
+            seen.add(key)
+            results.append(d)
+
+    return results
+
 # ==================== 节点定义 ====================
 
 
 def intent_rag_node(state: base.AgentState):
     logger.info("Intent rag node")
     query = state["messages"][-1].content
+    # todo 这里可以对于本身 query 进行优化/拆分/扩展等等，同样是需要使用老三层（字符串+Embedding+轻量LLM）
 
-    # 检索
-    ret_docs = retriever_knowledge_base.invoke(query)
+    # todo 检索
+    #  可以对于 query 提取 metadata 过滤查询，同样是需要使用老三层（字符串+Embedding+轻量LLM）进行打标签
+    ret_docs_vec = retriever_knowledge_base.invoke(query)
+    # bm25
+    ret_docs_bm25 = bm25_search(query, top_k=5)
+    logger.info(f"Results: {len(ret_docs_vec)}")
+    logger.info(f"Results: {len(ret_docs_bm25)}")
+    # 去重
+    ret_docs = merge_docs(ret_docs_vec, ret_docs_bm25)
+    logger.info(f"Results: {len(ret_docs)}")
+    # todo 这里可以加入 reranker（Qdrant 中的检索本质上还是向量匹配，即 embedding cosine 向量余弦比较，
+    #  一般对于 reranker 是语义匹配（cross attention），所以在查询阶段而言，向量匹配不需要模型，而 reranker 是需要专门模型的）
     context_text = "\n\n".join([doc.page_content for doc in ret_docs])
 
     # 消息
