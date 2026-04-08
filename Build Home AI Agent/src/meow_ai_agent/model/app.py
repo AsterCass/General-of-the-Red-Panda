@@ -1,5 +1,6 @@
 from langchain_core.messages import AIMessage
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableLambda
 from langgraph.constants import END
 from langgraph.graph import StateGraph
 from loguru import logger
@@ -47,11 +48,14 @@ def not_support_node(state: base.AgentState):
     }
 
 
-def intent_chat_node(state: base.AgentState):
-    logger.info("Intent chat node")
-    response = base.llm.invoke(prompt_chat.format(messages=state["messages"]))
-    return {"messages": [response]}
-
+def intent_chat_node(state):
+    return (
+        prompt_chat
+        | base.llm
+        | RunnableLambda(lambda msg: {
+            "messages": [msg]
+        })
+    )
 
 # ==================== 路由定义 ====================
 

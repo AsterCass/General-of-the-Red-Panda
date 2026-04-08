@@ -18,21 +18,28 @@ def main():
         memory.setup()  # 只有首次需要
 
         this_app = app.builder.compile(checkpointer=memory)
-        thread_config = {"configurable": {"thread_id": "home_assistant_001"}}
+        thread_config = {"configurable": {"thread_id": "home_assistant_004"}}
         print("由乃智能家居助手已启动（LangGraph 版），输入 exit 退出。")
         while True:
             user_input = input(">>> ")
             if user_input == "exit":
                 break
 
-            # todo 改成流式输出，整个图的处理都要改
-            result = this_app.invoke(
-                {"messages": [HumanMessage(content=user_input)]},
-                config=thread_config
-            )
+            for chunk in this_app.stream(
+                    {"messages": [HumanMessage(content=user_input)]},
+                    config=thread_config,
+                    stream_mode="messages"
+            ):
+                msg_chunk, metadata = chunk
 
-            # todo 放入消息队列，写入数据库
-            print(result["messages"][-1].content)
+                # 过滤空 token
+                if not msg_chunk.content:
+                    continue
+
+                # todo 合并放入消息队列，异步写入数据库
+                print(msg_chunk.content, end="", flush=True)
+
+            print()
 
 
 if __name__ == "__main__":
