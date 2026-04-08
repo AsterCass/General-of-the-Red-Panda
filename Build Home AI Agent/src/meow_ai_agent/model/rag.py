@@ -8,6 +8,7 @@ from langchain_community.document_loaders import (
 )
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableLambda
 from langchain_qdrant import QdrantVectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from loguru import logger
@@ -195,8 +196,8 @@ def merge_docs(vec_docs, bm25_docs):
 
 # ==================== 节点定义 ====================
 
-
-def intent_rag_node(state: base.AgentState):
+# 非流式输出，用于后续更新处理的参考
+def intent_rag_node_invoke(state: base.AgentState):
     logger.info("Intent rag node")
     query = state["messages"][-1].content
     # todo 这里可以对于本身 query 进行优化/拆分/扩展等等，同样是需要使用老三层（字符串+Embedding+轻量LLM）
@@ -223,3 +224,38 @@ def intent_rag_node(state: base.AgentState):
 
     response = base.llm.invoke(messages)
     return {"messages": [response]}
+
+
+def intent_rag_node(state):
+    return (
+        RunnableLambda(lambda s: {
+            "query": s["messages"][-1].content,
+            "messages": s["messages"]
+        })
+        # 检索阶段
+        | RunnableLambda(lambda x: {
+            **x,
+            "ret_docs_vec": retriever_knowledge_base.invoke(x["query"]),
+            "ret_docs_bm25": bm25_search(x["query"], top_k=5)
+        })
+        # merge + context
+        | RunnableLambda(lambda x: {
+            **x,
+            "ret_docs": merge_docs(x["ret_docs_vec"], x["ret_docs_bm25"]),
+        })
+        | RunnableLambda(lambda x: {
+            **x,
+            "context_text": "\n\n".join(
+                [doc.page_content for doc in x["ret_docs"]]
+            )
+        })
+        # prompt
+        | RunnableLambda(lambda x: prompt_rag.format_messages(
+            context_text=x["context_text"],
+            messages=x["messages"]
+        ))
+        | base.llm
+        | RunnableLambda(lambda msg: {
+            "messages": [msg]
+        })
+    )

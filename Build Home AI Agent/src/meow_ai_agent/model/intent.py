@@ -135,6 +135,7 @@ base.vectorstore_intent_router.add_documents(intent_docs)
 # ==================== 额外方法 ====================
 
 def llm_classify(query: str):
+    # 内部小模型，不流式
     ret = base.llm_l.invoke(
         prompt_intent.format_messages(
             messages=[HumanMessage(content=query)]
@@ -155,8 +156,10 @@ def intent_single_node(state: base.AgentState):
     query = messages[-1].content
     logger.info(f"Intent query: {query}")
     if state.get("intent"):
+        logger.info(f"Intent intent: {state['intent']}")
         return {}
     # String 先判断
+    logger.info(f"No intent for query")
     for intent_str_key in intent_strings:
         if intent_str_key in query:
             logger.info(f"Intent {intent_str_key}")

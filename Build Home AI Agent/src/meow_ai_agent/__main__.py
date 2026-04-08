@@ -18,7 +18,8 @@ def main():
         memory.setup()  # 只有首次需要
 
         this_app = app.builder.compile(checkpointer=memory)
-        thread_config = {"configurable": {"thread_id": "home_assistant_004"}}
+        # 这里不仅会存对话，也会存最后的 AgentState
+        thread_config = {"configurable": {"thread_id": "home_assistant_005"}}
         print("由乃智能家居助手已启动（LangGraph 版），输入 exit 退出。")
         while True:
             user_input = input(">>> ")
