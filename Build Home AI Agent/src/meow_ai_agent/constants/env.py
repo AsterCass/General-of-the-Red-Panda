@@ -7,7 +7,7 @@ load_dotenv()
 
 QDRANT_URL = "http://localhost:6333"
 # services:
-#   ollama:
+#   qdrant:
 #     image: qdrant/qdrant
 #     container_name: qdrant
 #     restart: always
