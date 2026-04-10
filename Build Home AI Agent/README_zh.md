@@ -4,12 +4,15 @@
 
 ## 介绍
 
-演示使用家中旧电脑使用`LLM`为核心，接入自定义的相关`API`以及文档实现`RAG`处理常用需求
+一个基于 LangChain、LangGraph 和 Ollama 构建的家用 AI 代理，支持意图识别、工具调用和 RAG 检索
 
-* 可以配置某个开灯`localhost:8080/home/api/light/open`然后对话“房间有点暗”即可自动开灯
-* 可以配置文档中心，存入相关内容，当你询问文档中的问题的时候，自动回复相应答案
-* 可以自动开启联网搜索，回答文档中心和模型自带中没有的知识，比如“最新的一联的世界杯的冠军是谁”
+### 功能
 
+- 意图分类（Chat、Tool、RAG、Web）
+- 工具执行并确认
+- 基于 RAG 的知识检索
+- 流式响应
+- 使用 Redis 的持久化记忆
 
 ## 具体文档
 
@@ -50,9 +53,34 @@ wsl --import Ubuntu-jjdyycm C:\Users\astercasc X:\red.panda\new\jjdyycm.tar
 ### Windows相关命令
 
 
+## 开发
+
+不进行开发修改的小伙伴略过这个部分
+
+* 安装[uv](https://docs.astral.sh/uv/)以及[python](https://www.python.org/)环境
+
+1. 安装依赖:
+   ```bash
+   uv install
+   ```
+
+2. 设置环境，在`.env`中：
+   ```
+   QDRANT_URL=http://localhost:6333
+   OLLAMA_BASE_URL=http://localhost:11434
+   REDIS_URL=redis://localhost:6379
+   MODEL_NAME=qwen2.5:7b
+   MODEL_NAME_LIGHT=qwen2.5:1.5b
+   EMBED_TEXT_MODEL_NAME=bge-m3
+   RESET_COLLECTIONS=false
+   ```
+
+3. 运行:
+   ```bash
+   uv run app
+   ```
 
 
 ## 技术栈
-
 
 - [WSL官网](https://learn.microsoft.com/en-us/windows/wsl/)

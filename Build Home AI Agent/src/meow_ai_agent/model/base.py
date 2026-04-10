@@ -48,8 +48,8 @@ qdrant_cli = QdrantClient(
 
 intent_router = "intent_router"
 
-# 临时测试，每次清空
-if qdrant_cli.collection_exists(intent_router):
+# 指定重置时清空
+if env.RESET_COLLECTIONS and qdrant_cli.collection_exists(intent_router):
     qdrant_cli.delete_collection(intent_router)
 
 # 意图库

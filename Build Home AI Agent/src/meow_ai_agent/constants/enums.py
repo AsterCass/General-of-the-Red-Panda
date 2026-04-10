@@ -14,6 +14,6 @@ class IntentStatus(Enum):
     @classmethod
     def from_string(cls, value: str):
         try:
-            return cls(value.lower())
+            return cls(value.upper())
         except ValueError:
             return cls.UNKNOW

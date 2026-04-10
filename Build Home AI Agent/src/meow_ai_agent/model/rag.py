@@ -15,6 +15,7 @@ from loguru import logger
 from qdrant_client.models import Distance, VectorParams
 from rank_bm25 import BM25Okapi
 
+import meow_ai_agent.constants.env as env
 import meow_ai_agent.model.base as base
 
 
@@ -105,8 +106,8 @@ def split_docs(docs):
 
 knowledge_base = "knowledge_base"
 
-# 临时测试，每次清空
-if base.qdrant_cli.collection_exists(knowledge_base):
+# 指定重置时清空
+if env.RESET_COLLECTIONS and base.qdrant_cli.collection_exists(knowledge_base):
     base.qdrant_cli.delete_collection(knowledge_base)
 
 # 知识库
