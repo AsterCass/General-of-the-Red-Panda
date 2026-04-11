@@ -146,6 +146,7 @@ tokenized_corpus = [
     for doc in documents
 ]
 
+# todo 生产环境考虑使用es
 bm25 = BM25Okapi(tokenized_corpus)
 
 # Embedding
