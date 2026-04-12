@@ -6,14 +6,7 @@ import meow_ai_agent.constants.env as env
 import meow_ai_agent.model.app as app
 from meow_ai_agent.config.logging import setup_logging
 
-
-def main():
-    """程序主入口"""
-    # 基础配置
-    setup_logging(False)
-    env.print_env()
-    config.load_config()
-
+def text_input():
     with RedisSaver.from_conn_string(env.REDIS_URL) as memory:
         memory.setup()  # 只有首次需要
 
@@ -41,6 +34,16 @@ def main():
                 print(msg_chunk.content, end="", flush=True)
 
             print()
+
+
+def main():
+    """程序主入口"""
+    # 基础配置
+    setup_logging(False)
+    env.print_env()
+    config.load_config()
+
+    text_input()
 
 
 if __name__ == "__main__":
