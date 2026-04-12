@@ -4,6 +4,7 @@ from pathlib import Path
 from loguru import logger
 
 data_path = Path("data/data.db")
+audio = Path("models/faster-whisper-large-v3-turbo")
 
 def load_config():
     path = Path("config.toml")

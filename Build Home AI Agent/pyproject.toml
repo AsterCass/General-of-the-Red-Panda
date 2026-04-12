@@ -6,7 +6,7 @@ authors = [
     { name = "AsterCasc", email = "astercass@qq.com" }
 ]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     # 一般
     #"flask>=3.1.2", # HTTP 服务端
@@ -34,7 +34,23 @@ dependencies = [
     "docx2txt>=0.9",
     "redis>=7.4.0",
     "langgraph-checkpoint-redis>=0.4.0",
+    "torch==2.3.1",
+    "torchvision==0.18.1",
+    "torchaudio==2.3.1",
+    "faster-whisper>=1.2.1",
+    "sounddevice>=0.5.5",
+    "numpy>=1.26,<2.0",
 ]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu121" }
+torchvision = { index = "pytorch-cu121" }
+torchaudio = { index = "pytorch-cu121" }
+
+[[tool.uv.index]]
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true
 
 [[tool.uv.index]]
 name = "tuna"
@@ -43,6 +59,8 @@ url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 [[tool.uv.index]]
 name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple/"
+
+
 
 [dependency-groups]
 dev = [
