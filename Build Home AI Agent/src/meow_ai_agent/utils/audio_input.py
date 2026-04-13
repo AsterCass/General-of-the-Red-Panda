@@ -1,48 +1,36 @@
-import sounddevice as sd
-import numpy as np
-from faster_whisper import WhisperModel
-import torch
 import queue
 import threading
 import time
-import logging
-from typing import Callable, Optional
 from dataclasses import dataclass
-from enum import Enum
+from typing import Callable, Optional
 
-# ================== 日志配置 ==================
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+import numpy as np
+import sounddevice as sd
+import torch
+from faster_whisper import WhisperModel
+from loguru import logger
+
+from meow_ai_agent.constants.enums import AudioProcessorState
 
 
 # ================== 配置数据类 ==================
 @dataclass
 class AudioConfig:
     """音频处理配置"""
-    model_size: str = r"models\faster-whisper-large-v3-turbo"
-    language: str = "zh"
-    sample_rate: int = 16000
-    chunk_duration: float = 0.05  # 每50ms采集一次
-    min_silence_ms: int = 800  # 停顿多久算一句结束
-    min_audio_ms: int = 500  # 最短语音长度
-    vad_window_sec: float = 0.5  # VAD检测窗口大小（秒）
+    model: str
+    vad: str
+    language: str
+    sample_rate: int
+    chunk_duration: float
+    min_silence_ms: int
+    min_audio_ms: int
+    vad_window_sec: float
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
-    compute_type: str = None  # 将在初始化时设置
+    compute_type: str = None
     
     def __post_init__(self):
         if self.compute_type is None:
             self.compute_type = "float16" if self.device == "cuda" else "int8"
-
-
-class AudioProcessorState(Enum):
-    """音频处理器状态"""
-    IDLE = "idle"
-    LISTENING = "listening"
-    PROCESSING = "processing"
-    STOPPED = "stopped"
 
 
 # ================== 音频处理器 ==================
@@ -52,26 +40,37 @@ class AudioProcessor:
     - 监听麦克风输入
     - 使用VAD检测语音
     - 使用Faster-Whisper进行语音识别
+    - 支持流式转录回调
     """
 
     def __init__(
         self,
         config: Optional[AudioConfig] = None,
-        on_text_callback: Optional[Callable[[str], None]] = None
+            on_text_callback: Optional[Callable[[str], None]] = None,
+            on_partial_callback: Optional[Callable[[str], None]] = None
     ):
-        self.config = config or AudioConfig()
+        """
+        初始化音频处理器
+        
+        Args:
+            config: 音频配置
+            on_text_callback: 完整文本回调函数 fn(text: str)
+            on_partial_callback: 部分文本回调函数（实时显示）fn(partial_text: str)
+        """
+        self.config = config
         self.on_text_callback = on_text_callback
+        self.on_partial_callback = on_partial_callback
         self.state = AudioProcessorState.IDLE
         self._stop_event = threading.Event()
         self._lock = threading.Lock()
-        
-        # 音频缓冲（使用numpy数组更高效）
+
+        # 音频缓冲
         self.current_buffer = np.zeros(0, dtype=np.float32)
         self.is_speaking = False
         self.last_speech_time = time.time()
-        
-        # 队列
-        self.audio_queue = queue.Queue(maxsize=10)  # 限制队列大小防止内存溢出
+
+        # 队列限制队列大小防止内存溢出
+        self.audio_queue = queue.Queue(maxsize=50)
         
         logger.info(f"初始化音频处理器 (设备: {self.config.device})")
         self._load_models()
@@ -81,14 +80,14 @@ class AudioProcessor:
         try:
             logger.info(f"加载 Faster-Whisper 模型 ({self.config.device})...")
             self.whisper_model = WhisperModel(
-                self.config.model_size,
+                self.config.model,
                 device=self.config.device,
                 compute_type=self.config.compute_type
             )
             
             logger.info("加载 Silero VAD 模型...")
             vad_model, utils = torch.hub.load(
-                repo_or_dir=r'models/silero-vad',
+                repo_or_dir=self.config.vad,
                 model='silero_vad',
                 source='local',
                 force_reload=False,
@@ -203,8 +202,12 @@ class AudioProcessor:
                                     
                                     if text:
                                         logger.info(f"识别内容: {text}")
+                                        # 调用完整文本回调
                                         if self.on_text_callback:
                                             self.on_text_callback(text)
+                                        # 调用部分文本回调（用于实时显示）
+                                        if self.on_partial_callback:
+                                            self.on_partial_callback(text)
                                 
                                 # 重置状态
                                 self.current_buffer = np.zeros(0, dtype=np.float32)
@@ -247,19 +250,49 @@ def default_text_callback(text: str):
     print(f"识别结果: {text}\n")
 
 
-# ================== 如果直接运行此脚本 ==================
-if __name__ == "__main__":
-    # 创建处理器
-    config = AudioConfig()
-    processor = AudioProcessor(config=config, on_text_callback=default_text_callback)
+# ================== 工厂函数 ==================
+def create_audio_processor(
+        model: str,
+        vad: str,
+        language,
+        sample_rate,
+        chunk_duration,
+        min_silence_ms,
+        min_audio_ms,
+        vad_window_sec,
+        on_text_callback: Optional[Callable[[str], None]] = None,
+        on_partial_callback: Optional[Callable[[str], None]] = None
+) -> AudioProcessor:
+    """
+    创建音频处理器的工厂函数
     
-    # 启动处理
-    processor.start()
-    
-    try:
-        input("按回车键停止...\n")
-    except KeyboardInterrupt:
-        print("\n中断信号收到")
-    finally:
-        processor.stop()
-        print("程序已退出")
+    Args:
+        model: 模型路径
+        vad: 语音活动检测
+        language: 识别语言
+        sample_rate: 采样率
+        chunk_duration: 每个音频块的时长
+        min_silence_ms: 最小静音时长
+        min_audio_ms: 最小音频长度
+        vad_window_sec: VAD窗口大小
+        on_text_callback: 完整文本回调
+        on_partial_callback: 部分文本回调
+        
+    Returns:
+        AudioProcessor: 配置好的音频处理器
+    """
+    config = AudioConfig(
+        model=model,
+        vad=vad,
+        language=language,
+        sample_rate=sample_rate,
+        chunk_duration=chunk_duration,
+        min_silence_ms=min_silence_ms,
+        min_audio_ms=min_audio_ms,
+        vad_window_sec=vad_window_sec
+    )
+    return AudioProcessor(
+        config=config,
+        on_text_callback=on_text_callback,
+        on_partial_callback=on_partial_callback
+    )

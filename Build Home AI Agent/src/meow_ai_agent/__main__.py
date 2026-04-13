@@ -1,39 +1,11 @@
-from langchain_core.messages import HumanMessage
 from langgraph.checkpoint.redis import RedisSaver
 
 import meow_ai_agent.constants.config as config
 import meow_ai_agent.constants.env as env
 import meow_ai_agent.model.app as app
 from meow_ai_agent.config.logging import setup_logging
-
-def text_input():
-    with RedisSaver.from_conn_string(env.REDIS_URL) as memory:
-        memory.setup()  # 只有首次需要
-
-        this_app = app.builder.compile(checkpointer=memory)
-        # 这里不仅会存对话，也会存最后的 AgentState
-        thread_config = {"configurable": {"thread_id": "home_assistant_007"}}
-        print("由乃智能家居助手已启动（LangGraph 版），输入 exit 退出。")
-        while True:
-            user_input = input(">>> ")
-            if user_input == "exit":
-                break
-
-            for chunk in this_app.stream(
-                    {"messages": [HumanMessage(content=user_input)]},
-                    config=thread_config,
-                    stream_mode="messages"
-            ):
-                msg_chunk, metadata = chunk
-
-                # 过滤空 token
-                if not msg_chunk.content:
-                    continue
-
-                # todo 合并放入消息队列，异步写入数据库
-                print(msg_chunk.content, end="", flush=True)
-
-            print()
+from meow_ai_agent.constants.config import service_settings
+from meow_ai_agent.utils.input import InputManager
 
 
 def main():
@@ -43,7 +15,19 @@ def main():
     env.print_env()
     config.load_config()
 
-    text_input()
+    # 初始化Redis内存
+    with RedisSaver.from_conn_string(service_settings.redis_url) as memory:
+        memory.setup()  # 只有首次需要
+
+        # 编译应用
+        this_app = app.builder.compile(checkpointer=memory)
+
+        # 线程配置
+        thread_config = {"configurable": {"thread_id": "home_assistant_007"}}
+
+        # 创建输入管理器并启动
+        input_manager = InputManager(this_app, thread_config)
+        input_manager.start()
 
 
 if __name__ == "__main__":

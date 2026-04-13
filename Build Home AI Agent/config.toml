@@ -1,2 +1,42 @@
 [path]
+# 数据库地址
 dbPath="data/data.db"
+
+[input]
+# 输入模式: "text" (文本输入) 或 "audio" (语音输入)
+mode = "audio"
+
+[audio]
+# 语音识别模型大小
+model = "models/faster-whisper-large-v3-turbo"
+# VAD
+vad = "models/silero-vad"
+# 语言
+language = "zh"
+# 采样率（Hz）
+sample_rate = 16000
+# 每个音频块的时长（秒）
+chunk_duration = 0.1
+# 停顿多久算一句结束（毫秒）
+min_silence_ms = 1000
+# 最短语音长度（毫秒）
+min_audio_ms = 500
+# VAD检测窗口大小（秒）
+vad_window_sec = 0.8
+
+
+[service]
+# 向量库地址
+qdrant_url = "http://localhost:6333"
+# Ollama地址
+ollama_base_url = "http://localhost:11434"
+# Redis地址
+redis_url = "redis://localhost:6379"
+# 主LLM模型
+llm_model = "qwen2.5:7b"
+# 辅助LLM模型
+llm_model_light = "qwen2.5:1.5b"
+# Embedding模型
+embed_text_model = "bge-m3"
+# 每次启动删除清空向量库
+reset_collections = "True"

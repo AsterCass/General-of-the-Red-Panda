@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+
 
 def resource_path(relative_path):
     """ 获取资源绝对路径，兼容开发和打包 """

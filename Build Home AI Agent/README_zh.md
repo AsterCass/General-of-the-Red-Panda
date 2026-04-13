@@ -64,21 +64,43 @@ wsl --import Ubuntu-jjdyycm C:\Users\astercasc X:\red.panda\new\jjdyycm.tar
    uv install
    ```
 
-2. 设置环境，在`.env`中：
-   ```
-   QDRANT_URL=http://localhost:6333
-   OLLAMA_BASE_URL=http://localhost:11434
-   REDIS_URL=redis://localhost:6379
-   MODEL_NAME=qwen2.5:7b
-   MODEL_NAME_LIGHT=qwen2.5:1.5b
-   EMBED_TEXT_MODEL_NAME=bge-m3
-   RESET_COLLECTIONS=false
-   ```
+2. 设置配置，在`config.toml`中：
 
 3. 运行:
    ```bash
    uv run app
    ```
+
+## 常见问题
+
+### Q: 如何切换输入模式？
+
+**A:** 修改 `config.toml` 中的 `[input]mode`
+
+### Q: 为什么识别很慢？
+
+**A:**
+
+- 检查是否启用了GPU（应显示 `CUDA` 而不是 `CPU`）
+- 减小 `chunk_duration` 和 `vad_window_sec`
+- 使用更小的模型（turbo版本）
+
+### Q: 为什么识别不准确？
+
+**A:**
+
+- 增加 `min_silence_ms` 给更多时间
+- 使用更大的模型（non-turbo版本）
+- 增加 `min_audio_ms` 过滤噪音
+- 检查环境噪音
+
+### Q: 支持其他语言吗？
+
+**A:** 是的，修改`config.toml` 中的 `[audio]language`
+
+- `zh` - 中文
+- `en` - 英文
+- 更多语言见 Faster-Whisper 文档
 
 
 ## 技术栈

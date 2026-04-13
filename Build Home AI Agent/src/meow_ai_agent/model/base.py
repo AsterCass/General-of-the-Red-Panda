@@ -8,7 +8,7 @@ from langgraph.graph.message import add_messages
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
 
-import meow_ai_agent.constants.env as env
+from meow_ai_agent.constants.config import service_settings
 from meow_ai_agent.constants.enums import IntentStatus
 
 
@@ -25,31 +25,31 @@ class AgentState(TypedDict):
 # ==================== 模型 ====================
 
 llm = ChatOllama(
-    model=env.MODEL_NAME,
-    base_url=env.OLLAMA_BASE_URL,
+    model=service_settings.llm_model,
+    base_url=service_settings.ollama_base_url,
 )
 
 emb = OllamaEmbeddings(
-    model=env.EMBED_TEXT_MODEL_NAME,
-    base_url=env.OLLAMA_BASE_URL,
+    model=service_settings.embed_text_model,
+    base_url=service_settings.ollama_base_url,
 )
 
 llm_l = ChatOllama(
-    model=env.MODEL_NAME_LIGHT,
-    base_url=env.OLLAMA_BASE_URL,
+    model=service_settings.llm_model_light,
+    base_url=service_settings.ollama_base_url,
     temperature=0
 )
 
 # ==================== 向量库 ====================
 
 qdrant_cli = QdrantClient(
-    url=env.QDRANT_URL
+    url=service_settings.qdrant_url,
 )
 
 intent_router = "intent_router"
 
 # 指定重置时清空
-if env.RESET_COLLECTIONS and qdrant_cli.collection_exists(intent_router):
+if service_settings.reset_collections and qdrant_cli.collection_exists(intent_router):
     qdrant_cli.delete_collection(intent_router)
 
 # 意图库

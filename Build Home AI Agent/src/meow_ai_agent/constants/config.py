@@ -1,14 +1,83 @@
 import tomllib
+from dataclasses import dataclass
 from pathlib import Path
 
 from loguru import logger
 
+# 默认数据库路径
 data_path = Path("data/data.db")
-audio = Path("models/faster-whisper-large-v3-turbo")
+
+# 输入模式配置 "text" 或 "audio"
+input_mode = "text"
+
+
+@dataclass
+class AudioSettings:
+    """音频配置数据类"""
+    model: str = "models/faster-whisper-large-v3-turbo"
+    vad: str = "models/silero-vad"
+    language: str = "zh"
+    sample_rate: int = 16000
+    chunk_duration: float = 0.05
+    min_silence_ms: int = 800
+    min_audio_ms: int = 500
+    vad_window_sec: float = 0.5
+
+
+audio_settings = AudioSettings()
+
+
+# services:
+#   redis:
+#     image: redis/redis-stack:latest
+#     container_name: redis
+#     restart: always
+#     ports:
+#       - "6379:6379"
+#     volumes:
+#       - ./data:/data
+# services:
+#   qdrant:
+#     image: qdrant/qdrant
+#     container_name: qdrant
+#     restart: always
+#     ports:
+#       - "6333:6333"
+#     volumes:
+#       - ./data:/qdrant/storage
+#
+# services:
+#   ollama:
+#     image: ollama/ollama
+#     container_name: ollama
+#     restart: always
+#     ports:
+#       - "11434:11434"
+#     volumes:
+#       - ./data:/root/.ollama
+#
+# ollama pull qwen2.5:7b
+# ollama pull nomic-embed-text
+# ollama pull qwen2.5:1.5b
+# ollama pull bge-m3
+
+@dataclass
+class ServiceSettings:
+    """服务配置数据类"""
+    qdrant_url: str = "http://localhost:6333"
+    ollama_base_url: str = "http://localhost:11434"
+    redis_url: str = "redis://localhost:6379"
+    llm_model: str = "qwen2.5:7b"
+    llm_model_light: str = "qwen2.5:1.5b"
+    embed_text_model: str = "bge-m3"
+    reset_collections: bool = False
+
+
+service_settings = ServiceSettings()
 
 def load_config():
     path = Path("config.toml")
-    global data_path
+    global data_path, input_mode, audio_settings, service_settings
 
     if not path.exists():
         logger.warning(f"{path} not found.")
@@ -30,7 +99,14 @@ def load_config():
                     logger.info(f"  {k} = {v}")
                     if k == "dbPath":
                         data_path = v
-                        logger.info(f"DB path: {data_path}")
+                    elif section == "input" and k == "mode":
+                        input_mode = v
+                    elif section == "audio":
+                        if hasattr(audio_settings, k):
+                            setattr(audio_settings, k, v)
+                    elif section == "service":
+                        if hasattr(service_settings, k):
+                            setattr(service_settings, k, v)
             else:
                 logger.info(f"  {content}")
 

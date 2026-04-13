@@ -4,6 +4,11 @@ class RetStatus(Enum):
     SUCCESS = 0
     ERROR = -1
 
+class AudioProcessorState(Enum):
+    IDLE = "idle"
+    LISTENING = "listening"
+    PROCESSING = "processing"
+    STOPPED = "stopped"
 
 class IntentStatus(Enum):
     UNKNOW = "UNKNOW"

@@ -1,7 +1,9 @@
 # logging_config.py
-from loguru import logger
 import sys
 from pathlib import Path
+
+from loguru import logger
+
 
 def setup_logging(save_file: bool = True):
     logger.remove()
