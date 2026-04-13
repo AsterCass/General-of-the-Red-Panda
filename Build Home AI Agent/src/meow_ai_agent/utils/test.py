@@ -29,12 +29,14 @@ class AgentState(TypedDict):
 llm = ChatOllama(
     model=MODEL_NAME,
     base_url=OLLAMA_BASE_URL,
+    tags=["nostream"],
 )
 
 llm_l = ChatOllama(
     model=LIGHT_MODEL_NAME,
     base_url=OLLAMA_BASE_URL,
-    temperature=0
+    temperature=0,
+    tags=["nostream"],
 )
 
 confirm_words = [
@@ -64,6 +66,7 @@ system_prompt_tool = """
 3. 如果不能调用工具，就正常回答。
 4. 不要自问自答。
 5. 你的回复必须是纯文本，不允许包含“AI:”、“Assistant:”等角色前缀。
+6. 直接调用工具即可，不要再次询问。
 """
 prompt_tool = ChatPromptTemplate.from_messages([("system", system_prompt_tool), ("placeholder", "{messages}"), ])
 
