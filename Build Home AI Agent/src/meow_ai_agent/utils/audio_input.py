@@ -26,8 +26,9 @@ model = WhisperModel(
 
 print("加载 VAD 模型...")
 vad_model, utils = torch.hub.load(
-    repo_or_dir='snakers4/silero-vad',
+    repo_or_dir=r'models/silero-vad',
     model='silero_vad',
+    source= 'local',
     force_reload=False,
     onnx=True
 )
