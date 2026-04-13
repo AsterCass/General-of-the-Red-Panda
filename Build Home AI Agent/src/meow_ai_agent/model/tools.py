@@ -40,6 +40,7 @@ system_prompt_tool = """
 2. 当需要执行设备或者工具操作时，必须使用 tool_call，不允许模拟 tool_call ，不允许在文本中输出 JSON
 3. 如果不能调用工具，就正常回答.
 4. 不要自问自答。
+5. 你的回复必须是纯文本，不允许包含“AI:”、“Assistant:”等角色前缀。
 """
 prompt_tool = ChatPromptTemplate.from_messages([("system", system_prompt_tool), ("placeholder", "{messages}"), ])
 

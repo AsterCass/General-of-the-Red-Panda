@@ -5,6 +5,7 @@ from loguru import logger
 
 import meow_ai_agent.constants.config as config
 from meow_ai_agent.utils.audio_input import create_audio_processor
+from meow_ai_agent.utils.output import clean_output
 
 
 class InputManager:
@@ -103,7 +104,7 @@ class InputManager:
                     continue
 
                 # 输出AI回复
-                print(msg_chunk.content, end="", flush=True)
+                print(clean_output(msg_chunk.content), end="", flush=True)
 
             print()  # 换行
 
