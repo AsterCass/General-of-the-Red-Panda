@@ -29,6 +29,12 @@ llm = ChatOllama(
     base_url=service_settings.ollama_base_url,
 )
 
+llm_ns = ChatOllama(
+    model=service_settings.llm_model,
+    base_url=service_settings.ollama_base_url,
+    tags=["nostream"],
+)
+
 emb = OllamaEmbeddings(
     model=service_settings.embed_text_model,
     base_url=service_settings.ollama_base_url,
@@ -37,7 +43,8 @@ emb = OllamaEmbeddings(
 llm_l = ChatOllama(
     model=service_settings.llm_model_light,
     base_url=service_settings.ollama_base_url,
-    temperature=0
+    temperature=0,
+    tags=["nostream"],
 )
 
 # ==================== 向量库 ====================

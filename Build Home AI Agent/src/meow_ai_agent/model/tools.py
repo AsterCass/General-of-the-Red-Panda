@@ -12,7 +12,7 @@ from meow_ai_agent.utils.device import turn_off_light_bedroom, turn_off_light_li
 # ==================== 确认语义 ====================
 
 confirm_words = [
-    "是", "好的", "确认", "ok", "yes", "sure", "嗯", "可以", "行", "行", "是的", "确定"
+    "是", "好的", "确认", "ok", "yes", "sure", "嗯", "可以", "行", "是的", "确定"
 ]
 
 system_prompt_confirm = f"""
@@ -50,7 +50,7 @@ tools = [turn_off_light_bedroom, turn_off_light_living_room, close_window_living
          turn_on_heating_bedroom, open_curtain_living_room, close_curtain_living_room]
 tool_node = ToolNode(tools=tools)
 tool_map = {t.name: t for t in tools}
-llm_with_tools = base.llm.bind_tools(tools)
+llm_with_tools = base.llm_ns.bind_tools(tools)
 
 
 # ==================== 节点定义 ====================

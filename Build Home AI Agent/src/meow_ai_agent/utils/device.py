@@ -14,14 +14,14 @@ def smart_tool(**meta):
 def turn_off_light_bedroom() -> str:
     """关闭卧室灯光"""
     logger.info("Turn off light 1...")
-    return "卧室灯光已经关闭"
+    return "卧室灯光已关闭"
 
 
 @smart_tool(need_confirm=True, category="device")
 def turn_off_light_living_room() -> str:
     """关闭客厅灯光"""
     logger.info("Turn off light 2...")
-    return "客厅灯已经关闭"
+    return "客厅灯光已关闭"
 
 
 @smart_tool(need_confirm=True, category="device")
@@ -35,7 +35,7 @@ def close_window_living_room() -> str:
 def turn_on_heating_bedroom() -> str:
     """打开卧室暖气"""
     logger.info("Turn on heating...")
-    return "卧室暖气已经打开"
+    return "卧室暖气已打开"
 
 
 @smart_tool(need_confirm=False, category="device")
