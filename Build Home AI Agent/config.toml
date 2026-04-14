@@ -6,6 +6,14 @@ dbPath="data/data.db"
 # 输入模式: "text" (文本输入) 或 "audio" (语音输入)
 mode = "audio"
 
+[output]
+# 输出模式: "text" (文本输入) 或 "audio" (语音输入)
+mode = "audio"
+
+[speaker]
+# 朗读模型地址
+model = "models/zh_CN-xiao_ya-medium/zh_CN-xiao_ya-medium.onnx"
+
 [audio]
 # 语音识别模型大小
 model = "models/faster-whisper-large-v3-turbo"

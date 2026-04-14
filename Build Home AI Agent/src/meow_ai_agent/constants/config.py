@@ -10,6 +10,11 @@ data_path = Path("data/data.db")
 # 输入模式配置 "text" 或 "audio"
 input_mode = "text"
 
+# 输出模式配置 "text" 或 "audio"
+output_mode = "text"
+
+# 输出模式为 audio 需要加载的语言的模型
+speak_model_path = Path("models/zh_CN-xiao_ya-medium/zh_CN-xiao_ya-medium.onnx")
 
 @dataclass
 class AudioSettings:
@@ -77,7 +82,7 @@ service_settings = ServiceSettings()
 
 def load_config():
     path = Path("config.toml")
-    global data_path, input_mode, audio_settings, service_settings
+    global data_path, input_mode, audio_settings, service_settings, output_mode, speak_model_path
 
     if not path.exists():
         logger.warning(f"{path} not found.")
@@ -101,6 +106,10 @@ def load_config():
                         data_path = v
                     elif section == "input" and k == "mode":
                         input_mode = v
+                    elif section == "output" and k == "mode":
+                        output_mode = v
+                    elif section == "speaker" and k == "model":
+                        speak_model_path = v
                     elif section == "audio":
                         if hasattr(audio_settings, k):
                             setattr(audio_settings, k, v)

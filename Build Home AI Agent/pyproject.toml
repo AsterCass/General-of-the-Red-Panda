@@ -40,6 +40,7 @@ dependencies = [
     "faster-whisper>=1.2.1",
     "sounddevice>=0.5.5",
     "numpy>=1.26,<2.0",
+    "piper-tts>=1.4.1",
 ]
 
 [tool.uv.sources]
