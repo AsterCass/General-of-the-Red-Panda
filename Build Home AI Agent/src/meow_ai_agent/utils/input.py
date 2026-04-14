@@ -5,6 +5,8 @@ from loguru import logger
 
 import meow_ai_agent.constants.config as config
 from meow_ai_agent.utils.audio_input import create_audio_processor
+from meow_ai_agent.utils.output import OutputManager
+from pathlib import Path
 
 
 class InputManager:
@@ -15,6 +17,10 @@ class InputManager:
         self.thread_config = thread_config
         self.input_queue = queue.Queue()
         self.audio_processor = None
+        self.output_manager = OutputManager(
+            output_mode=config.output_mode,
+            speak_model_path=Path(config.speak_model_path)
+        )
 
     def on_audio_text(self, text: str):
         """音频识别回调"""
@@ -103,9 +109,9 @@ class InputManager:
                     continue
 
                 # 输出AI回复
-                print(msg_chunk.content, end="", flush=True)
+                self.output_manager.output(msg_chunk.content)
 
-            print()  # 换行
+            self.output_manager.output("\n")  # 换行
 
         except Exception as e:
             logger.error(f"处理输入时出错: {e}")

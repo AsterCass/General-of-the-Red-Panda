@@ -80,3 +80,35 @@ class Reader:
     def stop(self):
         with self._lock:
             self._interrupt = True
+
+
+class OutputManager:
+    """输出管理器 - 支持文本和语音输出"""
+
+    def __init__(self, output_mode: str, speak_model_path: Path = None):
+        self.output_mode = output_mode
+        self.reader = None
+        if output_mode == "audio" and speak_model_path:
+            try:
+                self.reader = Reader(speak_model_path)
+            except Exception as e:
+                logger.error(f"语音模型加载失败: {e}")
+                logger.warning("切换到文本输出模式")
+                self.output_mode = "text"
+
+    def output(self, text: str):
+        """输出文本"""
+        # 过滤掉内部数据输出，如工具调用信息和确认结果
+        if ('tool_call' in text or 
+            text.strip().startswith('[') or 
+            text.strip().upper() in ['YES', 'NO']):
+            return
+        if self.output_mode == "audio" and self.reader:
+            self.reader.speak(text)
+        else:
+            print(text, end="", flush=True)
+
+    def stop(self):
+        """停止输出"""
+        if self.reader:
+            self.reader.stop()

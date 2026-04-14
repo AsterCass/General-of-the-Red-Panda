@@ -5,7 +5,7 @@ from pathlib import Path
 from loguru import logger
 
 # 默认数据库路径
-data_path = Path("data/data.db")
+data_path = "data/data.db"
 
 # 输入模式配置 "text" 或 "audio"
 input_mode = "text"
@@ -14,7 +14,7 @@ input_mode = "text"
 output_mode = "text"
 
 # 输出模式为 audio 需要加载的语言的模型
-speak_model_path = Path("models/zh_CN-xiao_ya-medium/zh_CN-xiao_ya-medium.onnx")
+speak_model_path = "models/zh_CN-xiao_ya-medium/zh_CN-xiao_ya-medium.onnx"
 
 @dataclass
 class AudioSettings:
