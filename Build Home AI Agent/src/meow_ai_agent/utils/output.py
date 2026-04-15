@@ -5,6 +5,7 @@ from pathlib import Path
 from faster_qwen3_tts import FasterQwen3TTS
 from loguru import logger
 
+import meow_ai_agent.constants.config as config
 from meow_ai_agent.utils.stream_play import StreamPlayer
 
 
@@ -54,6 +55,10 @@ class Reader:
             finally:
                 self._current_text = None
                 thisPlay.close()
+                logger.info("Play close !!!")
+                # todo 临时逻辑
+                time.sleep(1)
+                config.audio_is_playing = False
 
     def speak(self, text: str):
         with self._lock:

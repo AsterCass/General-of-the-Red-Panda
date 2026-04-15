@@ -1,6 +1,7 @@
 import queue
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Callable, Optional
 
@@ -10,6 +11,7 @@ import torch
 from faster_whisper import WhisperModel
 from loguru import logger
 
+import meow_ai_agent.constants.config as config
 from meow_ai_agent.constants.enums import AudioProcessorState
 
 
@@ -71,6 +73,9 @@ class AudioProcessor:
 
         # 队列限制队列大小防止内存溢出
         self.audio_queue = queue.Queue(maxsize=50)
+
+        # 线程池用于异步转录
+        self._executor = ThreadPoolExecutor(max_workers=1)
         
         logger.info(f"初始化音频处理器 (设备: {self.config.device})")
         self._load_models()
@@ -105,7 +110,8 @@ class AudioProcessor:
         """音频输入回调"""
         if status:
             logger.warning(f"音频回调状态: {status}")
-        
+        if config.audio_is_playing:
+            return
         try:
             # 更高效的方式：直接转换为numpy数组
             audio_chunk = indata[:, 0].astype(np.float32)
@@ -166,6 +172,12 @@ class AudioProcessor:
         ):
             while not self._stop_event.is_set():
                 try:
+
+                    if config.audio_is_playing:
+                        self.current_buffer = np.zeros(0, dtype=np.float32)
+                        time.sleep(0.5)
+                        continue
+
                     # 获取音频块，超时防止无限等待
                     audio_chunk = self.audio_queue.get(timeout=0.5)
                     
@@ -197,7 +209,11 @@ class AudioProcessor:
                                 
                                 if len(self.current_buffer) > min_buffer_samples:
                                     self.state = AudioProcessorState.PROCESSING
-                                    text = self._transcribe_audio(self.current_buffer)
+
+                                    # 使用线程池异步转录
+                                    future = self._executor.submit(self._transcribe_audio, self.current_buffer.copy())
+                                    text = future.result()
+                                    
                                     self.state = AudioProcessorState.LISTENING
                                     
                                     if text:
@@ -238,16 +254,12 @@ class AudioProcessor:
         """停止音频处理"""
         logger.info("停止音频处理...")
         self._stop_event.set()
+        self._executor.shutdown(wait=True)
 
     def is_running(self) -> bool:
         """检查是否正在运行"""
         return self.state in [AudioProcessorState.LISTENING, AudioProcessorState.PROCESSING]
 
-
-# ================== 默认回调处理 ==================
-def default_text_callback(text: str):
-    """默认的文本回调函数"""
-    print(f"识别结果: {text}\n")
 
 
 # ================== 工厂函数 ==================
