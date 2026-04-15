@@ -7,12 +7,12 @@ dbPath="data/data.db"
 mode = "audio"
 
 [output]
-# 输出模式: "text" (文本输入) 或 "audio" (语音输入)
+# 输出模式: "text" (文本输出) 或 "audio" (语音输出)
 mode = "audio"
 
 [speaker]
 # 朗读模型地址
-model = "models/zh_CN-xiao_ya-medium/zh_CN-xiao_ya-medium.onnx"
+model = "models/Qwen3-TTS-12Hz-0.6B-CustomVoice"
 
 [audio]
 # 语音识别模型大小

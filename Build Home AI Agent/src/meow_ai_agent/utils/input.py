@@ -6,7 +6,6 @@ from loguru import logger
 import meow_ai_agent.constants.config as config
 from meow_ai_agent.utils.audio_input import create_audio_processor
 from meow_ai_agent.utils.output import OutputManager
-from pathlib import Path
 
 
 class InputManager:
@@ -19,7 +18,7 @@ class InputManager:
         self.audio_processor = None
         self.output_manager = OutputManager(
             output_mode=config.output_mode,
-            speak_model_path=Path(config.speak_model_path)
+            speak_model_path=config.speak_model_path
         )
 
     def on_audio_text(self, text: str):
@@ -97,21 +96,28 @@ class InputManager:
     def _process_input(self, user_input: str):
         """处理用户输入"""
         try:
-            for chunk in self.app.stream(
-                    {"messages": [HumanMessage(content=user_input)]},
-                    config=self.thread_config,
-                    stream_mode="messages"
-            ):
-                msg_chunk, metadata = chunk
+            # for chunk in self.app.stream(
+            #         {"messages": [HumanMessage(content=user_input)]},
+            #         config=self.thread_config,
+            #         stream_mode="messages"
+            # ):
+            #     msg_chunk, metadata = chunk
+            #
+            #     # 过滤空 token
+            #     if not msg_chunk.content:
+            #         continue
+            #
+            #     # 输出AI回复
+            #     self.output_manager.output(msg_chunk.content)
+            #
+            # self.output_manager.output("\n")  # 换行
 
-                # 过滤空 token
-                if not msg_chunk.content:
-                    continue
-
-                # 输出AI回复
-                self.output_manager.output(msg_chunk.content)
-
-            self.output_manager.output("\n")  # 换行
+            # 非流式
+            result = self.app.invoke(
+                {"messages": [HumanMessage(content=user_input)]},
+                config=self.thread_config
+            )
+            self.output_manager.output(result["messages"][-1].content)
 
         except Exception as e:
             logger.error(f"处理输入时出错: {e}")

@@ -2,26 +2,26 @@ import threading
 import time
 from pathlib import Path
 
-import numpy as np
-import sounddevice as sd
+from faster_qwen3_tts import FasterQwen3TTS
 from loguru import logger
-from piper import PiperVoice
+
+from meow_ai_agent.utils.stream_play import StreamPlayer
 
 
 class Reader:
     """
-    # https://github.com/rhasspy/piper
-    # https://github.com/OHF-Voice/piper1-gpl
-    # https://huggingface.co/rhasspy/piper-voices
-    # python -m piper.download_voices zh_CN-xiao_ya-medium
+    # https://github.com/andimarafioti/faster-qwen3-tts/issues/43
+    # https://github.com/andimarafioti/faster-qwen3-tts/issues/96
+    # https://github.com/HaujetZhao/Qwen3-TTS-GGUF
+    # https://modelscope.cn/collections/Qwen/Qwen3-TTS
     """
 
-    def __init__(self, model_path: Path):
-        if not model_path.is_file():
+    def __init__(self, model_path: str):
+        if not Path(model_path).is_dir():
             raise FileNotFoundError(f"模型文件不存在: {model_path}")
 
-        self.voice = PiperVoice.load(model_path)
-        logger.info(f"模型加载成功：{model_path.name}")
+        self.model = FasterQwen3TTS.from_pretrained(model_path)
+        logger.info(f"模型加载成功：{model_path}")
 
         # 当前要播放的文本
         self._current_text = None
@@ -37,40 +37,23 @@ class Reader:
         self._thread.start()
 
     def _speak_worker(self):
-        stream = None
         while True:
             if self._current_text is None:
                 time.sleep(0.2)
                 continue
-            with self._lock:
-                text = self._current_text
-                self._current_text = None
-                self._interrupt = False
+            logger.info(f"Start play {self._current_text}")
+            thisPlay = StreamPlayer()
             try:
-                for chunk in self.voice.synthesize(text):
-                    if self._interrupt:
-                        logger.info("打断播放")
-                        break
-                    if stream is None:
-                        stream = sd.OutputStream(
-                            samplerate=chunk.sample_rate,
-                            channels=chunk.sample_channels,
-                            dtype="int16",
-                        )
-                        stream.start()
-                    audio = np.frombuffer(chunk.audio_int16_bytes, dtype=np.int16)
-                    stream.write(audio)
-                logger.info("播放结束")
-            except Exception as e:
-                logger.error(f"播放错误: {e}")
+                for audio_chunk, sr, timing in self.model.generate_custom_voice_streaming(
+                        text=self._current_text,
+                        language="Chinese",
+                        speaker="Serena",
+                        non_streaming_mode=False,
+                ):
+                    thisPlay(audio_chunk, sr)
             finally:
-                if stream:
-                    try:
-                        stream.stop()
-                        stream.close()
-                    except:
-                        pass
-                    stream = None
+                self._current_text = None
+                thisPlay.close()
 
     def speak(self, text: str):
         with self._lock:
@@ -85,7 +68,7 @@ class Reader:
 class OutputManager:
     """输出管理器 - 支持文本和语音输出"""
 
-    def __init__(self, output_mode: str, speak_model_path: Path = None):
+    def __init__(self, output_mode: str, speak_model_path: str = None):
         self.output_mode = output_mode
         self.reader = None
         if output_mode == "audio" and speak_model_path:
@@ -99,8 +82,9 @@ class OutputManager:
     def output(self, text: str):
         """输出文本"""
         # 过滤掉内部数据输出，如工具调用信息和确认结果
-        if ('tool_call' in text or 
-            text.strip().startswith('[') or 
+        logger.info(f"Output: {text}")
+        if ('tool_call' in text or
+                text.strip().startswith('[') or
             text.strip().upper() in ['YES', 'NO']):
             return
         if self.output_mode == "audio" and self.reader:

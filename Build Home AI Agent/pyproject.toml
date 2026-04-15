@@ -6,7 +6,7 @@ authors = [
     { name = "AsterCasc", email = "astercass@qq.com" }
 ]
 readme = "README.md"
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     # 一般
     #"flask>=3.1.2", # HTTP 服务端
@@ -34,23 +34,23 @@ dependencies = [
     "docx2txt>=0.9",
     "redis>=7.4.0",
     "langgraph-checkpoint-redis>=0.4.0",
-    "torch==2.3.1",
-    "torchvision==0.18.1",
-    "torchaudio==2.3.1",
+    "torch==2.7.1",
+    "torchvision==0.22.1",
+    "torchaudio==2.7.1",
     "faster-whisper>=1.2.1",
     "sounddevice>=0.5.5",
     "numpy>=1.26,<2.0",
-    "piper-tts>=1.4.1",
+    "faster-qwen3-tts>=0.2.5",
 ]
 
 [tool.uv.sources]
-torch = { index = "pytorch-cu121" }
-torchvision = { index = "pytorch-cu121" }
-torchaudio = { index = "pytorch-cu121" }
+torch = { index = "pytorch-cu128" }
+torchvision = { index = "pytorch-cu128" }
+torchaudio = { index = "pytorch-cu128" }
 
 [[tool.uv.index]]
-name = "pytorch-cu121"
-url = "https://download.pytorch.org/whl/cu121"
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
 explicit = true
 
 [[tool.uv.index]]
