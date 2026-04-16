@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import queue
 import threading
-from typing import Optional
+from typing import Callable, Optional
 
 import numpy as np
 
@@ -12,10 +12,12 @@ import numpy as np
 class StreamPlayer:
     """Play streaming audio chunks through one persistent output stream."""
 
-    def __init__(self, *, channels: int = 1, dtype: str = "float32", max_queue_chunks: int = 0):
+    def __init__(self, *, channels: int = 1, dtype: str = "float32", max_queue_chunks: int = 0,
+                 on_finished: Optional[Callable[[], None]] = None):
         self.channels = channels
         self.dtype = dtype
         self.max_queue_chunks = max_queue_chunks
+        self.on_finished = on_finished
 
         self._queue: queue.Queue[Optional[np.ndarray]] = queue.Queue(maxsize=max_queue_chunks)
         self._pending = np.zeros((0, channels), dtype=np.float32)
@@ -62,8 +64,15 @@ class StreamPlayer:
                 if next_chunk is None:
                     outdata[written:] = 0
                     self._drained.set()
-                    sd = self._load_sounddevice()
-                    raise sd.CallbackStop()
+                    if self._closed:
+                        sd = self._load_sounddevice()
+                        raise sd.CallbackStop()
+
+                    if self.on_finished:
+                        threading.Thread(target=self.on_finished, daemon=True).start()
+
+                    self._pending = np.zeros((0, self.channels), dtype=np.float32)
+                    continue
 
                 self._pending = next_chunk
 
@@ -95,6 +104,13 @@ class StreamPlayer:
             raise RuntimeError("StreamPlayer is already closed")
         self._ensure_stream(sample_rate)
         self._queue.put(self._reshape_chunk(audio_chunk))
+
+    def end_segment(self):
+        """End the current audio segment and trigger the on_finished callback if set."""
+        if self._closed:
+            raise RuntimeError("StreamPlayer is already closed")
+        self._drained.clear()
+        self._queue.put(None)
 
     def close(self, *, wait: bool = True, timeout: Optional[float] = None):
         if self._closed:

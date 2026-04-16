@@ -1,11 +1,14 @@
+from langchain_core.messages import HumanMessage
 from langgraph.checkpoint.redis import RedisSaver
+from loguru import logger
 
 import meow_ai_agent.constants.config as config
 import meow_ai_agent.constants.env as env
 import meow_ai_agent.model.app as app
 from meow_ai_agent.config.logging import setup_logging
 from meow_ai_agent.constants.config import service_settings
-from meow_ai_agent.utils.input import InputManager
+from meow_ai_agent.utils.input_manager import InputManager
+from meow_ai_agent.utils.output_manager import OutputManager
 
 
 def main():
@@ -25,8 +28,43 @@ def main():
         # 线程配置
         thread_config = {"configurable": {"thread_id": "home_assistant_007"}}
 
+        # 输出管理器
+        output_manager = OutputManager()
+
+        # 回调
+        def process_input_callback(user_input: str):
+            """处理用户输入"""
+            logger.info(f"检测到输入内容：{user_input}")
+            try:
+                # 流式
+                # for chunk in self.app.stream(
+                #         {"messages": [HumanMessage(content=user_input)]},
+                #         config=self.thread_config,
+                #         stream_mode="messages"
+                # ):
+                #     msg_chunk, metadata = chunk
+                #
+                #     # 过滤空 token
+                #     if not msg_chunk.content:
+                #         continue
+                #
+                #     # 输出AI回复
+                #     self.output_manager.output(msg_chunk.content)
+                #
+                # self.output_manager.output("\n")  # 换行
+
+                # 非流式
+                result = this_app.invoke(
+                    {"messages": [HumanMessage(content=user_input)]},
+                    config=thread_config
+                )
+                config.audio_is_playing = True
+                output_manager.output(result["messages"][-1].content + "\n")
+            except Exception as e:
+                logger.error(f"处理输入时出错: {e}")
+
         # 创建输入管理器并启动
-        input_manager = InputManager(this_app, thread_config)
+        input_manager = InputManager(process_input_callback)
         input_manager.start()
 
 

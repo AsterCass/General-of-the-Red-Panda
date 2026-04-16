@@ -29,7 +29,7 @@ class AudioConfig:
     vad_window_sec: float
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
     compute_type: str = None
-    
+
     def __post_init__(self):
         if self.compute_type is None:
             self.compute_type = "float16" if self.device == "cuda" else "int8"
@@ -46,14 +46,14 @@ class AudioProcessor:
     """
 
     def __init__(
-        self,
-        config: Optional[AudioConfig] = None,
+            self,
+            config: Optional[AudioConfig] = None,
             on_text_callback: Optional[Callable[[str], None]] = None,
             on_partial_callback: Optional[Callable[[str], None]] = None
     ):
         """
         初始化音频处理器
-        
+
         Args:
             config: 音频配置
             on_text_callback: 完整文本回调函数 fn(text: str)
@@ -76,7 +76,7 @@ class AudioProcessor:
 
         # 线程池用于异步转录
         self._executor = ThreadPoolExecutor(max_workers=1)
-        
+
         logger.info(f"初始化音频处理器 (设备: {self.config.device})")
         self._load_models()
 
@@ -89,7 +89,7 @@ class AudioProcessor:
                 device=self.config.device,
                 compute_type=self.config.compute_type
             )
-            
+
             logger.info("加载 Silero VAD 模型...")
             vad_model, utils = torch.hub.load(
                 repo_or_dir=self.config.vad,
@@ -100,7 +100,7 @@ class AudioProcessor:
             )
             self.vad_model = vad_model
             (self.get_speech_timestamps, _, _, _, _) = utils
-            
+
             logger.info("模型加载完成")
         except Exception as e:
             logger.error(f"模型加载失败: {e}")
@@ -125,7 +125,7 @@ class AudioProcessor:
             # 只取最近的音频做VAD检测
             vad_window_samples = int(self.config.sample_rate * self.config.vad_window_sec)
             recent_audio = audio_array[-vad_window_samples:]
-            
+
             audio_tensor = torch.from_numpy(recent_audio)
             speech_timestamps = self.get_speech_timestamps(
                 audio_tensor,
@@ -155,20 +155,20 @@ class AudioProcessor:
     def _process_audio_stream(self):
         """主处理循环"""
         logger.info("实时监听中（停顿自动转录）...\n")
-        
+
         chunk_size = int(self.config.sample_rate * self.config.chunk_duration)
         min_buffer_size = int(self.config.sample_rate * 0.3)
         min_buffer_samples = int(self.config.sample_rate * (self.config.min_audio_ms / 1000))
         max_buffer_samples = int(self.config.sample_rate * 30)  # 防止缓冲区过大
-        
+
         self.state = AudioProcessorState.LISTENING
-        
+
         with sd.InputStream(
-            samplerate=self.config.sample_rate,
-            channels=1,
-            dtype='float32',
-            blocksize=chunk_size,
-            callback=self._audio_callback
+                samplerate=self.config.sample_rate,
+                channels=1,
+                dtype='float32',
+                blocksize=chunk_size,
+                callback=self._audio_callback
         ):
             while not self._stop_event.is_set():
                 try:
@@ -180,22 +180,22 @@ class AudioProcessor:
 
                     # 获取音频块，超时防止无限等待
                     audio_chunk = self.audio_queue.get(timeout=0.5)
-                    
+
                     with self._lock:
                         self.current_buffer = np.concatenate([self.current_buffer, audio_chunk])
-                        
+
                         # 防止缓冲区过大
                         if len(self.current_buffer) > max_buffer_samples:
                             self.current_buffer = self.current_buffer[-max_buffer_samples:]
-                        
+
                         # 至少积累一点音频再做VAD
                         if len(self.current_buffer) < min_buffer_size:
                             continue
-                        
+
                         # 检测语音
                         is_speech = self._detect_speech(self.current_buffer)
                         now = time.time()
-                        
+
                         if is_speech:
                             if not self.is_speaking:
                                 logger.info("检测到说话...")
@@ -206,16 +206,16 @@ class AudioProcessor:
                             silence_duration = (now - self.last_speech_time) * 1000
                             if self.is_speaking and silence_duration > self.config.min_silence_ms:
                                 buffer_duration = len(self.current_buffer) / self.config.sample_rate * 1000
-                                
+
                                 if len(self.current_buffer) > min_buffer_samples:
                                     self.state = AudioProcessorState.PROCESSING
 
                                     # 使用线程池异步转录
                                     future = self._executor.submit(self._transcribe_audio, self.current_buffer.copy())
                                     text = future.result()
-                                    
+
                                     self.state = AudioProcessorState.LISTENING
-                                    
+
                                     if text:
                                         logger.info(f"识别内容: {text}")
                                         # 调用完整文本回调
@@ -224,18 +224,18 @@ class AudioProcessor:
                                         # 调用部分文本回调（用于实时显示）
                                         if self.on_partial_callback:
                                             self.on_partial_callback(text)
-                                
+
                                 # 重置状态
                                 self.current_buffer = np.zeros(0, dtype=np.float32)
                                 self.is_speaking = False
-                
+
                 except queue.Empty:
                     # 超时，继续循环
                     continue
                 except Exception as e:
                     logger.error(f"处理音频时出错: {e}")
                     continue
-        
+
         self.state = AudioProcessorState.STOPPED
         logger.info("音频处理已停止")
 
@@ -244,7 +244,7 @@ class AudioProcessor:
         if self.state != AudioProcessorState.IDLE:
             logger.warning("音频处理器已启动")
             return
-        
+
         self._stop_event.clear()
         thread = threading.Thread(target=self._process_audio_stream, daemon=True)
         thread.start()
@@ -259,7 +259,6 @@ class AudioProcessor:
     def is_running(self) -> bool:
         """检查是否正在运行"""
         return self.state in [AudioProcessorState.LISTENING, AudioProcessorState.PROCESSING]
-
 
 
 # ================== 工厂函数 ==================
@@ -277,7 +276,7 @@ def create_audio_processor(
 ) -> AudioProcessor:
     """
     创建音频处理器的工厂函数
-    
+
     Args:
         model: 模型路径
         vad: 语音活动检测
@@ -289,7 +288,7 @@ def create_audio_processor(
         vad_window_sec: VAD窗口大小
         on_text_callback: 完整文本回调
         on_partial_callback: 部分文本回调
-        
+
     Returns:
         AudioProcessor: 配置好的音频处理器
     """
