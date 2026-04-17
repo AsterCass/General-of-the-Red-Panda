@@ -8,7 +8,7 @@ mode = "audio"
 
 [output]
 # 输出模式: "text" (文本输出) 或 "audio" (语音输出)
-mode = "text"
+mode = "audio"
 
 [speaker]
 # 朗读模型地址

@@ -28,8 +28,12 @@ def main():
         # 线程配置
         thread_config = {"configurable": {"thread_id": "home_assistant_007"}}
 
+        # 输入管理器
+        input_manager = InputManager()
+
         # 输出管理器
-        output_manager = OutputManager()
+        # todo 这里在输出管理器中将暂停和恢复输入监听的函数传入，作为输出的前置和后置处理，是临时逻辑，后续使用声纹或者回声消除等方式处理
+        output_manager = OutputManager(input_manager.pause_audio_input, input_manager.resume_audio_input)
 
         # 回调
         def process_input_callback(user_input: str):
@@ -62,8 +66,9 @@ def main():
             except Exception as e:
                 logger.error(f"处理输入时出错: {e}")
 
-        # 创建输入管理器并启动
-        input_manager = InputManager(process_input_callback)
+        input_manager.set_callback(process_input_callback)
+
+        # 输入管理器启动
         input_manager.start()
 
 

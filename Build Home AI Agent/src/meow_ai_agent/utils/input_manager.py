@@ -9,14 +9,18 @@ from meow_ai_agent.audio.input import AudioInput
 class InputManager:
     """输入管理器 - 支持文本和语音输入"""
 
-    def __init__(self, callback: Callable[[str], None]):
+    def __init__(self):
+        self.callback = None
+        self.audio_processor = None
+
+    def set_callback(self, callback: Callable[[str], None]):
         self.callback = callback
 
     def audio_input(self):
         logger.info("由乃智能家居助手已启动（语音输入模式）")
         try:
-            audio_input = AudioInput(self.callback)
-            audio_input.start()
+            self.audio_processor = AudioInput(self.callback)
+            self.audio_processor.start()
         except KeyboardInterrupt:
             return
         except Exception as e:
@@ -43,8 +47,19 @@ class InputManager:
 
     def start(self):
         """根据配置启动相应的输入模式"""
+        if self.callback is None:
+            logger.error("回调函数未设置，无法处理输入")
+            raise ValueError("回调函数未设置")
         logger.info(f"启动输入模式: {config.input_mode}")
         if config.input_mode == "audio":
             self.audio_input()
         else:
             self.text_input()
+
+    def pause_audio_input(self):
+        if self.audio_processor:
+            self.audio_processor.pause()
+
+    def resume_audio_input(self):
+        if self.audio_processor:
+            self.audio_processor.resume()

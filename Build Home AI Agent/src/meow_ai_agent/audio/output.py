@@ -1,7 +1,7 @@
 import threading
-import time
 from pathlib import Path
 from queue import Queue, Full
+from typing import Callable, Optional
 
 from faster_qwen3_tts import FasterQwen3TTS
 from loguru import logger
@@ -17,12 +17,12 @@ class AudioOutput:
     # https://modelscope.cn/collections/Qwen/Qwen3-TTS
     """
 
-    def __init__(self, model_path: str):
+    def __init__(self, model_path: str, after_output: Optional[Callable[[], None]] = None):
         if not Path(model_path).is_dir():
             raise FileNotFoundError(f"模型文件不存在: {model_path}")
 
         self.model = FasterQwen3TTS.from_pretrained(model_path)
-        self.thisPlay = StreamPlayer(on_finished=lambda: logger.info("输出音频播放完成"))
+        self.thisPlay = StreamPlayer(on_finished=after_output)
         logger.info(f"模型加载成功：{model_path}")
 
         # 当前要播放的文本

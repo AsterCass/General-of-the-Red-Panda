@@ -40,7 +40,8 @@ class AudioInput:
         self.on_text_callback = on_text_callback
         self.state = AudioProcessorState.IDLE
         self._stop_event = threading.Event()
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
+        self.is_paused = False
 
         # 音频缓冲
         self.current_buffer = np.zeros(0, dtype=np.float32)
@@ -83,6 +84,8 @@ class AudioInput:
         """音频输入回调"""
         if status:
             logger.warning(f"音频回调状态: {status}")
+        if self.is_paused:
+            return
         try:
             audio_chunk = indata[:, 0].astype(np.float32)
             self.audio_queue.put_nowait(audio_chunk)
@@ -216,3 +219,29 @@ class AudioInput:
         """检查是否正在运行"""
         return self.state in [AudioProcessorState.LISTENING, AudioProcessorState.PROCESSING]
 
+    def pause(self):
+        logger.info("暂停监听...")
+        self.is_paused = True
+        with self._lock:
+            self.clear_queue()
+            self.current_buffer = np.zeros(0, dtype=np.float32)
+            self.is_speaking = False
+
+    def resume(self):
+        """恢复监听"""
+        logger.info("恢复监听...")
+        with self._lock:
+            self.is_paused = False
+            self.last_speech_time = time.time()
+
+    def clear_queue(self):
+        """清空音频队列"""
+        cleared_count = 0
+        while not self.audio_queue.empty():
+            try:
+                self.audio_queue.get_nowait()
+                cleared_count += 1
+            except queue.Empty:
+                break
+        if cleared_count > 0:
+            logger.debug(f"已清空音频队列中的 {cleared_count} 个块")
