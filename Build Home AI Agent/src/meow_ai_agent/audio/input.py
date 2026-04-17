@@ -229,6 +229,7 @@ class AudioInput:
 
     def resume(self):
         """恢复监听"""
+        time.sleep(1)
         logger.info("恢复监听...")
         with self._lock:
             self.is_paused = False
