@@ -4,11 +4,11 @@ dbPath="data/data.db"
 
 [input]
 # 输入模式: "text" (文本输入) 或 "audio" (语音输入)
-mode = "text"
+mode = "audio"
 
 [output]
 # 输出模式: "text" (文本输出) 或 "audio" (语音输出)
-mode = "audio"
+mode = "text"
 
 [speaker]
 # 朗读模型地址

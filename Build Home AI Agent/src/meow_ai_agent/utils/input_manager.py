@@ -3,6 +3,7 @@ from typing import Callable
 from loguru import logger
 
 import meow_ai_agent.constants.config as config
+from meow_ai_agent.audio.input import AudioInput
 
 
 class InputManager:
@@ -14,8 +15,8 @@ class InputManager:
     def audio_input(self):
         logger.info("由乃智能家居助手已启动（语音输入模式）")
         try:
-            # todo
-            logger.info("TODO")
+            audio_input = AudioInput(self.callback)
+            audio_input.start()
         except KeyboardInterrupt:
             return
         except Exception as e:

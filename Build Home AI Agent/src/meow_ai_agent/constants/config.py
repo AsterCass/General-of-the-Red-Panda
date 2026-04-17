@@ -4,9 +4,6 @@ from pathlib import Path
 
 from loguru import logger
 
-# todo 临时
-audio_is_playing = False
-
 # 默认数据库路径
 data_path = "data/data.db"
 

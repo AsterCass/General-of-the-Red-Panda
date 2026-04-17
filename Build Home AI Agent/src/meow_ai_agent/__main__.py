@@ -58,7 +58,6 @@ def main():
                     {"messages": [HumanMessage(content=user_input)]},
                     config=thread_config
                 )
-                config.audio_is_playing = True
                 output_manager.output(result["messages"][-1].content + "\n")
             except Exception as e:
                 logger.error(f"处理输入时出错: {e}")
