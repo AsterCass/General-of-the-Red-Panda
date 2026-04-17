@@ -48,7 +48,7 @@ class AudioInput:
         self.last_speech_time = time.time()
 
         # 队列限制队列大小防止内存溢出
-        self.audio_queue = queue.Queue(maxsize=100)
+        self.audio_queue = queue.Queue(maxsize=200)
 
         logger.info(f"初始化音频处理器 (设备: {self.device})")
         self._load_models()
@@ -84,7 +84,6 @@ class AudioInput:
         if status:
             logger.warning(f"音频回调状态: {status}")
         try:
-            # 更高效的方式：直接转换为numpy数组
             audio_chunk = indata[:, 0].astype(np.float32)
             self.audio_queue.put_nowait(audio_chunk)
         except queue.Full:
@@ -144,8 +143,8 @@ class AudioInput:
         ):
             while not self._stop_event.is_set():
                 try:
-                    # 获取音频块，超时防止无限等待
-                    audio_chunk = self.audio_queue.get(timeout=0.5)
+                    # 获取音频块
+                    audio_chunk = self.audio_queue.get()
 
                     with self._lock:
                         self.current_buffer = np.concatenate([self.current_buffer, audio_chunk])
@@ -171,7 +170,7 @@ class AudioInput:
                             # 判断是否结束一句话
                             silence_duration = (now - self.last_speech_time) * 1000
                             if self.is_speaking and silence_duration > self.min_silence_ms:
-                                buffer_duration = len(self.current_buffer) / self.sample_rate * 1000
+                                # buffer_duration = len(self.current_buffer) / self.sample_rate * 1000
 
                                 if len(self.current_buffer) > min_buffer_samples:
                                     self.state = AudioProcessorState.PROCESSING
@@ -186,14 +185,12 @@ class AudioInput:
                                         # 调用完整文本回调
                                         if self.on_text_callback:
                                             self.on_text_callback(text)
+                                    else:
+                                        logger.info("未识别到有效文本")
 
                                 # 重置状态
                                 self.current_buffer = np.zeros(0, dtype=np.float32)
                                 self.is_speaking = False
-
-                except queue.Empty:
-                    # 超时，继续循环
-                    continue
                 except Exception as e:
                     logger.error(f"处理音频时出错: {e}")
                     continue
