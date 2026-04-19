@@ -8,7 +8,11 @@ from loguru import logger
 import meow_ai_agent.model.base as base
 from meow_ai_agent.utils.device import turn_off_light_bedroom, turn_off_light_living_room, close_window_living_room, \
     turn_on_heating_bedroom, open_curtain_living_room, close_curtain_living_room, turn_on_light_bedroom, \
-    turn_on_light_living_room
+    turn_on_light_living_room, turn_off_heating_bedroom
+
+# todo 工具流程走完之后（即，调用完成接口后），考虑清除之前的工作的对话记录，否则幻觉太严重，后面执行工具在他那变成纯聊天了
+# todo 但是会导致，类似“还是关上把”无法定位到问题，还是需要解决
+# todo 还是模型的问题，这种东西靠外部编程很难处理，最好使用专门的执行工具操作的LLM模型
 
 # ==================== 确认语义 ====================
 
@@ -42,19 +46,13 @@ system_prompt_tool = """
 3. 如果不能调用工具，就正常回答.
 4. 不要自问自答。
 5. 你的回复必须是纯文本，不允许包含“AI:”、“Assistant:”等角色前缀。
-6. 使用自然口语表达，而不是书面表达。
-7. 禁止使用任何 Markdown 格式（如 **、*、#、- 等）。
-8. 不要使用列表、标题、加粗、代码块等格式。
-9. 不要使用括号补充说明或解释性文字
-10. 可以适当加入语气词，让表达更自然。
-11. 你的回答必须可以被直接朗读出来，不要包含任何不适合朗读的内容。
 """
 prompt_tool = ChatPromptTemplate.from_messages([("system", system_prompt_tool), ("placeholder", "{messages}"), ])
 
 # ==================== 工具配置 ====================
 
 tools = [turn_off_light_bedroom, turn_off_light_living_room, close_window_living_room,
-         turn_on_light_bedroom, turn_on_light_living_room,
+         turn_on_light_bedroom, turn_on_light_living_room, turn_off_heating_bedroom,
          turn_on_heating_bedroom, open_curtain_living_room, close_curtain_living_room]
 tool_node = ToolNode(tools=tools)
 tool_map = {t.name: t for t in tools}
