@@ -7,7 +7,8 @@ from loguru import logger
 
 import meow_ai_agent.model.base as base
 from meow_ai_agent.utils.device import turn_off_light_bedroom, turn_off_light_living_room, close_window_living_room, \
-    turn_on_heating_bedroom, open_curtain_living_room, close_curtain_living_room
+    turn_on_heating_bedroom, open_curtain_living_room, close_curtain_living_room, turn_on_light_bedroom, \
+    turn_on_light_living_room
 
 # ==================== 确认语义 ====================
 
@@ -41,12 +42,19 @@ system_prompt_tool = """
 3. 如果不能调用工具，就正常回答.
 4. 不要自问自答。
 5. 你的回复必须是纯文本，不允许包含“AI:”、“Assistant:”等角色前缀。
+6. 使用自然口语表达，而不是书面表达。
+7. 禁止使用任何 Markdown 格式（如 **、*、#、- 等）。
+8. 不要使用列表、标题、加粗、代码块等格式。
+9. 不要使用括号补充说明或解释性文字
+10. 可以适当加入语气词，让表达更自然。
+11. 你的回答必须可以被直接朗读出来，不要包含任何不适合朗读的内容。
 """
 prompt_tool = ChatPromptTemplate.from_messages([("system", system_prompt_tool), ("placeholder", "{messages}"), ])
 
 # ==================== 工具配置 ====================
 
 tools = [turn_off_light_bedroom, turn_off_light_living_room, close_window_living_room,
+         turn_on_light_bedroom, turn_on_light_living_room,
          turn_on_heating_bedroom, open_curtain_living_room, close_curtain_living_room]
 tool_node = ToolNode(tools=tools)
 tool_map = {t.name: t for t in tools}

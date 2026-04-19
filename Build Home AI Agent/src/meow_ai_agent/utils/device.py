@@ -18,10 +18,24 @@ def turn_off_light_bedroom() -> str:
 
 
 @smart_tool(need_confirm=True, category="device")
+def turn_on_light_bedroom() -> str:
+    """打开卧室灯光"""
+    logger.info("Turn on light 1...")
+    return "卧室灯光已打开"
+
+
+@smart_tool(need_confirm=True, category="device")
 def turn_off_light_living_room() -> str:
     """关闭客厅灯光"""
     logger.info("Turn off light 2...")
     return "客厅灯光已关闭"
+
+
+@smart_tool(need_confirm=True, category="device")
+def turn_on_light_living_room() -> str:
+    """打开客厅灯光"""
+    logger.info("Turn on light 2...")
+    return "客厅灯光已打开"
 
 
 @smart_tool(need_confirm=True, category="device")
