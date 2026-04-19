@@ -83,6 +83,7 @@ intent_docs = [
     # ================= TOOL =================
     Document(page_content="打开灯", metadata={"intent": "TOOL"}),
     Document(page_content="关闭卧室灯", metadata={"intent": "TOOL"}),
+    Document(page_content="打开卧室灯", metadata={"intent": "TOOL"}),
     Document(page_content="帮我关掉空调", metadata={"intent": "TOOL"}),
     Document(page_content="把窗户打开", metadata={"intent": "TOOL"}),
     Document(page_content="启动服务器", metadata={"intent": "TOOL"}),

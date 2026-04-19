@@ -4,7 +4,7 @@
 
 ## 介绍
 
-一个基于 LangChain、LangGraph 和 Ollama 构建的家用 AI 代理，支持意图识别、工具调用和 RAG 检索
+一个基于 LangChain、LangGraph 和 Ollama 构建的家用人工智能体，支持正常聊天、工具调用和文档检索等功能
 
 ### 功能
 
@@ -16,7 +16,9 @@
 
 ## 具体文档
 
-
+- [构建完全自定义的全屋智能系统（七）（智能体篇-接入大语言模型）](https://www.astercasc.com/article/detail?articleId=AT204218015656262451)
+- [构建完全自定义的全屋智能系统（八）（智能体篇-知识库查询）](https://www.astercasc.com/article/detail?articleId=AT204285085250252390)
+- [构建完全自定义的全屋智能系统（九）（智能体篇-自定义工具调用）](https://www.astercasc.com/article/detail?articleId=AT204369538413155532)
 
 ## 相关资源下载地址
 
@@ -59,23 +61,25 @@ wsl --import Ubuntu-jjdyycm C:\Users\astercasc X:\red.panda\new\jjdyycm.tar
 
 * 安装[uv](https://docs.astral.sh/uv/)以及[python](https://www.python.org/)环境
 
-1. 安装依赖:
+1. 安装相应服务端并配置地址在`config.toml`中，如 Ollama、Redis、RAG向量数据库等，参考上方**具体文档**部分
+
+2. 安装依赖:
    ```bash
    uv install
    ```
 
-2. 设置配置，在`config.toml`中：
+3. 设置配置，在`config.toml`中：
 
-3. 运行:
+4. 运行:
    ```bash
    uv run app
    ```
 
 ## 常见问题
 
-### Q: 如何切换输入模式？
+### Q: 如何切换输入/输出模式？
 
-**A:** 修改 `config.toml` 中的 `[input]mode`
+**A:** 修改 `config.toml` 中的 `[input]mode` 以及 `[output]mode`
 
 ### Q: 为什么识别很慢？
 
@@ -94,9 +98,9 @@ wsl --import Ubuntu-jjdyycm C:\Users\astercasc X:\red.panda\new\jjdyycm.tar
 - 增加 `min_audio_ms` 过滤噪音
 - 检查环境噪音
 
-### Q: 支持其他语言吗？
+### Q: 支持其他默认语言吗？
 
-**A:** 是的，修改`config.toml` 中的 `[audio]language`
+**A:** 修改`config.toml` 中的 `[audio]language`
 
 - `zh` - 中文
 - `en` - 英文
