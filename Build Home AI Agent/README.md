@@ -16,7 +16,9 @@ A home AI agent built with LangChain, LangGraph, and Ollama, supporting intent r
 
 ## Documentation
 
-
+- [Building a Complete Custom Smart Home System (7) (Agent Chapter - Integrating Large Language Models)](https://www.astercasc.com/article/detail?articleId=AT204218015656262451)
+- [Building a Complete Custom Smart Home System (8) (Agent Chapter - Knowledge Base Query)](https://www.astercasc.com/article/detail?articleId=AT204285085250252390)
+- [Building a Complete Custom Smart Home System (9) (Agent Chapter - Custom Tool Calling)](https://www.astercasc.com/article/detail?articleId=AT204369538413155532)
 
 ## Related Resources
 
@@ -58,10 +60,12 @@ wsl --import Ubuntu-jjdyycm C:\Users\astercasc X:\red.panda\new\jjdyycm.tar
 
 ### Linux Related (Native Linux or after entering a container using WSL -d <distro>)
 
+todo
 
 
 ### Windows Commands
 
+todo
 
 ## Development
 
@@ -75,13 +79,55 @@ If you are not modifying the project, you can skip this section.
    ```
 
 2. Set up config in `config.toml`:
+   - Configure service URLs (Ollama, Redis, Qdrant)
+   - Set input/output modes (text/audio)
+   - Adjust audio settings (model paths, language, etc.)
+   - Specify LLM models and embedding models
 
 3. Run the app:
    ```bash
    uv run app
    ```
 
+## FAQ
+
+### Q: How to switch input/output modes?
+
+**A:** Modify `[input]mode` and `[output]mode` in `config.toml`
+
+### Q: Why is recognition slow?
+
+**A:**
+
+- Check if GPU is enabled (should show `CUDA` instead of `CPU`)
+- Reduce `chunk_duration` and `vad_window_sec`
+- Use smaller models (turbo versions)
+
+### Q: Why is recognition inaccurate?
+
+**A:**
+
+- Increase `min_silence_ms` to allow more time
+- Use larger models (non-turbo versions)
+- Increase `min_audio_ms` to filter noise
+- Check environmental noise
+
+### Q: Does it support other default languages?
+
+**A:** Modify `[audio]language` in `config.toml`
+
+- `zh` - Chinese
+- `en` - English
+- More languages see Faster-Whisper documentation
 
 ## Tech Stack
 
 - [WSL](https://learn.microsoft.com/en-us/windows/wsl/)
+- [LangChain](https://www.langchain.com/)
+- [LangGraph](https://langchain-ai.github.io/langgraph/)
+- [Ollama](https://ollama.ai/)
+- [Qdrant](https://qdrant.tech/)
+- [Redis](https://redis.io/)
+- [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper)
+- [Qwen3 TTS](https://github.com/andimarafioti/faster-qwen3-tts)
+- [Silero VAD](https://github.com/snakers4/silero-vad)

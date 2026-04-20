@@ -6,13 +6,41 @@
 
 一个基于 LangChain、LangGraph 和 Ollama 构建的家用人工智能体，支持正常聊天、工具调用和文档检索等功能
 
-### 功能
+## 功能
 
 - 意图分类（Chat、Tool、RAG、Web）
 - 工具执行并确认
 - 基于 RAG 的知识检索
 - 流式响应
 - 使用 Redis 的持久化记忆
+- 支持文本和语音输入输出
+- 实时语音识别（Faster-Whisper + Silero VAD）
+- 语音合成（Qwen3 TTS）
+
+## 项目结构
+
+```
+Build Home AI Agent/
+├── config.toml              # 配置文件
+├── pyproject.toml           # 项目依赖
+├── src/meow_ai_agent/       # 主要代码
+│   ├── __main__.py          # 程序入口
+│   ├── audio/               # 音频处理
+│   │   ├── input.py         # 语音输入
+│   │   └── output.py        # 语音输出
+│   ├── config/              # 配置
+│   ├── constants/           # 常量和枚举
+│   ├── model/               # AI 模型逻辑
+│   │   ├── app.py           # LangGraph 应用
+│   │   ├── base.py          # 基础模型配置
+│   │   ├── intent.py        # 意图分类
+│   │   ├── rag.py           # RAG 检索
+│   │   └── tools.py         # 工具调用
+│   └── utils/               # 工具函数
+├── models/                  # 本地模型文件
+├── data/                    # 数据存储
+└── tests/                   # 测试
+```
 
 ## 具体文档
 
@@ -51,9 +79,11 @@ wsl --import Ubuntu-jjdyycm C:\Users\astercasc X:\red.panda\new\jjdyycm.tar
 
 ### Linux 相关（即你使用的是原生Linux或者已经使用【WSL -d 指定容器名】进入容器）
 
+todo
 
 ### Windows相关命令
 
+todo
 
 ## 开发
 
@@ -69,6 +99,10 @@ wsl --import Ubuntu-jjdyycm C:\Users\astercasc X:\red.panda\new\jjdyycm.tar
    ```
 
 3. 设置配置，在`config.toml`中：
+   - 配置服务地址（Ollama、Redis、Qdrant）
+   - 设置输入输出模式（文本/语音）
+   - 调整音频设置（模型路径、语言等）
+   - 指定LLM模型和嵌入模型
 
 4. 运行:
    ```bash
@@ -109,4 +143,12 @@ wsl --import Ubuntu-jjdyycm C:\Users\astercasc X:\red.panda\new\jjdyycm.tar
 
 ## 技术栈
 
-- [WSL官网](https://learn.microsoft.com/en-us/windows/wsl/)
+- [WSL](https://learn.microsoft.com/en-us/windows/wsl/)
+- [LangChain](https://www.langchain.com/)
+- [LangGraph](https://langchain-ai.github.io/langgraph/)
+- [Ollama](https://ollama.ai/)
+- [Qdrant](https://qdrant.tech/)
+- [Redis](https://redis.io/)
+- [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper)
+- [Qwen3 TTS](https://github.com/andimarafioti/faster-qwen3-tts)
+- [Silero VAD](https://github.com/snakers4/silero-vad)

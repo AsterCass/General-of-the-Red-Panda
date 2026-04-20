@@ -11,7 +11,7 @@ def smart_tool(**meta):
     return wrapper
 
 
-@smart_tool(need_confirm=True, category="device")
+@smart_tool(need_confirm=False, category="device")
 def turn_off_light_bedroom() -> str:
     """关闭卧室灯光"""
     logger.info("Turn off light 1...")
@@ -24,7 +24,7 @@ def turn_off_light_bedroom() -> str:
     return "卧室灯光已关闭"
 
 
-@smart_tool(need_confirm=True, category="device")
+@smart_tool(need_confirm=False, category="device")
 def turn_on_light_bedroom() -> str:
     """打开卧室灯光"""
     logger.info("Turn on light 1...")
@@ -37,7 +37,7 @@ def turn_on_light_bedroom() -> str:
     return "卧室灯光已打开"
 
 
-@smart_tool(need_confirm=True, category="device")
+@smart_tool(need_confirm=False, category="device")
 def turn_off_light_living_room() -> str:
     """关闭客厅灯光"""
     logger.info("Turn off light 2...")
@@ -50,7 +50,7 @@ def turn_off_light_living_room() -> str:
     return "客厅灯光已关闭"
 
 
-@smart_tool(need_confirm=True, category="device")
+@smart_tool(need_confirm=False, category="device")
 def turn_on_light_living_room() -> str:
     """打开客厅灯光"""
     logger.info("Turn on light 2...")
@@ -63,14 +63,14 @@ def turn_on_light_living_room() -> str:
     return "客厅灯光已打开"
 
 
-@smart_tool(need_confirm=True, category="device")
+@smart_tool(need_confirm=False, category="device")
 def close_window_living_room() -> str:
     """关闭客厅窗户"""
     logger.info("Closing window...")
     return "客厅窗户已关闭"
 
 
-@smart_tool(need_confirm=True, category="device")
+@smart_tool(need_confirm=False, category="device")
 def turn_on_heating_bedroom() -> str:
     """打开卧室暖气"""
     logger.info("Turn on heating...")
@@ -82,7 +82,7 @@ def turn_on_heating_bedroom() -> str:
     logger.info(response.json())
     return "卧室暖气已打开"
 
-@smart_tool(need_confirm=True, category="device")
+@smart_tool(need_confirm=False, category="device")
 def turn_off_heating_bedroom() -> str:
     """关闭卧室暖气"""
     logger.info("Turn on heating...")
