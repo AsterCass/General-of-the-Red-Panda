@@ -79,7 +79,89 @@ wsl --import Ubuntu-jjdyycm C:\Users\astercasc X:\red.panda\new\jjdyycm.tar
 
 ### Linux 相关（即你使用的是原生Linux或者已经使用【WSL -d 指定容器名】进入容器）
 
-todo
+
+英伟达显卡容器支持：
+
+```shell
+curl -fsSL https://mirrors.ustc.edu.cn/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+curl -s -L https://mirrors.ustc.edu.cn/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+  sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+  sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo apt-get update
+sudo apt-get install -y nvidia-container-toolkit
+systemctl restart docker
+```
+
+相关服务安装：
+
+```shell
+# Docker 安装相关镜像
+# Ollama
+# 标记映射文件夹
+mkdir  -p /home/service/ollama/data
+# 容器配置
+cd /home/service/ollama
+cat <<'EOF' > /home/service/ollama/docker-compose.yml
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - /home/service/ollama/data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      - OLLAMA_FLASH_ATTENTION=1
+EOF
+docker compose up -d
+
+# 这里根据你的硬件配置拉取合适的镜像，如果不清楚可以先拉取小模型测试，确认没问题后再拉取大模型
+docker exec ollama ollama pull qwen3:14b-q4_K_M
+
+# Redis
+# 标记映射文件夹
+mkdir  -p /home/service/redis/data
+# 容器配置
+cd /home/service/redis
+cat <<'EOF' > /home/service/redis/docker-compose.yml
+services:
+  redis:
+    image: redis/redis-stack:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - /home/service/redis/data:/data
+EOF
+docker compose up -d
+
+# Qdrant
+# 标记映射文件夹
+mkdir  -p /home/service/qdrant/data
+# 容器配置
+cd /home/service/qdrant
+cat <<'EOF' > /home/service/qdrant/docker-compose.yml
+services:
+  qdrant:
+    image: qdrant/qdrant
+    container_name: qdrant
+    restart: always
+    ports:
+      - "6333:6333"
+    volumes:
+      - /home/service/qdrant/data:/qdrant/storage
+EOF
+docker compose up -d
+```
 
 ### Windows相关命令
 
