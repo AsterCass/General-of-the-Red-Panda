@@ -125,6 +125,8 @@ docker compose up -d
 
 # 这里根据你的硬件配置拉取合适的镜像，如果不清楚可以先拉取小模型测试，确认没问题后再拉取大模型
 docker exec ollama ollama pull qwen3:14b-q4_K_M
+docker exec ollama ollama pull bge-m3
+docker exec ollama ollama pull qwen2.5:1.5b
 
 # Redis
 # 标记映射文件夹
