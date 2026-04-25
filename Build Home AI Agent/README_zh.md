@@ -99,7 +99,7 @@ systemctl restart docker
 # Ollama
 # 标记映射文件夹
 mkdir  -p /home/service/ollama/data
-# 容器配置
+# 容器配置，使用 CPU 推理则不需要使用 deploy 以及 environment 部分
 cd /home/service/ollama
 cat <<'EOF' > /home/service/ollama/docker-compose.yml
 services:
