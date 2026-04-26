@@ -16,6 +16,9 @@ output_mode = "text"
 # 输出模式为 audio 需要加载的语言的模型
 speak_model_path = "models/zh_CN-xiao_ya-medium/zh_CN-xiao_ya-medium.onnx"
 
+# 是否为半双工对话，默认回声消除由硬件侧处理，如果硬件侧没有处理则参考 tests/ace.py 改写相关代码，如果都不处理则将改值置为 False
+half_duplex_communication = True
+
 @dataclass
 class AudioSettings:
     """音频配置数据类"""
@@ -82,7 +85,8 @@ service_settings = ServiceSettings()
 
 def load_config():
     path = Path("config.toml")
-    global data_path, input_mode, audio_settings, service_settings, output_mode, speak_model_path
+    global data_path, input_mode, audio_settings, \
+        service_settings, output_mode, speak_model_path, half_duplex_communication
 
     if not path.exists():
         logger.warning(f"{path} not found.")
@@ -106,6 +110,8 @@ def load_config():
                         data_path = v
                     elif section == "input" and k == "mode":
                         input_mode = v
+                    elif section == "input" and k == "half_duplex_communication":
+                        half_duplex_communication = v.lower() == "true"
                     elif section == "output" and k == "mode":
                         output_mode = v
                     elif section == "speaker" and k == "model":

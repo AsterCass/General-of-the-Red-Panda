@@ -32,8 +32,10 @@ def main():
         input_manager = InputManager()
 
         # 输出管理器
-        # todo 这里在输出管理器中将暂停和恢复输入监听的函数传入，作为输出的前置和后置处理，是临时逻辑，后续使用声纹或者回声消除等方式处理
-        output_manager = OutputManager(input_manager.pause_audio_input, input_manager.resume_audio_input)
+        if config.half_duplex_communication:
+            output_manager = OutputManager(input_manager.pause_audio_input, input_manager.resume_audio_input)
+        else:
+            output_manager = OutputManager()
 
         # 回调
         def process_input_callback(user_input: str):
