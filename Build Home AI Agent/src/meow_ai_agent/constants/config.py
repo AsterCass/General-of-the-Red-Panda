@@ -14,10 +14,19 @@ input_mode = "text"
 output_mode = "text"
 
 # 输出模式为 audio 需要加载的语言的模型
-speak_model_path = "models/zh_CN-xiao_ya-medium/zh_CN-xiao_ya-medium.onnx"
+speak_model_path = "models/Qwen3-TTS-12Hz-0.6B-CustomVoice"
 
 # 是否为半双工对话，默认回声消除由硬件侧处理，如果硬件侧没有处理则参考 tests/ace.py 改写相关代码，如果都不处理则将改值置为 False
 half_duplex_communication = True
+
+# 是否为声音克隆，如果为False则使用默认QwenTTS的声音，需要匹配不同的模型 VoiceDesign or CustomVoice
+speak_is_clone = False
+
+# 需要克隆的音频路径 speak_is_clone 为 True生效
+speak_clone_audio = "data/clone.wav"
+
+# 需要克隆的音频文本 speak_is_clone 为 True生效
+speak_clone_audio_text = ""
 
 @dataclass
 class AudioSettings:
@@ -85,7 +94,7 @@ service_settings = ServiceSettings()
 
 def load_config():
     path = Path("config.toml")
-    global data_path, input_mode, audio_settings, \
+    global data_path, input_mode, audio_settings, speak_clone_audio, speak_is_clone, speak_clone_audio_text, \
         service_settings, output_mode, speak_model_path, half_duplex_communication
 
     if not path.exists():
@@ -116,6 +125,12 @@ def load_config():
                         output_mode = v
                     elif section == "speaker" and k == "model":
                         speak_model_path = v
+                    elif section == "speaker" and k == "speak_is_clone":
+                        speak_is_clone = v.lower() == "true"
+                    elif section == "speaker" and k == "speak_clone_audio":
+                        speak_clone_audio = v
+                    elif section == "speaker" and k == "speak_clone_audio_text":
+                        speak_clone_audio_text = v
                     elif section == "audio":
                         if hasattr(audio_settings, k):
                             setattr(audio_settings, k, v)

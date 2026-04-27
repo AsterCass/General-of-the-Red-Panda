@@ -14,7 +14,13 @@ mode = "audio"
 
 [speaker]
 # 朗读模型地址
-model = "models/Qwen3-TTS-12Hz-0.6B-CustomVoice"
+model = "models/Qwen3-TTS-12Hz-1.7B-Base"
+# 是否为声音克隆，如果为False则使用默认QwenTTS的声音，需要匹配不同的模型 VoiceDesign or CustomVoice or Base
+speak_is_clone = "True"
+# 需要克隆的音频路径 speak_is_clone 为 True生效
+speak_clone_audio = "data/clone.wav"
+# 需要克隆的音频文本 speak_is_clone 为 True生效
+speak_clone_audio_text = "你问我西厂算什么东西。现在我就来告诉你，东厂不敢杀的人我杀，东厂不敢管的事我管。"
 
 [audio]
 # 语音识别模型大小

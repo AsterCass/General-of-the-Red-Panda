@@ -17,10 +17,14 @@ class AudioOutput:
     # https://modelscope.cn/collections/Qwen/Qwen3-TTS
     """
 
-    def __init__(self, model_path: str, after_output: Optional[Callable[[], None]] = None):
+    def __init__(self, model_path: str, is_clone: bool, clone_audio: str, clone_audio_text: str,
+                 after_output: Optional[Callable[[], None]] = None):
         if not Path(model_path).is_dir():
             raise FileNotFoundError(f"模型文件不存在: {model_path}")
 
+        self.is_clone = is_clone
+        self.clone_audio = clone_audio
+        self.clone_audio_text = clone_audio_text
         self.model = FasterQwen3TTS.from_pretrained(model_path)
         self.thisPlay = StreamPlayer(on_finished=after_output)
         logger.info(f"模型加载成功：{model_path}")
@@ -38,13 +42,23 @@ class AudioOutput:
         while True:
             current_text = self.text_queue.get()
             try:
-                for audio_chunk, sr, timing in self.model.generate_custom_voice_streaming(
-                        text=current_text,
-                        language="Chinese",
-                        speaker="Serena",
-                        non_streaming_mode=False,
-                ):
-                    self.thisPlay(audio_chunk, sr)
+                if self.is_clone:
+                    for audio_chunk, sr, timing in self.model.generate_voice_clone_streaming(
+                            text=current_text,
+                            language="Chinese",
+                            ref_audio=self.clone_audio,
+                            ref_text=self.clone_audio_text,
+                            non_streaming_mode=False,
+                    ):
+                        self.thisPlay(audio_chunk, sr)
+                else:
+                    for audio_chunk, sr, timing in self.model.generate_custom_voice_streaming(
+                            text=current_text,
+                            language="Chinese",
+                            speaker="Serena",
+                            non_streaming_mode=False,
+                    ):
+                        self.thisPlay(audio_chunk, sr)
 
                 self.thisPlay.end_segment()
 

@@ -11,12 +11,16 @@ class OutputManager:
                  after_output: Optional[Callable[[], None]] = None):
         self.output_mode = config.output_mode
         self.speak_model_path = config.speak_model_path
+        self.clone_audio = config.speak_clone_audio
+        self.is_clone = config.speak_is_clone
+        self.clone_audio_text = config.speak_clone_audio_text
         self.audio_output = None
         self.before_output = before_output
         self.after_output = after_output
         if self.output_mode == "audio" and self.speak_model_path:
             try:
-                self.audio_output = AudioOutput(self.speak_model_path, self.after_output)
+                self.audio_output = AudioOutput(self.speak_model_path, self.is_clone,
+                                                self.clone_audio, self.clone_audio_text, self.after_output)
             except Exception as e:
                 logger.error(f"输出音频模式异常: {e}")
                 logger.warning("切换到文本输出模式")
