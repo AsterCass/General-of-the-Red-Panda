@@ -120,6 +120,17 @@ if not base.qdrant_cli.collection_exists(knowledge_base):
         )
     )
 
+
+# 向量索引，查询时需要控制索引精度，ef 越大：更准，更慢，越占内存
+# from qdrant_client.http.models import HnswConfigDiff
+# base.qdrant_cli.update_collection(
+#     collection_name=knowledge_base,
+#     hnsw_config=HnswConfigDiff(
+#         m=16,               # 图中每个节点连接数（越大越准但更慢更占内存）
+#         ef_construct=100    # 构建时搜索深度
+#     )
+# )
+
 vectorstore_knowledge_base = QdrantVectorStore(
     client=base.qdrant_cli,
     collection_name=knowledge_base,
