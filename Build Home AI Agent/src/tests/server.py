@@ -61,28 +61,30 @@ app = Flask(__name__)
 
 @app.route('/stream', methods=['GET'])
 def ai_stream():
-    user_input = request.args.get('user_input', '你好')
-    user_id = request.args.get('user_id', 'YU001')
+    user_input = request.args.get('user_input')
+    user_id = request.args.get('user_id')
 
     def generate():
         thread_config = {"configurable": {"thread_id": user_id}}
         message = HumanMessage(content=user_input)
 
-        # 流式处理返回的内容
-        for chunk in this_app.stream(
-                {"messages": [message]},
-                config=thread_config,
-                stream_mode="messages"
-        ):
-            msg_chunk, metadata = chunk
+        try:
+            for chunk in this_app.stream(
+                    {"messages": [message]},
+                    config=thread_config,
+                    stream_mode="messages"
+            ):
+                msg_chunk, metadata = chunk
+                if not msg_chunk.content:
+                    continue
 
-            # 过滤掉空的 token
-            if not msg_chunk.content:
-                continue
+                yield f"data: {msg_chunk.content}\n\n"
+                time.sleep(0.3)
 
-            # 每次发送一个块
-            yield f"data: {msg_chunk.content}\n\n"
-            time.sleep(0.3)
+            yield "data: [[DONE]]\n\n"
+
+        except Exception as e:
+            yield f"data: [[ERROR]] {str(e)}\n\n"
 
     return Response(generate(), content_type='text/event-stream')
 
