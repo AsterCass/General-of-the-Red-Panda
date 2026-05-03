@@ -59,13 +59,37 @@ this_app = builder.compile(checkpointer=memory)
 # server
 app = Flask(__name__)
 
+
+@app.route('/history', methods=['GET'])
+def get_history():
+    session_id = request.args.get('session_id')
+    if not session_id:
+        return {"error": "missing session_id"}, 400
+
+    thread_config = {"configurable": {"thread_id": session_id}}
+    try:
+        state = this_app.get_state(thread_config)
+        print(state)
+        if not state or not state.values or "messages" not in state.values:
+            return {"messages": []}
+
+        history = []
+        for msg in state.values["messages"]:
+            history.append({
+                "type": msg.type,
+                "content": msg.content
+            })
+        return {"messages": history}
+    except Exception as e:
+        return {"error": str(e)}, 500
+
 @app.route('/stream', methods=['GET'])
 def ai_stream():
     user_input = request.args.get('user_input')
-    user_id = request.args.get('user_id')
+    session_id = request.args.get('session_id')
 
     def generate():
-        thread_config = {"configurable": {"thread_id": user_id}}
+        thread_config = {"configurable": {"thread_id": session_id}}
         message = HumanMessage(content=user_input)
 
         try:
