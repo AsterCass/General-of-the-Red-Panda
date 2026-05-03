@@ -10,7 +10,28 @@ from langgraph.checkpoint.redis import RedisSaver
 from langgraph.constants import END
 from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
+import redis
 
+redis_cli = redis.Redis(host='localhost', port=6379)
+
+
+def delete_session(session_id: str):
+    pattern = f"*:{session_id}:__empty__*"
+
+    cursor = 0
+    keys_to_delete = []
+
+    while True:
+        cursor, keys = redis_cli.scan(cursor=cursor, match=pattern, count=100)
+        keys_to_delete.extend(keys)
+
+        if cursor == 0:
+            break
+
+    if keys_to_delete:
+        redis_cli.delete(*keys_to_delete)
+
+    return len(keys_to_delete)
 
 class AgentState(TypedDict):
     messages: Annotated[list, add_messages]  # 自动合并消息历史
@@ -58,6 +79,21 @@ this_app = builder.compile(checkpointer=memory)
 
 # server
 app = Flask(__name__)
+
+@app.route('/clear', methods=['POST'])
+def clear_history():
+    session_id = request.args.get('session_id')
+    if not session_id:
+        return {"error": "missing session_id"}, 400
+
+    try:
+        # 直接删redis
+        delete_session(session_id)
+
+        return {"status": 200}
+
+    except Exception as e:
+        return {"error": str(e)}, 500
 
 
 @app.route('/history', methods=['GET'])
