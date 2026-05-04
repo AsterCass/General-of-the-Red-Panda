@@ -80,6 +80,10 @@ this_app = builder.compile(checkpointer=memory)
 # server
 app = Flask(__name__)
 
+@app.route('/online', methods=['GET'])
+def online():
+    return {"status": 200}
+
 @app.route('/clear', methods=['POST'])
 def clear_history():
     session_id = request.args.get('session_id')
