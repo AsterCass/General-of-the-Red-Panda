@@ -1,6 +1,8 @@
-import time
+from collections import deque
+from enum import Enum
 from typing import TypedDict, Annotated
 
+import redis
 from flask import Flask, Response, request
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
@@ -10,9 +12,28 @@ from langgraph.checkpoint.redis import RedisSaver
 from langgraph.constants import END
 from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
-import redis
 
 redis_cli = redis.Redis(host='localhost', port=6379)
+
+
+class MessageType(Enum):
+    AI = ("ai", 0)
+    HUMAN = ("human", 1)
+
+    def __init__(self, label, code):
+        self.label = label
+        self.code = code
+
+    def to_int(self):
+        return self.code
+
+    @classmethod
+    def from_string(cls, value: str):
+        value = value.lower().strip()
+        for item in cls:
+            if item.label == value:
+                return item
+        return cls.AI
 
 
 def delete_session(session_id: str):
@@ -39,12 +60,8 @@ class AgentState(TypedDict):
 
 system_prompt_chat = """
 你是一个聊天机器人，需要遵守以下规则：
-1. 使用自然口语表达，而不是书面表达。
-2. 禁止使用任何 Markdown 格式（如 **、*、#、- 等）。
-3. 不要使用列表、标题、加粗、代码块等格式。
-4. 不要使用括号补充说明或解释性文字
-5. 可以适当加入语气词，让表达更自然。
-6. 你的回答必须可以被直接朗读出来，不要包含任何不适合朗读的内容。
+1. 亲切礼貌，不卑不亢。
+2. 乐于给出建议。
 """
 
 prompt_chat = ChatPromptTemplate.from_messages([("system", system_prompt_chat), ("placeholder", "{messages}"), ])
@@ -109,17 +126,16 @@ def get_history():
     thread_config = {"configurable": {"thread_id": session_id}}
     try:
         state = this_app.get_state(thread_config)
-        print(state)
         if not state or not state.values or "messages" not in state.values:
             return {"messages": []}
 
-        history = []
+        history = deque([])
         for msg in state.values["messages"]:
-            history.append({
-                "type": msg.type,
+            history.appendleft({
+                "type": MessageType.from_string(msg.type).to_int(),
                 "content": msg.content
             })
-        return {"messages": history}
+        return {"status": 200, "data": list(history)}
     except Exception as e:
         return {"error": str(e)}, 500
 
@@ -143,7 +159,6 @@ def ai_stream():
                     continue
 
                 yield f"data: {msg_chunk.content}\n\n"
-                time.sleep(0.3)
 
             yield "data: [[DONE]]\n\n"
 
