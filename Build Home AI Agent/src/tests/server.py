@@ -105,16 +105,13 @@ def online():
 def clear_history():
     session_id = request.args.get('session_id')
     if not session_id:
-        return {"error": "missing session_id"}, 400
-
+        return {"status": 200, "data": True}
     try:
-        # 直接删redis
         delete_session(session_id)
-
-        return {"status": 200}
-
+        return {"status": 200, "data": True}
     except Exception as e:
-        return {"error": str(e)}, 500
+        print(e)
+        return {"status": 400, "data": False}
 
 
 @app.route('/history', methods=['GET'])
@@ -127,7 +124,7 @@ def get_history():
     try:
         state = this_app.get_state(thread_config)
         if not state or not state.values or "messages" not in state.values:
-            return {"messages": []}
+            return {"status": 200, "data": []}
 
         history = deque([])
         for msg in state.values["messages"]:
@@ -137,7 +134,8 @@ def get_history():
             })
         return {"status": 200, "data": list(history)}
     except Exception as e:
-        return {"error": str(e)}, 500
+        print(e)
+        return {"status": 400, "data": []}
 
 @app.route('/stream', methods=['GET'])
 def ai_stream():
@@ -158,12 +156,12 @@ def ai_stream():
                 if not msg_chunk.content:
                     continue
 
-                yield f"data: {msg_chunk.content}\n\n"
+                yield f"data: {msg_chunk.content}\n"
 
-            yield "data: [[DONE]]\n\n"
+            yield "data: [[DONE]]\n"
 
         except Exception as e:
-            yield f"data: [[ERROR]] {str(e)}\n\n"
+            yield f"data: [[ERROR]] {str(e)}\n"
 
     return Response(generate(), content_type='text/event-stream')
 
