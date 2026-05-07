@@ -3,10 +3,11 @@ import re
 from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import Slot, Signal, QUrl
 from PySide6.QtGui import QIcon, QDesktopServices
+from PySide6.QtWidgets import QSlider
 
 import meow_reader.constants.config as config
 from meow_reader.constants.style import text_browser_style, text_label_style, push_btn_style, check_box_style, \
-    url_label_style
+    url_label_style, text_label_style_mini, slider_style
 from meow_reader.utils.clipboard import ClipboardTextWatcher
 from meow_reader.utils.reader import Reader
 from meow_reader.utils.resource import resource_path
@@ -48,6 +49,28 @@ class MainWidget(QtWidgets.QWidget):
         self.settingLayout.setContentsMargins(0, 0, 0, 0)
         self.settingLayout.setSpacing(4)
 
+        # 速度设置
+        self.speedSettingWidget = QtWidgets.QWidget()
+        self.speedSettingLayout = QtWidgets.QHBoxLayout(self.speedSettingWidget)
+        self.speedSettingLayout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.speedLabel = QtWidgets.QLabel("朗读速度：")
+        self.speedLabel.setStyleSheet(text_label_style_mini)
+        self.speedNumLabel = QtWidgets.QLabel("（200）")
+        self.speedNumLabel.setStyleSheet(text_label_style_mini)
+        self.speed = QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.speed.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.speed.setStyleSheet(slider_style)
+        self.speed.setMinimum(110)
+        self.speed.setMaximum(300)
+        self.speed.setValue(200)
+        self.speed.setSingleStep(20)
+        self.speedSettingLayout.addWidget(self.speedLabel)
+        self.speedSettingLayout.addWidget(self.speed)
+        self.speedSettingLayout.addWidget(self.speedNumLabel)
+
+        self.speedSettingLayout.setContentsMargins(0, 0, 0, 0)
+        self.speedSettingLayout.setSpacing(2)
+
         # 输入
         self.textInputLabel = QtWidgets.QLabel("剪贴板内容")
         self.textInputLabel.setStyleSheet(text_label_style)
@@ -78,6 +101,7 @@ class MainWidget(QtWidgets.QWidget):
         # 布局
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.settingWidget)
+        self.layout.addWidget(self.speedSettingWidget)
         self.layout.addWidget(self.textInputLabel)
         self.layout.addWidget(self.textInpout)
         self.layout.addWidget(self.textOutputLabel)
@@ -93,6 +117,7 @@ class MainWidget(QtWidgets.QWidget):
 
         # 信号
         self.translation_done.connect(self._update_text_input_output)
+        self.speed.valueChanged.connect(self._update_speed)
 
         # 监视剪贴板文本变化
         self.watcher = ClipboardTextWatcher()
@@ -122,7 +147,8 @@ class MainWidget(QtWidgets.QWidget):
         self.translator.translate(text, self._on_translated)
         if self.needMute.isChecked():
             return
-        self.reader.speak(text)
+        current_speed_value = self.speed.value() / 100 - 1
+        self.reader.speak(text, current_speed_value)
 
     def _on_toggle_topmost(self, checked: bool):
         is_top = self.windowFlags() & QtCore.Qt.WindowType.WindowStaysOnTopHint
@@ -137,4 +163,9 @@ class MainWidget(QtWidgets.QWidget):
 
     @Slot()
     def _on_re_read(self):
-        self.reader.speak(self.textInpout.toPlainText())
+        current_speed_value = self.speed.value()/100 - 1
+        self.reader.speak(self.textInpout.toPlainText(), current_speed_value)
+
+    def _update_speed(self, value):
+        self.speedNumLabel.setText(f"（{value}）")
+        return

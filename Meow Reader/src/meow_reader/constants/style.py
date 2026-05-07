@@ -1,3 +1,42 @@
+
+text_label_style_mini = """
+QLabel {
+    color: #303030;                  
+    font-size: 12px;              
+}
+"""
+
+slider_style = """
+QSlider::groove:horizontal {
+    height: 6px;
+    background: #f0f0f0;
+    margin: 2px 0;
+    border-radius: 3px;
+    border: 1px solid #888;
+}
+
+QSlider::sub-page:horizontal {    
+    background: #303030;         
+    border-radius: 3px;
+    border: 1px solid #888;
+}
+
+QSlider::add-page:horizontal {    
+    background: #f8f8f8;
+    border-radius: 3px;
+    border: 1px solid #888;
+}
+
+QSlider::handle:horizontal {
+    background-color: #666;
+    border: 2px solid #444;
+    width: 18px;
+    height: 18px;
+    margin: -6px 0;   
+    border-radius: 3px;
+}
+"""
+
 splash_window_style = """
 #container {
     background-color: rgba(255, 255, 255, 180);

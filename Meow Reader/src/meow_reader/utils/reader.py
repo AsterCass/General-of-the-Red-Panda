@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import sounddevice as sd
 from loguru import logger
-from piper import PiperVoice
+from piper import PiperVoice, SynthesisConfig
 
 
 class Reader:
@@ -22,7 +22,8 @@ class Reader:
 
         self.voice = PiperVoice.load(model_path)
         logger.info(f"模型加载成功：{model_path.name}")
-
+        # 当前语速
+        self._current_speed = 1.0
         # 当前要播放的文本
         self._current_text = None
         # 中断信号
@@ -47,7 +48,7 @@ class Reader:
                 self._current_text = None
                 self._interrupt = False
             try:
-                for chunk in self.voice.synthesize(text):
+                for chunk in self.voice.synthesize(text, SynthesisConfig(length_scale=self._current_speed)):
                     if self._interrupt:
                         logger.info("打断播放")
                         break
@@ -72,9 +73,10 @@ class Reader:
                         pass
                     stream = None
 
-    def speak(self, text: str):
+    def speak(self, text: str, speed: float):
         with self._lock:
             self._interrupt = True
+            self._current_speed = speed
             self._current_text = text
 
     def stop(self):
