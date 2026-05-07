@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    container_name: chatagent
+    ports:
+      - "10031:10031"
+    restart: always
+    network_mode: "host"
+    environment:
+      - PYTHONUNBUFFERED=1
