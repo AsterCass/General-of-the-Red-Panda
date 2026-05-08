@@ -13,6 +13,8 @@ from langgraph.constants import END
 from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
 
+from tests.project.app import project_app_builder
+
 redis_cli = redis.Redis(host='localhost', port=6379)
 
 
@@ -93,6 +95,7 @@ redis_saver = RedisSaver.from_conn_string("redis://localhost:6379")
 with redis_saver as memory:
     memory.setup()
 this_app = builder.compile(checkpointer=memory)
+project_app = project_app_builder.compile(checkpointer=memory)
 
 # server
 app = Flask(__name__)
@@ -141,8 +144,10 @@ def get_history():
 def ai_stream():
     user_input = request.args.get('user_input')
     session_id = request.args.get('session_id')
+    model = request.args.get('model')
+    project_res = request.args.get('project_res')
 
-    def generate():
+    def generateChat():
         thread_config = {"configurable": {"thread_id": session_id}}
         message = HumanMessage(content=user_input)
 
@@ -163,7 +168,35 @@ def ai_stream():
         except Exception as e:
             yield f"data: [[ERROR]] {str(e)}\n"
 
-    return Response(generate(), content_type='text/event-stream')
+    def generateProject():
+        thread_config = {"configurable": {"thread_id": session_id}}
+        message = HumanMessage(content=user_input)
+
+        try:
+            for chunk in project_app.stream(
+                    {"messages": [message]},
+                    config=thread_config,
+                    stream_mode="messages"
+            ):
+                msg_chunk, metadata = chunk
+                if not msg_chunk.content:
+                    continue
+
+                print(f"node: {metadata.get("langgraph_node")}\n")  # todo set allow node list
+                yield f"data: {msg_chunk.content}\n"
+
+            yield "data: [[DONE]]\n"
+
+        except Exception as e:
+            yield f"data: [[ERROR]] {str(e)}\n"
+
+    ret = None
+    if model == "PROJECT":
+        ret = Response(generateProject(), content_type='text/event-stream')
+    else:
+        ret = Response(generateChat(), content_type='text/event-stream')
+
+    return ret
 
 
 if __name__ == '__main__':
