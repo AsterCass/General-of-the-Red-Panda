@@ -174,7 +174,7 @@ def ai_stream():
 
         try:
             for chunk in project_app.stream(
-                    {"messages": [message]},
+                    {"messages": [message], "project_res": project_res},
                     config=thread_config,
                     stream_mode="messages"
             ):

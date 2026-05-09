@@ -45,10 +45,11 @@ class AgentState(TypedDict):
     bg_list: Optional[List[ProjectItem]]
     loaded_res: Optional[bool]
     is_confirm: Optional[bool]
+    project_res: Optional[str]
 
 
 system_prompt_main = """
-你是需求解析专家。从用户输入中提取项目需求，输出 JSON。
+你是需求解析专家。从用户输入中提取推广项目（通常包含期望项目的场景、风格、内容等信息），输出 JSON。
 
 {history_project}
 
@@ -67,6 +68,11 @@ system_prompt_main = """
 只输出 JSON，不要其他内容。
 """
 prompt_main = ChatPromptTemplate.from_messages([("system", system_prompt_main), ("placeholder", "{messages}"), ])
+
+system_prompt_image = """
+你是一个专门处理图片的机器人。详细描述你看到的图片，以及可能适用的推广项目类型（如：美妆、数码、服装等）。
+"""
+prompt_image = ChatPromptTemplate.from_messages([("system", system_prompt_main)])
 
 # ==================== 额外方法 ====================
 
@@ -116,13 +122,50 @@ def project_parse_fail_node(state: AgentState):
     }
 
 
-def load_res_node(state: AgentState):
-    print("load_res_node ... ")
+def load_res_pre_node(state: AgentState):
+    print("load_res_pre_node ... ")
+    try:
+        json_obj = json.loads(state["project_res"])
+        bg_list = json_obj.get("bgList")
+        product_list = json_obj.get("productList")
+        avatar_list = json_obj.get("avatarList")
+        if not bg_list or not product_list or not avatar_list:
+            return {
+                "messages": [
+                    AIMessage(content="资源检测为空，请检查虚拟人物、商品、背景是否配置\n\n")
+                ]
+            }
+        return {
+            "bg_list": bg_list,
+            "product_list": product_list,
+            "avatar_list": avatar_list,
+            "messages": [
+                AIMessage(content="图片资源尚未解析，即将解析传入的图片资源\n\n")
+            ]
+        }
+    except Exception as e:
+        print(f"load_res_pre_node error: {e}")
     return {
         "messages": [
-            AIMessage(content="加载资源")
+            AIMessage(content="图片资源解析错误，请确认图片相关资源格式正确性，且不能为空\n\n")
         ]
     }
+
+
+def load_res_node(state: AgentState):
+    print("load_res_node ... ")
+    bg_list = state["bg_list"]
+    product_list = state["product_list"]
+    avatar_list = state["avatar_list"]
+    print("bg_list: ", bg_list)
+    print("product_list: ", product_list)
+    print("avatar_list: ", avatar_list)
+    return {
+        "messages": [
+            AIMessage(content="资源加载完成")
+        ]
+    }
+
 
 
 def select_res_node(state: AgentState):
@@ -140,20 +183,21 @@ def route_after_project_parse_node(state: AgentState):
     if not state.get("created_project"):
         return "project_parse_fail_node"
     if not state.get("loaded_res"):
-        return "load_res_node"
+        return "load_res_pre_node"
     else:
         return "select_res_node"
 
 
 # ==================== 输出节点 ====================
 
-stream_output_list = ["project_parse_fail_node", "load_res_node", "select_res_node"]
+stream_output_list = ["project_parse_fail_node", "load_res_pre_node", "load_res_node"]
 
 # ==================== 构造 ====================
 
 project_app_builder = StateGraph(AgentState)
 project_app_builder.add_node("project_parse_node", project_parse_node)
 project_app_builder.add_node("project_parse_fail_node", project_parse_fail_node)
+project_app_builder.add_node("load_res_pre_node", load_res_pre_node)
 project_app_builder.add_node("load_res_node", load_res_node)
 project_app_builder.add_node("select_res_node", select_res_node)
 
@@ -164,11 +208,14 @@ project_app_builder.add_conditional_edges(
     route_after_project_parse_node,
     {
         "project_parse_fail_node": "project_parse_fail_node",
-        "load_res_node": "load_res_node",
+        "load_res_pre_node": "load_res_pre_node",
         "select_res_node": "select_res_node",
     }
 )
 
+project_app_builder.add_edge("load_res_pre_node", "load_res_node")
+
+
 project_app_builder.add_edge("project_parse_fail_node", END)
-project_app_builder.add_edge("load_res_node", END)
 project_app_builder.add_edge("select_res_node", END)
+project_app_builder.add_edge("load_res_node", END)
