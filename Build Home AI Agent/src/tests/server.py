@@ -4,7 +4,7 @@ from typing import TypedDict, Annotated
 
 import redis
 from flask import Flask, Response, request
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, RemoveMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda
 from langchain_ollama import ChatOllama
@@ -172,6 +172,9 @@ def ai_stream():
         thread_config = {"configurable": {"thread_id": session_id}}
         message = HumanMessage(content=user_input)
 
+        collected_parts = []  # 收集流式内容，用于最终合并
+        seen_message_ids = []  # 记录需要被替换的 AIMessage id
+
         try:
             for chunk in project_app.stream(
                     {"messages": [message], "project_res": project_res},
@@ -183,7 +186,28 @@ def ai_stream():
                     continue
                 if not msg_chunk.content:
                     continue
+
+                # 记录消息 id（去重），用于后续 RemoveMessage
+                msg_id = msg_chunk.id
+                if msg_id and msg_id not in seen_message_ids:
+                    seen_message_ids.append(msg_id)
+
+                # 收集内容用于合并
+                collected_parts.append(msg_chunk.content)
+
                 yield f"data: {msg_chunk.content}\n"
+
+            # ---- graph 结束，合并历史 ----
+            if collected_parts and seen_message_ids:
+                merged_content = "".join(collected_parts)
+                merged_message = AIMessage(content=merged_content)
+
+                # 先删除所有分散的 AIMessage，再写入合并后的一条
+                remove_msgs = [RemoveMessage(id=mid) for mid in seen_message_ids]
+                project_app.update_state(
+                    thread_config,
+                    {"messages": remove_msgs + [merged_message]}
+                )
 
             yield "data: [[DONE]]\n"
 

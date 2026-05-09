@@ -1,6 +1,8 @@
+import base64
 import json
 from typing import TypedDict, Annotated, List, Optional
 
+import requests
 from langchain_core.messages import AIMessage
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
@@ -10,7 +12,7 @@ from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
 
 llm_text = ChatOllama(model="qwen3:14b-q4_K_M", base_url="http://localhost:11434", temperature=0.3)
-llm_vl = ChatOllama(model="qwen3-vl:8b", base_url="http://localhost:11434", temperature=0.2)
+llm_vl = ChatOllama(model="qwen3-vl:8b", base_url="http://localhost:11434", temperature=0.2, tags=["nostream"], )
 
 
 class ProjectItem(TypedDict):
@@ -18,6 +20,7 @@ class ProjectItem(TypedDict):
     url: Optional[str]
     price: Optional[float]
     desc: Optional[str]
+    described: Optional[bool]
     reason: Optional[str]
 
 
@@ -70,13 +73,27 @@ system_prompt_main = """
 prompt_main = ChatPromptTemplate.from_messages([("system", system_prompt_main), ("placeholder", "{messages}"), ])
 
 system_prompt_image = """
-你是一个专门处理图片的机器人。详细描述你看到的图片，以及可能适用的推广项目类型（如：美妆、数码、服装等）。
+你是一个专门处理图片的机器人。描述你看到的图片，以及可能适用的推广项目类型（如：美妆、数码、服装等）（总共100字以内，不需要标明具体字数）。
 """
-prompt_image = ChatPromptTemplate.from_messages([("system", system_prompt_main)])
+prompt_image = ChatPromptTemplate.from_messages([
+    ("system", system_prompt_image),
+    ("human", [
+        {"type": "text", "text": "请描述这张图片："},
+        {"type": "image_url", "image_url": {"url": "{image_url}"}}
+    ])
+])
 
 # ==================== 额外方法 ====================
 
-
+def image_url_to_base64(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        img_base64 = base64.b64encode(response.content).decode('utf-8')
+        return img_base64
+    except requests.RequestException as e:
+        print(f"请求失败: {e}")
+        return None
 
 
 # ==================== 节点定义 ====================
@@ -140,7 +157,7 @@ def load_res_pre_node(state: AgentState):
             "product_list": product_list,
             "avatar_list": avatar_list,
             "messages": [
-                AIMessage(content="图片资源尚未解析，即将解析传入的图片资源\n\n")
+                AIMessage(content="图片资源尚未解析，即将解析传入的图片资源...\n\n")
             ]
         }
     except Exception as e:
@@ -155,24 +172,43 @@ def load_res_pre_node(state: AgentState):
 def load_res_node(state: AgentState):
     print("load_res_node ... ")
     bg_list = state["bg_list"]
-    product_list = state["product_list"]
     avatar_list = state["avatar_list"]
-    print("bg_list: ", bg_list)
-    print("product_list: ", product_list)
-    print("avatar_list: ", avatar_list)
-    return {
-        "messages": [
-            AIMessage(content="资源加载完成")
-        ]
-    }
+    lists_to_process = [
+        ("bg_list", bg_list),
+        ("avatar_list", avatar_list),
+    ]
+    for list_name, item_list in lists_to_process:
+        for i, item in enumerate(item_list):
+            print(f"load_res_node {item}")
+            if not item.get("described"):
+                item["described"] = True
+                if item.get("url"):
+                    try:
+                        b64 = f"data:image/jpeg;base64,{image_url_to_base64(item["url"])}"
+                        chain = prompt_image | llm_vl
+                        response = chain.invoke({"image_url": b64})
+                        description = response.content.strip()
+                        item["desc"] = description
+                        return {
+                            "messages": [
+                                AIMessage(content=f"对于【{item["name"]}】解析：\n\n\n {description}\n\n")
+                            ]
+                        }
+                    except Exception as e:
+                        error_msg = f"对于【{item["name"]}】解析：\n\n\n 失败: {str(e)}"
+                        item["desc"] = "图片分析失败"
+                        return {"messages": [AIMessage(content=error_msg)]}
+                return {"messages": [AIMessage(content=f"对于【{item["name"]}】解析：\n\n\n 无法获取图片")]}
+    return {"loaded_res": True}
 
 
 
 def select_res_node(state: AgentState):
     print("select_res_node ... ")
     return {
+        "is_confirm": True,
         "messages": [
-            AIMessage(content="选择资源")
+            AIMessage(content="选择资源\n\n")
         ]
     }
 
@@ -186,6 +222,14 @@ def route_after_project_parse_node(state: AgentState):
         return "load_res_pre_node"
     else:
         return "select_res_node"
+
+
+def route_after_load_res_node(state: AgentState):
+    print("route_after_load_res_node ... ")
+    if state.get("loaded_res"):
+        return "select_res_node"
+    else:
+        return "load_res_node"
 
 
 # ==================== 输出节点 ====================
@@ -213,9 +257,17 @@ project_app_builder.add_conditional_edges(
     }
 )
 
+project_app_builder.add_conditional_edges(
+    "load_res_node",
+    route_after_load_res_node,
+    {
+        "load_res_node": "load_res_node",
+        "select_res_node": "select_res_node"
+    }
+)
+
 project_app_builder.add_edge("load_res_pre_node", "load_res_node")
 
 
 project_app_builder.add_edge("project_parse_fail_node", END)
 project_app_builder.add_edge("select_res_node", END)
-project_app_builder.add_edge("load_res_node", END)
