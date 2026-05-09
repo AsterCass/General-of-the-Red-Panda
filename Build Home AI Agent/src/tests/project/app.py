@@ -206,7 +206,6 @@ def load_res_node(state: AgentState):
 def select_res_node(state: AgentState):
     print("select_res_node ... ")
     return {
-        "is_confirm": True,
         "messages": [
             AIMessage(content="选择资源\n\n")
         ]
@@ -234,7 +233,7 @@ def route_after_load_res_node(state: AgentState):
 
 # ==================== 输出节点 ====================
 
-stream_output_list = ["project_parse_fail_node", "load_res_pre_node", "load_res_node"]
+stream_output_list = ["project_parse_fail_node", "load_res_pre_node", "load_res_node", "select_res_node"]
 
 # ==================== 构造 ====================
 
