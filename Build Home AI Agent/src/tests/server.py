@@ -13,7 +13,7 @@ from langgraph.constants import END
 from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
 
-from tests.project.app import project_app_builder
+from tests.project.app import project_app_builder, stream_output_list
 
 redis_cli = redis.Redis(host='localhost', port=6379)
 
@@ -179,10 +179,10 @@ def ai_stream():
                     stream_mode="messages"
             ):
                 msg_chunk, metadata = chunk
+                if metadata.get("langgraph_node") not in stream_output_list:
+                    continue
                 if not msg_chunk.content:
                     continue
-
-                print(f"node: {metadata.get("langgraph_node")}\n")  # todo set allow node list
                 yield f"data: {msg_chunk.content}\n"
 
             yield "data: [[DONE]]\n"

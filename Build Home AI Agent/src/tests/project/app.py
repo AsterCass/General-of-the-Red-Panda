@@ -78,7 +78,7 @@ def new_project_node(state: AgentState):
     print("new_project_node ... ")
     return {
         "messages": [
-            AIMessage(content="创建成功")
+            AIMessage(content="当前智能体有一些小BUG，正在维护中，预计恢复时间：5.11")
         ]
     }
 
@@ -87,7 +87,7 @@ def modify_project_node(state: AgentState):
     print("modify_project_node ... ")
     return {
         "messages": [
-            AIMessage(content="修改成功")
+            AIMessage(content="当前智能体有一些小BUG，正在维护中，预计恢复时间：5.11")
         ]
     }
 
@@ -96,7 +96,7 @@ def chat_node(state: AgentState):
     print("chat_node ... ")
     return {
         "messages": [
-            AIMessage(content="不聊天，谢谢")
+            AIMessage(content="当前智能体有一些小BUG，正在维护中，预计恢复时间：5.11")
         ]
     }
 
@@ -113,6 +113,10 @@ def route_after_intent_node(state: AgentState):
     else:
         return "chat_node"
 
+
+# ==================== 输出节点 ====================
+
+stream_output_list = ["new_project_node", "modify_project_node", "chat_node"]
 
 # ==================== 构造 ====================
 
