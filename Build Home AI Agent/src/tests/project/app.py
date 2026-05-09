@@ -39,9 +39,11 @@ class AgentState(TypedDict):
     messages: Annotated[list, add_messages]
     intent: Optional[str]
     project: Optional[Project]
+    created_project: Optional[bool]
     avatar_list: Optional[List[ProjectItem]]
     product_list: Optional[List[ProjectItem]]
     bg_list: Optional[List[ProjectItem]]
+    loaded_res: Optional[bool]
     is_confirm: Optional[bool]
 
 
@@ -77,20 +79,19 @@ prompt_main = ChatPromptTemplate.from_messages([("system", system_prompt_main), 
 def project_parse_node(state: AgentState):
     print("new_project_parse_node ... ")
     last_msg = state["messages"][-1].content
-    has_project = state.get("project") is not None
+    has_project = state.get("created_project") and state.get("project") is not None
     if has_project:
         history_project_section = f"基于之前项目：\n{json.dumps(state.get("project"), ensure_ascii=False)}"
     else:
         history_project_section = ""
-    print("=====================")
-    print(history_project_section)
-    print("=====================")
+    print(f"history_project_section: {history_project_section}")
     messages = prompt_main.format_messages(
         history_project=history_project_section,
         messages=[HumanMessage(content=last_msg)]
     )
     parse_json = llm_text.invoke(messages).content
     parse_json_data = json.loads(parse_json)
+    print(f"parse_json_data: {parse_json_data}")
     return {"project": {
         "background": None,
         "avatar": None,
@@ -103,30 +104,71 @@ def project_parse_node(state: AgentState):
         "tone": parse_json_data.get("tone"),
         "keywords": parse_json_data.get("keywords"),
         "parse_reason": parse_json_data.get("parse_reason"),
-    }}
+    }, "created_project": parse_json_data.get("is_success")}
 
-def new_project_node(state: AgentState):
-    print("new_project_node ... ")
-    print(state["project"])
+
+def project_parse_fail_node(state: AgentState):
+    print("project_parse_fail_node ... ")
     return {
         "messages": [
-            AIMessage(content="新需求分析完成")
+            AIMessage(content="项目创建失败，" + state["project"].get("parse_reason"))
         ]
     }
 
 
+def load_res_node(state: AgentState):
+    print("load_res_node ... ")
+    return {
+        "messages": [
+            AIMessage(content="加载资源")
+        ]
+    }
+
+
+def select_res_node(state: AgentState):
+    print("select_res_node ... ")
+    return {
+        "messages": [
+            AIMessage(content="选择资源")
+        ]
+    }
+
 # ==================== 路由定义 ====================
 
+def route_after_project_parse_node(state: AgentState):
+    print("route_after_project_parse_node ... ")
+    if not state.get("created_project"):
+        return "project_parse_fail_node"
+    if not state.get("loaded_res"):
+        return "load_res_node"
+    else:
+        return "select_res_node"
 
 
 # ==================== 输出节点 ====================
 
-stream_output_list = ["project_parse_node"]
+stream_output_list = ["project_parse_fail_node", "load_res_node", "select_res_node"]
 
 # ==================== 构造 ====================
 
 project_app_builder = StateGraph(AgentState)
-project_app_builder.set_entry_point("project_parse_node")
 project_app_builder.add_node("project_parse_node", project_parse_node)
+project_app_builder.add_node("project_parse_fail_node", project_parse_fail_node)
+project_app_builder.add_node("load_res_node", load_res_node)
+project_app_builder.add_node("select_res_node", select_res_node)
 
-project_app_builder.add_edge("project_parse_node", END)
+project_app_builder.set_entry_point("project_parse_node")
+
+project_app_builder.add_conditional_edges(
+    "project_parse_node",
+    route_after_project_parse_node,
+    {
+        "project_parse_fail_node": "project_parse_fail_node",
+        "load_res_node": "load_res_node",
+        "select_res_node": "select_res_node",
+    }
+)
+
+project_app_builder.add_edge("project_parse_fail_node", END)
+project_app_builder.add_edge("load_res_node", END)
+project_app_builder.add_edge("select_res_node", END)
