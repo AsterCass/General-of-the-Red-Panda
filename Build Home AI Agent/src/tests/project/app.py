@@ -72,6 +72,35 @@ system_prompt_main = """
 """
 prompt_main = ChatPromptTemplate.from_messages([("system", system_prompt_main), ("placeholder", "{messages}"), ])
 
+system_prompt_select = """
+你是产品项目设计师，专门负责资源选型。从给定虚拟人物形象资源列表，以及产品列表，以及背景图片资源列表中，
+根据用户的对于期望推广项目的描述，选择一个合适的虚拟人物，以及一个背景图片，以及1-3个推广产品，输出 JSON。
+
+{avatar_list_desc}
+
+{product_list_desc}
+
+{bg_list_desc}
+
+输出格式：
+{{
+  "avatar": "选择的虚拟人物的图片名称",
+  "avatar_reason": "选择该虚拟人物的原因",
+  "bg": "选择的虚拟人物的图片名称",
+  "bg_reason": "选择该背景图片的原因",
+  "products": [
+    {{
+    "name": "选择的推广产品的名称",
+    "reason": "选择该推广产品的原因"
+    }},
+    ...
+  ]
+}}
+
+只输出 JSON，不要其他内容。
+"""
+prompt_select = ChatPromptTemplate.from_messages([("system", system_prompt_select), ("placeholder", "{messages}"), ])
+
 system_prompt_image = """
 你是一个专门处理图片的机器人。描述你看到的图片，以及可能适用的推广项目类型（如：美妆、数码、服装等）（总共100字以内，不需要标明具体字数）。
 """
@@ -205,11 +234,18 @@ def load_res_node(state: AgentState):
 
 def select_res_node(state: AgentState):
     print("select_res_node ... ")
-    return {
-        "messages": [
-            AIMessage(content="选择资源\n\n")
-        ]
-    }
+    bg_list = state["bg_list"]
+    avatar_list = state["avatar_list"]
+    product_list = state["product_list"]
+
+    budget = state["project"].get("budget")
+    style = state["project"].get("style")
+    audience = state["project"].get("audience")
+    scene = state["project"].get("scene")
+    tone = state["project"].get("tone")
+    keywords = state["project"].get("keywords")
+
+
 
 # ==================== 路由定义 ====================
 
