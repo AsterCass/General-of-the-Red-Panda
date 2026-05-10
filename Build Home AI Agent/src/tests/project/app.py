@@ -36,6 +36,7 @@ class Project(TypedDict):
     scene: Optional[str]
     tone: Optional[str]
     keywords: Optional[List[str]]
+    extra: Optional[str]
     parse_reason: Optional[str]
 
 
@@ -66,6 +67,7 @@ system_prompt_main = """
   "scene": "使用/展示场景，没有相关描述则为空",
   "tone": "主持人语气/语调，没有相关描述则为空",
   "keywords": ["关键词1", "关键词2"],
+  "extra": "其他补充信息",
   "parse_reason": "解析思路说明"
 }}
 
@@ -157,6 +159,7 @@ def project_parse_node(state: AgentState):
         "scene": parse_json_data.get("scene"),
         "tone": parse_json_data.get("tone"),
         "keywords": parse_json_data.get("keywords"),
+        "extra": parse_json_data.get("extra"),
         "parse_reason": parse_json_data.get("parse_reason"),
     }, "created_project": parse_json_data.get("is_success")}
 
@@ -246,6 +249,7 @@ def select_res_node(state: AgentState):
     scene = state["project"].get("scene")
     tone = state["project"].get("tone")
     keywords = state["project"].get("keywords")
+    extra = state["project"].get("extra")
 
     # 构建资源描述
     avatar_list_desc = "\n".join([f"- {item['name']}: {item.get('desc', '无描述')}" for item in avatar_list])
@@ -253,7 +257,9 @@ def select_res_node(state: AgentState):
     bg_list_desc = "\n".join([f"- {item['name']}: {item.get('desc', '无描述')}" for item in bg_list])
 
     # 准备项目描述
-    project_desc = f"预算: {budget if budget != -1 else '无限制'}, 风格: {style or '无'}, 受众: {audience or '无'}, 场景: {scene or '无'}, 语气: {tone or '无'}, 关键词: {', '.join(keywords) if keywords else '无'}"
+    project_desc = (f"预算: {budget if budget != -1 else '无限制'}, 风格: {style or '无'},"
+                    f" 受众: {audience or '无'}, 场景: {scene or '无'}, 语气: {tone or '无'}, "
+                    f"关键词: {', '.join(keywords) if keywords else '无'}，其他补充信息: {extra or '无'}")
 
     # 格式化消息
     messages = prompt_select.format_messages(
