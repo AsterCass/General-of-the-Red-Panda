@@ -96,7 +96,7 @@ system_prompt_select = """
     }},
     ...
   ],
-  "script": "根据选择的资源，设计的推广脚本内容，要求包含推广要点，且适合主播口播"
+  "script": "根据选择的资源，设计的推广脚本内容，要求包含推广要点，且适合主播口播，500字左右"
 }}
 
 只输出 JSON，不要其他内容。
@@ -298,14 +298,24 @@ def select_res_node(state: AgentState):
     updated_project["script"] = script
     updated_project["products"] = products_selected
 
+    # 构建商品选择部分
+    products_section = ""
+    for prod in products_selected:
+        products_section += f"""
+#### {prod["name"]}
+
+
+商品价格：{prod.get("price", "无")} 元
+
+
+**选择理由：{prod["reason"]}**
+"""
+
     output_message = f"""
-## 生成推广项目如下
+## 推广项目构建参考
 
 
 ### 虚拟人物选择
-
-
-#### {avatar_item["name"] if avatar_item else "无"}
 
 
 <img src="{avatar_item["url"]}" width="40%">
@@ -321,9 +331,6 @@ def select_res_node(state: AgentState):
 ### 背景选择
 
 
-#### {bg_item["name"] if bg_item else "无"}
-
-
 <img src="{bg_item["url"]}" width="40%">
 
 
@@ -336,14 +343,19 @@ def select_res_node(state: AgentState):
 
 ### 商品选择
 
-todo
+
+{products_section}
+
 
 
 ### 推广脚本
 
 
-**{script}**
+{script}
 
+
+
+**是否确认生成该推广项目？**
 
 
 """
