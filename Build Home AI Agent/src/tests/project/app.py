@@ -96,7 +96,7 @@ prompt_main = ChatPromptTemplate.from_messages([("system", system_prompt_main), 
 
 system_prompt_select = """
 你是产品项目设计师，专门负责资源选型。从给定虚拟人物形象资源列表，以及产品列表，以及背景图片资源列表中，
-根据用户的对于期望推广项目的描述，选择一个合适的虚拟人物，以及一个背景图片，以及1-3个推广产品，并且配合推广脚本，输出 JSON。
+根据用户的对于期望推广项目的描述，选择一个合适的虚拟人物以及一个背景图片以及1-3个推广产品，并且输出相应推广脚本，输出 JSON。
 
 {avatar_list_desc}
 
@@ -108,7 +108,7 @@ system_prompt_select = """
 {{
   "avatar": "选择的虚拟人物的图片名称",
   "avatar_reason": "选择该虚拟人物的原因",
-  "bg": "选择的虚拟人物的图片名称",
+  "bg": "选择的背景图片的名称",
   "bg_reason": "选择该背景图片的原因",
   "products": [
     {{
@@ -117,7 +117,7 @@ system_prompt_select = """
     }},
     ...
   ],
-  "script": "根据选择的资源，设计的推广脚本内容，要求包含推广要点，且适合主播口播，500字左右"
+  "script": "根据选择的虚拟人物以及背景和推广产品，设计的推广脚本内容，要求包含推广要点，且适合主播口播，500字左右"
 }}
 
 只输出 JSON，不要其他内容。
@@ -296,7 +296,7 @@ def select_res_node(state: AgentState):
 
     # 构建资源描述
     avatar_list_desc = "\n".join([f"- {item['name']}: {item.get('desc', '无描述')}" for item in avatar_list])
-    product_list_desc = "\n".join([f"- {item['name']}: {item.get('desc', '无描述')}" for item in product_list])
+    product_list_desc = "\n".join([f"- {item['name']}: {item.get('price', '无明确价格')} 元" for item in product_list])
     bg_list_desc = "\n".join([f"- {item['name']}: {item.get('desc', '无描述')}" for item in bg_list])
 
     # 准备项目描述
@@ -311,6 +311,8 @@ def select_res_node(state: AgentState):
         bg_list_desc=bg_list_desc,
         messages=[HumanMessage(content=f"项目描述: {project_desc}")]
     )
+
+    print(f"select message {messages}")
 
     # 调用 LLM
     response = llm_text_no_stream.invoke(messages).content
@@ -419,6 +421,48 @@ def select_res_node(state: AgentState):
 
 def project_output_node(state: AgentState):
     print("project_output_node ... ")
+    project = state["project"]
+    avatar = project["avatar"]
+    bg = project["background"]
+    product = project["products"]
+    script = project["script"]
+
+    products_section = ""
+    for prod in product:
+        products_section += f"""{prod["name"]} {prod.get("price", "无")} 元，"""
+    products_section = products_section[:-1]
+
+    project_finish_msg = f"""
+## 最终项目生成结果
+
+
+### 虚拟人物选择
+
+
+<img src="{avatar["url"]}" width="40%">
+
+
+### 背景选择
+
+
+<img src="{bg["url"]}" width="40%">
+
+
+### 商品选择
+
+
+{products_section}
+
+
+### 推广脚本
+
+
+{script}
+
+
+**您可用重新配置虚拟人物资源、商品资源以及背景资源，然后提供新的推广需求，我将再次为您生成新的推广项目。**
+
+"""
     return {
         "project": None,
         "created_project": None,
@@ -429,7 +473,7 @@ def project_output_node(state: AgentState):
         "is_confirm": None,
         "project_res": None,
         "messages": [
-            AIMessage(content="项目生成成功")
+            AIMessage(content=project_finish_msg)
         ]
     }
 
