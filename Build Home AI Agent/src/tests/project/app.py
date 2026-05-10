@@ -42,7 +42,6 @@ class Project(TypedDict):
 
 class AgentState(TypedDict):
     messages: Annotated[list, add_messages]
-    intent: Optional[str]
     project: Optional[Project]
     created_project: Optional[bool]
     avatar_list: Optional[List[ProjectItem]]
@@ -51,6 +50,26 @@ class AgentState(TypedDict):
     loaded_res: Optional[bool]
     is_confirm: Optional[bool]
     project_res: Optional[str]
+
+confirm_words = [
+    "是", "好的", "确认", "ok", "yes", "sure", "嗯", "可以", "行", "是的", "确定", "好", "没问题",
+]
+
+system_prompt_confirm = f"""
+你是一个分类器，只能回答 YES 或 NO。
+
+判断输入内容是否表示肯定含义，常见肯定含义词：
+
+${confirm_words}
+
+规则：
+- 表示同意、确认、肯定、认同则输出 YES
+- 表示拒绝、取消则输出 NO
+- 不确定、无关则输出 NO
+
+只输出 YES 或 NO
+"""
+prompt_confirm = ChatPromptTemplate.from_messages([("system", system_prompt_confirm), ("placeholder", "{messages}"), ])
 
 
 system_prompt_main = """
@@ -130,6 +149,30 @@ def image_url_to_base64(url):
 
 
 # ==================== 节点定义 ====================
+
+
+def confirm_node(state: AgentState):
+    print("confirm_node ...")
+    has_project = state.get("created_project") and state.get("project") is not None
+    loaded_res = state.get("loaded_res")
+    if not has_project or not loaded_res:
+        return {}
+    # 字符串判断
+    print("confirm_node ... check confirm")
+    text = state["messages"][-1].content.lower()
+    if text in confirm_words:
+        return {"is_confirm": True}
+    # LLM 保底
+    result = llm_text_no_stream.invoke(
+        prompt_confirm.format_messages(
+            messages=[HumanMessage(content=text)]
+        )
+    ).content.strip().upper()
+    print(f"confirm classify result: {result}")
+    if "YES" in result:
+        return {"is_confirm": True}
+    else:
+        return {}
 
 
 def project_parse_node(state: AgentState):
@@ -374,7 +417,30 @@ def select_res_node(state: AgentState):
     }
 
 
+def project_output_node(state: AgentState):
+    print("project_output_node ... ")
+    return {
+        "project": None,
+        "created_project": None,
+        "avatar_list": None,
+        "product_list": None,
+        "bg_list": None,
+        "loaded_res": None,
+        "is_confirm": None,
+        "project_res": None,
+        "messages": [
+            AIMessage(content="项目生成成功")
+        ]
+    }
+
 # ==================== 路由定义 ====================
+
+def route_after_confirm_node(state: AgentState):
+    print("route_after_confirm_node ... ")
+    if state.get("is_confirm"):
+        return "project_output_node"
+    else:
+        return "project_parse_node"
 
 def route_after_project_parse_node(state: AgentState):
     print("route_after_project_parse_node ... ")
@@ -396,18 +462,32 @@ def route_after_load_res_node(state: AgentState):
 
 # ==================== 输出节点 ====================
 
-stream_output_list = ["project_parse_fail_node", "load_res_pre_node", "load_res_node", "select_res_node"]
+stream_output_list = ["project_parse_fail_node", "load_res_pre_node",
+                      "load_res_node", "select_res_node", "project_output_node"]
 
 # ==================== 构造 ====================
 
 project_app_builder = StateGraph(AgentState)
+
+project_app_builder.add_node("confirm_node", confirm_node)
+project_app_builder.add_node("project_output_node", project_output_node)
 project_app_builder.add_node("project_parse_node", project_parse_node)
 project_app_builder.add_node("project_parse_fail_node", project_parse_fail_node)
 project_app_builder.add_node("load_res_pre_node", load_res_pre_node)
 project_app_builder.add_node("load_res_node", load_res_node)
 project_app_builder.add_node("select_res_node", select_res_node)
 
-project_app_builder.set_entry_point("project_parse_node")
+project_app_builder.set_entry_point("confirm_node")
+
+
+project_app_builder.add_conditional_edges(
+    "confirm_node",
+    route_after_confirm_node,
+    {
+        "project_parse_node": "project_parse_node",
+        "project_output_node": "project_output_node",
+    }
+)
 
 project_app_builder.add_conditional_edges(
     "project_parse_node",
@@ -430,6 +510,6 @@ project_app_builder.add_conditional_edges(
 
 project_app_builder.add_edge("load_res_pre_node", "load_res_node")
 
-
 project_app_builder.add_edge("project_parse_fail_node", END)
 project_app_builder.add_edge("select_res_node", END)
+project_app_builder.add_edge("project_output_node", END)
