@@ -12,6 +12,7 @@ from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
 
 llm_text = ChatOllama(model="qwen3:14b-q4_K_M", base_url="http://localhost:11434", temperature=0.3)
+llm_text_no_stream = ChatOllama(model="qwen3:14b-q4_K_M", base_url="http://localhost:11434", temperature=0.3, tags=["nostream"],)
 llm_vl = ChatOllama(model="qwen3-vl:8b", base_url="http://localhost:11434", temperature=0.2, tags=["nostream"], )
 
 
@@ -74,7 +75,7 @@ prompt_main = ChatPromptTemplate.from_messages([("system", system_prompt_main), 
 
 system_prompt_select = """
 你是产品项目设计师，专门负责资源选型。从给定虚拟人物形象资源列表，以及产品列表，以及背景图片资源列表中，
-根据用户的对于期望推广项目的描述，选择一个合适的虚拟人物，以及一个背景图片，以及1-3个推广产品，输出 JSON。
+根据用户的对于期望推广项目的描述，选择一个合适的虚拟人物，以及一个背景图片，以及1-3个推广产品，并且配合推广脚本，输出 JSON。
 
 {avatar_list_desc}
 
@@ -94,7 +95,8 @@ system_prompt_select = """
     "reason": "选择该推广产品的原因"
     }},
     ...
-  ]
+  ],
+  "script": "根据选择的资源，设计的推广脚本内容，要求包含推广要点，且适合主播口播"
 }}
 
 只输出 JSON，不要其他内容。
@@ -245,6 +247,113 @@ def select_res_node(state: AgentState):
     tone = state["project"].get("tone")
     keywords = state["project"].get("keywords")
 
+    # 构建资源描述
+    avatar_list_desc = "\n".join([f"- {item['name']}: {item.get('desc', '无描述')}" for item in avatar_list])
+    product_list_desc = "\n".join([f"- {item['name']}: {item.get('desc', '无描述')}" for item in product_list])
+    bg_list_desc = "\n".join([f"- {item['name']}: {item.get('desc', '无描述')}" for item in bg_list])
+
+    # 准备项目描述
+    project_desc = f"预算: {budget if budget != -1 else '无限制'}, 风格: {style or '无'}, 受众: {audience or '无'}, 场景: {scene or '无'}, 语气: {tone or '无'}, 关键词: {', '.join(keywords) if keywords else '无'}"
+
+    # 格式化消息
+    messages = prompt_select.format_messages(
+        avatar_list_desc=avatar_list_desc,
+        product_list_desc=product_list_desc,
+        bg_list_desc=bg_list_desc,
+        messages=[HumanMessage(content=f"项目描述: {project_desc}")]
+    )
+
+    # 调用 LLM
+    response = llm_text_no_stream.invoke(messages).content
+    json_data = json.loads(response)
+
+    # 脚本
+    script = json_data["script"]
+
+    # 查找并设置 avatar
+    avatar_name = json_data.get("avatar")
+    avatar_item = next((item for item in avatar_list if item["name"] == avatar_name), None)
+    if avatar_item:
+        avatar_item["reason"] = json_data.get("avatar_reason")
+
+    # 查找并设置 background
+    bg_name = json_data.get("bg")
+    bg_item = next((item for item in bg_list if item["name"] == bg_name), None)
+    if bg_item:
+        bg_item["reason"] = json_data.get("bg_reason")
+
+    # 查找并设置 products
+    products_selected = []
+    for prod in json_data.get("products", []):
+        prod_name = prod["name"]
+        prod_item = next((item for item in product_list if item["name"] == prod_name), None)
+        if prod_item:
+            prod_item["reason"] = prod["reason"]
+            products_selected.append(prod_item)
+
+    # 更新 project
+    updated_project = state["project"].copy()
+    updated_project["avatar"] = avatar_item
+    updated_project["background"] = bg_item
+    updated_project["script"] = script
+    updated_project["products"] = products_selected
+
+    output_message = f"""
+## 生成推广项目如下
+
+
+### 虚拟人物选择
+
+
+#### {avatar_item["name"] if avatar_item else "无"}
+
+
+<img src="{avatar_item["url"]}" width="40%">
+
+
+人物描述：{avatar_item["desc"] if avatar_item else "无"}
+
+
+**选择理由：{avatar_item["reason"] if avatar_item else "无"}**
+
+
+
+### 背景选择
+
+
+#### {bg_item["name"] if bg_item else "无"}
+
+
+<img src="{bg_item["url"]}" width="40%">
+
+
+背景描述：{bg_item["desc"] if bg_item else "无"}
+
+
+**选择理由：{bg_item["reason"] if bg_item else "无"}**
+
+
+
+### 商品选择
+
+todo
+
+
+### 推广脚本
+
+
+**{script}**
+
+
+
+"""
+
+    return {
+        "project": updated_project,
+        "messages": [
+            AIMessage(content=output_message)
+        ]
+    }
 
 
 # ==================== 路由定义 ====================
