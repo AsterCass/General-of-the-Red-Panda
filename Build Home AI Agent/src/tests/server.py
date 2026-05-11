@@ -140,6 +140,8 @@ def get_history():
         print(e)
         return {"status": 400, "data": []}
 
+
+# todo 检查输出的时候异常断开，以及多线程请求并发的问题
 @app.route('/stream', methods=['GET'])
 def ai_stream():
     user_input = request.args.get('user_input')
