@@ -14,6 +14,7 @@ from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
 
 from tests.project.app import project_app_builder, stream_output_list
+from tests.project.app_simple import project_app_simple_builder
 
 redis_cli = redis.Redis(host='localhost', port=6379)
 
@@ -96,6 +97,7 @@ with redis_saver as memory:
     memory.setup()
 this_app = builder.compile(checkpointer=memory)
 project_app = project_app_builder.compile(checkpointer=memory)
+project_app_simple = project_app_simple_builder.compile(checkpointer=memory)
 
 # server
 app = Flask(__name__)
@@ -141,7 +143,7 @@ def get_history():
         return {"status": 400, "data": []}
 
 
-# todo 检查输出的时候异常断开，以及多线程请求并发的问题
+# todo 检查输出的时候如果前端异常断开，以及多线程请求并发的问题
 @app.route('/stream', methods=['GET'])
 def ai_stream():
     user_input = request.args.get('user_input')
@@ -216,9 +218,34 @@ def ai_stream():
         except Exception as e:
             yield f"data: [[ERROR]] {str(e)}\n"
 
+
+    def generateProjectNoStream():
+        thread_config = {"configurable": {"thread_id": session_id}}
+        message = HumanMessage(content=user_input)
+
+        try:
+            for chunk in project_app_simple.stream(
+                    {"messages": [message], "project_res": project_res},
+                    config=thread_config,
+                    stream_mode="messages"
+            ):
+                msg_chunk, metadata = chunk
+                if metadata.get("langgraph_node") not in stream_output_list:
+                    continue
+                if not msg_chunk.content:
+                    continue
+                yield f"data: {msg_chunk.content}\n"
+
+            yield "data: [[DONE]]\n"
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            yield f"data: [[ERROR]] {str(e)}\n"
+
     ret = None
     if model == "PROJECT":
-        ret = Response(generateProject(), content_type='text/event-stream')
+        ret = Response(generateProjectNoStream(), content_type='text/event-stream')
     else:
         ret = Response(generateChat(), content_type='text/event-stream')
 
