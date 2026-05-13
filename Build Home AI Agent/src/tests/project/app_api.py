@@ -1,27 +1,51 @@
 import json
+import os
 from collections import deque
 from enum import Enum
 from typing import TypedDict, Annotated, List, Optional
 
+import jieba
 import redis
 from flask import Flask, Response, request
 from flask import jsonify
 from langchain_community.chat_models import ChatOpenAI
+from langchain_community.document_loaders import (
+    TextLoader,
+    PyPDFLoader,
+    Docx2txtLoader
+)
+from langchain_core.documents import Document
 from langchain_core.messages import AIMessage
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda
-from langchain_ollama import ChatOllama
+from langchain_ollama import ChatOllama, OllamaEmbeddings
+from langchain_qdrant import QdrantVectorStore
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langgraph.checkpoint.redis import RedisSaver
 from langgraph.constants import END
 from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
+from loguru import logger
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, VectorParams
+from rank_bm25 import BM25Okapi
 
 redis_cli = redis.Redis(host='localhost', port=6379)
 
 llm = ChatOllama(
     model="qwen2.5:1.5b",
     base_url="http://localhost:11434",
+)
+
+llm_rag = ChatOpenAI(
+    model="qwen3.6-27b",
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+    api_key="key",
+    streaming=True,
+    extra_body={
+        "enable_thinking": False,
+    }
 )
 
 llm_no_stream = ChatOpenAI(
@@ -34,30 +58,14 @@ llm_no_stream = ChatOpenAI(
     }
 )
 
+emb = OllamaEmbeddings(
+    model="bge-m3",
+    base_url="http://localhost:11434",
+)
 
-
-# ================================================================
-
-# 简化流程直接写死图片分析，不再接入图片模型
-image_desc = {
-    "背景图片1": "多层酒架陈列各式酒瓶，暖光营造复古温馨氛围。适用推广项目：酒类（高端酒品、调酒课程）、餐饮服务。",
-    "背景图片2": "温馨书房，四周高大木质书架满载书籍，中央深色皮质扶手椅与棕色单人椅，木质地板配地毯，射灯营造静谧阅读氛围。适用推广项目：书籍、家居装饰。",
-    "背景图片3": "图片展示温馨简约的客厅，米色沙发搭毛毯，圆形木茶几置绿植，大窗户透入自然光，搭配龟背竹等绿植与米色窗帘，营造自然舒适氛围。适用推广项目：家居装饰、绿植、软装设计。",
-    "背景图片4": "白色沙滩绵延，清澈蓝绿色海水轻拍岸边，棕榈树与远山相映，蓝天白云点缀，呈现热带海滨度假胜地。适用推广项目：旅游、海岛游、度假酒店。",
-    "背景图片5": "金色沙丘在柔和光线中延展，细腻波纹如丝绸般流动，沙丘起伏间透出沙漠的静谧与壮美。适用推广：户外探险装备、摄影器材、防晒护肤产品、沙漠旅游线路。",
-    "背景图片6": "宽敞明亮的健身房内，多台跑步机整齐排列，搭配动感单车等器械，工业风装修，裸露管道与大窗户采光充足。推广项目：健身器材、运动服饰、健康科技产品（如智能手环）。",
-    "背景图片7": "霓虹紫蓝灯光照亮复古街机厅，排列整齐的街机、涂鸦墙面与格子地板，营造赛博朋克风游戏空间。推广项目：数码（游戏机/电竞设备）、娱乐（复古游戏周边）。",
-    "背景图片8": "蓝天白云下，广袤绿草地缀满白、黄、橙等小花，生机盎然。推广项目：美妆（天然草本护肤）。",
-    "背景图片9": "粉色樱花树成排，石板路蜿蜒绿草间，春意盎然。适合旅游推广（赏樱之旅）、摄影器材（樱花主题拍摄）及文创产品（樱花周边）。",
-    "背景图片10": "儿童房内设彩色条纹与米色帐篷，内有毛绒玩具；墙面挂艺术画、动物挂饰，地面铺编织地毯，配木质玩具架及毛绒玩具篮，整体温馨童趣。推广项目：母婴、儿童玩具、家居装饰。",
-    "人物图片1": "男子身着浅色汉服，束发持折扇，背景水墨植物与书法点缀，古风雅致。适用推广项目：服装（国风/汉服类）",
-    "人物图片2": "蓝发人物戴发光耳机，银色科技外套嵌蓝色光效，赛博朋克未来风。推广：数码、游戏、潮玩、智能穿戴设备。",
-    "人物图片3": "图片中老人白发编辫，头戴羽毛装饰，身着红蓝民族服饰，佩戴银饰与蓝宝石项链，展现传统民族风貌。适用推广项目：民族服饰、文化旅游、手工艺品。",
-    "人物图片4": "人物面部颈部饰金色几何纹身，配大圆环耳饰与金属颈饰，灰底凸显未来部落风。适配美妆（纹身灵感彩妆）及数码（科技设计）推广项目。",
-    "人物图片5": "黑白老照片中，男士身着复古西装、领结，叼烟斗，发型整齐，背景素色。推广项目：男士服装（复古西装、绅士服饰）。",
-    "人物图片6": "粉色双马尾配黑色发饰，烟熏眼妆精致，身着黑色皮质紧身胸衣与白色蕾丝袖，颈间金属链项圈点缀，整体呈现哥特暗黑风。适用推广项目：美妆（妆容）、服装（哥特风服饰）。",
-
-}
+qdrant_cli = QdrantClient(
+    url="http://localhost:6333",
+)
 
 
 class ProjectItem(TypedDict):
@@ -94,6 +102,229 @@ class AgentState(TypedDict):
     project_res: Optional[str]
     loaded_res: Optional[bool]
 
+
+# ================================================================
+
+# 文档加载
+
+def load_docs():
+    docs = []
+
+    for file in os.listdir("data/docs"):
+        path = os.path.join("data/docs", file)
+
+        try:
+            if file.endswith((".txt", ".md")):
+                loader = TextLoader(path, encoding="utf-8")
+
+            elif file.endswith(".pdf"):
+                loader = PyPDFLoader(path)
+
+            elif file.endswith(".docx"):
+                loader = Docx2txtLoader(path)
+
+            else:
+                continue
+
+            docs.extend(loader.load())
+
+        except Exception as e:
+            logger.error(f"{file} Parse failed: {e}")
+
+    return docs
+
+
+# 文档切分
+
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=500,
+    chunk_overlap=200
+)
+
+
+def split_docs(docs):
+    chunks = []
+    for doc in docs:
+        splits = splitter.split_text(doc.page_content)
+        for i, s in enumerate(splits):
+            chunks.append(
+                Document(
+                    page_content=s,
+                    # todo 这里可以丰富metadata的细节，然后查询的时候利用轻量的筛选（这里还是老三层，字符串+Embedding+轻量LLM兜底），
+                    #  并利用 from qdrant_client.models import Filter 写入 retriever 在向量搜索前加一层过滤
+                    metadata={
+                        "source": doc.metadata.get("source", "unknown"),
+                        "chunk_id": i
+                    }
+                )
+            )
+    return chunks
+
+
+# 向量库
+
+knowledge_base = "knowledge_base"
+
+# 指定重置时清空
+if qdrant_cli.collection_exists(knowledge_base):
+    qdrant_cli.delete_collection(knowledge_base)
+
+# 知识库
+if not qdrant_cli.collection_exists(knowledge_base):
+    qdrant_cli.create_collection(
+        collection_name=knowledge_base,
+        vectors_config=VectorParams(
+            size=1024,
+            distance=Distance.COSINE
+        )
+    )
+
+# 向量索引，查询时需要控制索引精度，ef 越大：更准，更慢，越占内存
+# from qdrant_client.http.models import HnswConfigDiff
+# base.qdrant_cli.update_collection(
+#     collection_name=knowledge_base,
+#     hnsw_config=HnswConfigDiff(
+#         m=16,               # 图中每个节点连接数（越大越准但更慢更占内存）
+#         ef_construct=100    # 构建时搜索深度
+#     )
+# )
+
+vectorstore_knowledge_base = QdrantVectorStore(
+    client=qdrant_cli,
+    collection_name=knowledge_base,
+    embedding=emb
+)
+
+# 检索器
+
+retriever_knowledge_base = vectorstore_knowledge_base.as_retriever(
+    search_kwargs={
+        "k": 5,
+        # match=MatchValue(value="xxx.md")
+    }
+)
+
+# 添加文档
+
+# 文档
+documents = split_docs(load_docs())
+
+# BM25
+tokenized_corpus = [
+    jieba.lcut(doc.page_content)
+    for doc in documents
+]
+
+# todo 生产环境考虑使用es
+bm25 = BM25Okapi(tokenized_corpus)
+
+# Embedding
+vectorstore_knowledge_base.add_documents(documents)
+
+system_prompt_rag = """
+你是一个严谨的AI助手，只能基于提供的上下文回答。
+
+如果答案不在上下文中，请根据自己理解回答，但是要在开始以及最后提示这并不是从知识库中找到的，知识库中没有相应答案。
+
+上下文内容：
+
+{context_text}
+
+"""
+prompt_rag = ChatPromptTemplate.from_messages([("system", system_prompt_rag), ("placeholder", "{messages}"), ])
+
+
+# ==================== 额外方法 ====================
+
+def bm25_search(query, top_k=10):
+    tokenized_query = jieba.lcut(query)
+
+    scores = bm25.get_scores(tokenized_query)
+
+    top_k_idx = sorted(
+        range(len(scores)),
+        key=lambda i: scores[i],
+        reverse=True
+    )[:top_k]
+
+    return [documents[i] for i in top_k_idx]
+
+
+def merge_docs(vec_docs, bm25_docs):
+    seen = set()
+    results = []
+
+    for d in vec_docs + bm25_docs:
+        key = d.page_content
+        if key not in seen:
+            seen.add(key)
+            results.append(d)
+
+    return results
+
+
+def intent_rag_node(state):
+    return (
+            RunnableLambda(lambda s: {
+                "query": s["messages"][-1].content,
+                "messages": s["messages"]
+            })
+            # 检索阶段
+            | RunnableLambda(lambda x: {
+        **x,
+        "ret_docs_vec": retriever_knowledge_base.invoke(x["query"]),
+        "ret_docs_bm25": bm25_search(x["query"], top_k=5)
+    })
+            # merge + context
+            | RunnableLambda(lambda x: {
+        **x,
+        "ret_docs": merge_docs(x["ret_docs_vec"], x["ret_docs_bm25"]),
+    })
+            | RunnableLambda(lambda x: {
+        **x,
+        "context_text": "\n\n".join(
+            [doc.page_content for doc in x["ret_docs"]]
+        )
+    })
+            # prompt
+            | RunnableLambda(lambda x: prompt_rag.format_messages(
+        context_text=x["context_text"],
+        messages=x["messages"]
+    ))
+            | llm_rag
+            | RunnableLambda(lambda msg: {
+        "messages": [msg]
+    })
+    )
+
+
+project_app_rag_builder = StateGraph(AgentState)
+project_app_rag_builder.set_entry_point("intent_rag_node")
+project_app_rag_builder.add_node("intent_rag_node", intent_rag_node)
+project_app_rag_builder.add_edge("intent_rag_node", END)
+
+# ================================================================
+
+# 简化流程直接写死图片分析，不再接入图片模型
+image_desc = {
+    "背景图片1": "多层酒架陈列各式酒瓶，暖光营造复古温馨氛围。适用推广项目：酒类（高端酒品、调酒课程）、餐饮服务。",
+    "背景图片2": "温馨书房，四周高大木质书架满载书籍，中央深色皮质扶手椅与棕色单人椅，木质地板配地毯，射灯营造静谧阅读氛围。适用推广项目：书籍、家居装饰。",
+    "背景图片3": "图片展示温馨简约的客厅，米色沙发搭毛毯，圆形木茶几置绿植，大窗户透入自然光，搭配龟背竹等绿植与米色窗帘，营造自然舒适氛围。适用推广项目：家居装饰、绿植、软装设计。",
+    "背景图片4": "白色沙滩绵延，清澈蓝绿色海水轻拍岸边，棕榈树与远山相映，蓝天白云点缀，呈现热带海滨度假胜地。适用推广项目：旅游、海岛游、度假酒店。",
+    "背景图片5": "金色沙丘在柔和光线中延展，细腻波纹如丝绸般流动，沙丘起伏间透出沙漠的静谧与壮美。适用推广：户外探险装备、摄影器材、防晒护肤产品、沙漠旅游线路。",
+    "背景图片6": "宽敞明亮的健身房内，多台跑步机整齐排列，搭配动感单车等器械，工业风装修，裸露管道与大窗户采光充足。推广项目：健身器材、运动服饰、健康科技产品（如智能手环）。",
+    "背景图片7": "霓虹紫蓝灯光照亮复古街机厅，排列整齐的街机、涂鸦墙面与格子地板，营造赛博朋克风游戏空间。推广项目：数码（游戏机/电竞设备）、娱乐（复古游戏周边）。",
+    "背景图片8": "蓝天白云下，广袤绿草地缀满白、黄、橙等小花，生机盎然。推广项目：美妆（天然草本护肤）。",
+    "背景图片9": "粉色樱花树成排，石板路蜿蜒绿草间，春意盎然。适合旅游推广（赏樱之旅）、摄影器材（樱花主题拍摄）及文创产品（樱花周边）。",
+    "背景图片10": "儿童房内设彩色条纹与米色帐篷，内有毛绒玩具；墙面挂艺术画、动物挂饰，地面铺编织地毯，配木质玩具架及毛绒玩具篮，整体温馨童趣。推广项目：母婴、儿童玩具、家居装饰。",
+    "人物图片1": "男子身着浅色汉服，束发持折扇，背景水墨植物与书法点缀，古风雅致。适用推广项目：服装（国风/汉服类）",
+    "人物图片2": "蓝发人物戴发光耳机，银色科技外套嵌蓝色光效，赛博朋克未来风。推广：数码、游戏、潮玩、智能穿戴设备。",
+    "人物图片3": "图片中老人白发编辫，头戴羽毛装饰，身着红蓝民族服饰，佩戴银饰与蓝宝石项链，展现传统民族风貌。适用推广项目：民族服饰、文化旅游、手工艺品。",
+    "人物图片4": "人物面部颈部饰金色几何纹身，配大圆环耳饰与金属颈饰，灰底凸显未来部落风。适配美妆（纹身灵感彩妆）及数码（科技设计）推广项目。",
+    "人物图片5": "黑白老照片中，男士身着复古西装、领结，叼烟斗，发型整齐，背景素色。推广项目：男士服装（复古西装、绅士服饰）。",
+    "人物图片6": "粉色双马尾配黑色发饰，烟熏眼妆精致，身着黑色皮质紧身胸衣与白色蕾丝袖，颈间金属链项圈点缀，整体呈现哥特暗黑风。适用推广项目：美妆（妆容）、服装（哥特风服饰）。",
+
+}
 
 confirm_words = [
     "是", "好的", "确认", "ok", "yes", "sure", "嗯", "可以", "行", "是的", "确定", "好", "没问题",
@@ -660,6 +891,7 @@ with redis_saver as memory:
     memory.setup()
 this_app = builder.compile(checkpointer=memory)
 project_app_simple = project_app_simple_builder.compile(checkpointer=memory)
+project_app_rag = project_app_rag_builder.compile(checkpointer=memory)
 
 app = Flask(__name__)
 
@@ -765,8 +997,32 @@ def ai_stream():
             traceback.print_exc()
             yield f"data: [[ERROR]] {str(e)}\n"
 
+    def generateRag():
+        thread_config = {"configurable": {"thread_id": session_id}}
+        message = HumanMessage(content=user_input)
+
+        try:
+            for chunk in project_app_rag.stream(
+                    {"messages": [message]},
+                    config=thread_config,
+                    stream_mode="messages"
+            ):
+                msg_chunk, metadata = chunk
+                if not msg_chunk.content:
+                    continue
+
+                print(f"data: {msg_chunk.content}\n")
+                yield f"data: {msg_chunk.content}\n"
+
+            yield "data: [[DONE]]\n"
+
+        except Exception as e:
+            yield f"data: [[ERROR]] {str(e)}\n"
+
     if model == "PROJECT":
         ret = Response(generateProjectNoStream(), content_type='text/event-stream')
+    elif model == "RAG":
+        ret = Response(generateRag(), content_type='text/event-stream')
     else:
         ret = Response(generate(), content_type='text/event-stream')
 
