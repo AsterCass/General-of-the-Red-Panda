@@ -28,8 +28,7 @@ from langgraph.constants import END
 from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
 from qdrant_client import QdrantClient
-from qdrant_client.http.models import PayloadSchemaType, Filter, FieldCondition, MatchAny
-from qdrant_client.models import Distance, VectorParams
+from qdrant_client.http.models import Filter, FieldCondition, MatchAny
 from rank_bm25 import BM25Okapi
 
 redis_cli = redis.Redis(host='localhost', port=6379)
@@ -166,42 +165,11 @@ def split_docs(docs):
 
 knowledge_base = "knowledge_base"
 
-# 指定重置时清空
-if qdrant_cli.collection_exists(knowledge_base):
-    qdrant_cli.delete_collection(knowledge_base)
-
-# 知识库
-if not qdrant_cli.collection_exists(knowledge_base):
-    qdrant_cli.create_collection(
-        collection_name=knowledge_base,
-        vectors_config=VectorParams(
-            size=1024,
-            distance=Distance.COSINE
-        ),
-    )
-    qdrant_cli.create_payload_index(
-        collection_name=knowledge_base,
-        field_name="source",
-        field_schema=PayloadSchemaType.KEYWORD
-    )
-
-# 向量索引，查询时需要控制索引精度，ef 越大：更准，更慢，越占内存
-# from qdrant_client.http.models import HnswConfigDiff
-# base.qdrant_cli.update_collection(
-#     collection_name=knowledge_base,
-#     hnsw_config=HnswConfigDiff(
-#         m=16,               # 图中每个节点连接数（越大越准但更慢更占内存）
-#         ef_construct=100    # 构建时搜索深度
-#     )
-# )
-
 vectorstore_knowledge_base = QdrantVectorStore(
     client=qdrant_cli,
     collection_name=knowledge_base,
     embedding=emb
 )
-
-# 添加文档
 
 # 文档
 documents = split_docs(load_docs())
@@ -214,9 +182,6 @@ tokenized_corpus = [
 
 # todo 生产环境考虑使用es
 bm25 = BM25Okapi(tokenized_corpus)
-
-# Embedding
-vectorstore_knowledge_base.add_documents(documents)
 
 system_prompt_rag = """
 你是一个严谨的AI助手，基于提供的知识库回答。
@@ -1053,7 +1018,3 @@ def ai_stream():
         ret = Response(generate(), content_type='text/event-stream')
 
     return ret
-
-
-if __name__ == '__main__':
-    app.run()
