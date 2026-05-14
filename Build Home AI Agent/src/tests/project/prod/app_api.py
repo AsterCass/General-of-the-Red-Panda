@@ -39,7 +39,7 @@ llm = ChatOllama(
 )
 
 llm_rag = ChatOpenAI(
-    model="qwen3.6-27b",
+    model="deepseek-v3",
     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
     api_key="key",
     streaming=True,
