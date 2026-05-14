@@ -2,6 +2,7 @@ import json
 import os
 from collections import deque
 from enum import Enum
+from pathlib import PurePath
 from typing import TypedDict, Annotated, List, Optional
 
 import jieba
@@ -26,8 +27,8 @@ from langgraph.checkpoint.redis import RedisSaver
 from langgraph.constants import END
 from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
-from loguru import logger
 from qdrant_client import QdrantClient
+from qdrant_client.http.models import PayloadSchemaType, Filter, FieldCondition, MatchAny
 from qdrant_client.models import Distance, VectorParams
 from rank_bm25 import BM25Okapi
 
@@ -64,7 +65,7 @@ emb = OllamaEmbeddings(
 )
 
 qdrant_cli = QdrantClient(
-    url="http://localhost:6333",
+    url="http://192.168.31.200:6333",
 )
 
 
@@ -129,7 +130,7 @@ def load_docs():
             docs.extend(loader.load())
 
         except Exception as e:
-            logger.error(f"{file} Parse failed: {e}")
+            print(f"{file} Parse failed: {e}")
 
     return docs
 
@@ -153,7 +154,7 @@ def split_docs(docs):
                     # todo 这里可以丰富metadata的细节，然后查询的时候利用轻量的筛选（这里还是老三层，字符串+Embedding+轻量LLM兜底），
                     #  并利用 from qdrant_client.models import Filter 写入 retriever 在向量搜索前加一层过滤
                     metadata={
-                        "source": doc.metadata.get("source", "unknown"),
+                        "source": PurePath(doc.metadata.get("source", "unknown").replace("\\", "/")).stem,
                         "chunk_id": i
                     }
                 )
@@ -176,7 +177,12 @@ if not qdrant_cli.collection_exists(knowledge_base):
         vectors_config=VectorParams(
             size=1024,
             distance=Distance.COSINE
-        )
+        ),
+    )
+    qdrant_cli.create_payload_index(
+        collection_name=knowledge_base,
+        field_name="source",
+        field_schema=PayloadSchemaType.KEYWORD
     )
 
 # 向量索引，查询时需要控制索引精度，ef 越大：更准，更慢，越占内存
@@ -193,15 +199,6 @@ vectorstore_knowledge_base = QdrantVectorStore(
     client=qdrant_cli,
     collection_name=knowledge_base,
     embedding=emb
-)
-
-# 检索器
-
-retriever_knowledge_base = vectorstore_knowledge_base.as_retriever(
-    search_kwargs={
-        "k": 5,
-        # match=MatchValue(value="xxx.md")
-    }
 )
 
 # 添加文档
@@ -222,11 +219,11 @@ bm25 = BM25Okapi(tokenized_corpus)
 vectorstore_knowledge_base.add_documents(documents)
 
 system_prompt_rag = """
-你是一个严谨的AI助手，只能基于提供的上下文回答。
+你是一个严谨的AI助手，只能基于提供的知识库回答。
 
-如果答案不在上下文中，请根据自己理解回答，但是要在开始以及最后提示这并不是从知识库中找到的，知识库中没有相应答案。
+如果答案不在知识库中，请根据自己理解回答，但是要在开始以及最后提示这并不是从知识库中找到的，知识库中没有相应答案。
 
-上下文内容：
+知识库相关内容：
 
 {context_text}
 
@@ -236,7 +233,7 @@ prompt_rag = ChatPromptTemplate.from_messages([("system", system_prompt_rag), ("
 
 # ==================== 额外方法 ====================
 
-def bm25_search(query, top_k=10):
+def bm25_search(query, filter_item_list, top_k=10):
     tokenized_query = jieba.lcut(query)
 
     scores = bm25.get_scores(tokenized_query)
@@ -247,7 +244,11 @@ def bm25_search(query, top_k=10):
         reverse=True
     )[:top_k]
 
-    return [documents[i] for i in top_k_idx]
+    docs = []
+    for i in top_k_idx:
+        if documents[i].metadata["source"] in filter_item_list:
+            docs.append(documents[i])
+    return docs
 
 
 def merge_docs(vec_docs, bm25_docs):
@@ -263,39 +264,65 @@ def merge_docs(vec_docs, bm25_docs):
     return results
 
 
-def intent_rag_node(state):
-    return (
-            RunnableLambda(lambda s: {
-                "query": s["messages"][-1].content,
-                "messages": s["messages"]
-            })
-            # 检索阶段
-            | RunnableLambda(lambda x: {
-        **x,
-        "ret_docs_vec": retriever_knowledge_base.invoke(x["query"]),
-        "ret_docs_bm25": bm25_search(x["query"], top_k=5)
-    })
-            # merge + context
-            | RunnableLambda(lambda x: {
-        **x,
-        "ret_docs": merge_docs(x["ret_docs_vec"], x["ret_docs_bm25"]),
-    })
-            | RunnableLambda(lambda x: {
-        **x,
-        "context_text": "\n\n".join(
-            [doc.page_content for doc in x["ret_docs"]]
-        )
-    })
-            # prompt
-            | RunnableLambda(lambda x: prompt_rag.format_messages(
-        context_text=x["context_text"],
-        messages=x["messages"]
-    ))
-            | llm_rag
-            | RunnableLambda(lambda msg: {
-        "messages": [msg]
-    })
+def intent_rag_node(state: AgentState):
+    print("Intent rag node")
+
+    json_obj = json.loads(state["project_res"])
+    rag_list = json_obj.get("ragList")
+
+    if not rag_list:
+        return {
+            "messages": [
+                AIMessage(content="资源检测为空，请检查文档是否配置\n\n")
+            ]
+        }
+
+    filter_item_list = []
+    for item in rag_list:
+        item_name = item.get("name")
+        filter_item_list.append(item_name)
+
+    query = state["messages"][-1].content
+    # todo 这里可以对于本身 query 进行优化/拆分/扩展等等，同样是需要使用老三层（字符串+Embedding+轻量LLM）
+
+    # todo 检索
+    #  可以对于 query 提取 metadata 过滤查询，同样是需要使用老三层（字符串+Embedding+轻量LLM）进行打标签
+    retriever_knowledge_base = vectorstore_knowledge_base.as_retriever(
+        search_kwargs={
+            "k": 10,
+            "filter": Filter(
+                must=[FieldCondition(key="metadata.source",
+                                     match=MatchAny(any=filter_item_list))]
+            )
+        },
     )
+    ret_docs_vec = retriever_knowledge_base.invoke(query)
+    # bm25
+    ret_docs_bm25 = bm25_search(query, filter_item_list)
+    print(f"Results: {len(ret_docs_vec)}")
+    print(f"Results: {len(ret_docs_bm25)}")
+    # 去重
+    ret_docs = merge_docs(ret_docs_vec, ret_docs_bm25)
+    print(f"Results: {len(ret_docs)}")
+    # todo 这里可以加入 reranker（Qdrant 中的检索本质上还是向量匹配，即 embedding cosine 向量余弦比较，
+    #  一般对于 reranker 是语义匹配（cross attention），所以在查询阶段而言，向量匹配不需要模型，而 reranker 是需要专门模型的）
+    context_text = ""
+    for doc in ret_docs:
+        context_text += f"\n\n\n以下内容节选自《{doc.metadata['source']}》：\n\n{doc.page_content}\n"
+
+    if context_text.strip() == "":
+        context_text = "空"
+
+    print(context_text)
+
+    # 消息
+    messages = prompt_rag.format_messages(
+        context_text=context_text,
+        messages=state["messages"]
+    )
+
+    response = llm_rag.invoke(messages)
+    return {"messages": [response]}
 
 
 project_app_rag_builder = StateGraph(AgentState)
@@ -1003,7 +1030,7 @@ def ai_stream():
 
         try:
             for chunk in project_app_rag.stream(
-                    {"messages": [message]},
+                    {"messages": [message], "project_res": project_res},
                     config=thread_config,
                     stream_mode="messages"
             ):
@@ -1011,7 +1038,6 @@ def ai_stream():
                 if not msg_chunk.content:
                     continue
 
-                print(f"data: {msg_chunk.content}\n")
                 yield f"data: {msg_chunk.content}\n"
 
             yield "data: [[DONE]]\n"
