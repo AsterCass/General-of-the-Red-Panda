@@ -4,19 +4,19 @@ dbPath="data/data.db"
 
 [input]
 # 输入模式: "text" (文本输入) 或 "audio" (语音输入)
-mode = "audio"
+mode = "text"
 # 是否为半双工对话，默认回声消除由硬件侧处理，如果硬件侧没有处理则参考 tests/ace.py 改写相关代码，如果都不处理则将改值置为 False
 half_duplex_communication = "True"
 
 [output]
 # 输出模式: "text" (文本输出) 或 "audio" (语音输出)
-mode = "audio"
+mode = "text"
 
 [speaker]
 # 朗读模型地址
 model = "models/Qwen3-TTS-12Hz-1.7B-Base"
 # 是否为声音克隆，如果为False则使用默认QwenTTS的声音，需要匹配不同的模型 VoiceDesign or CustomVoice or Base
-speak_is_clone = "True"
+speak_is_clone = "False"
 # 需要克隆的音频路径 speak_is_clone 为 True生效
 speak_clone_audio = "data/clone.wav"
 # 需要克隆的音频文本 speak_is_clone 为 True生效

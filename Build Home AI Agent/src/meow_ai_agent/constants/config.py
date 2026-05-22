@@ -28,6 +28,7 @@ speak_clone_audio = "data/clone.wav"
 # 需要克隆的音频文本 speak_is_clone 为 True生效
 speak_clone_audio_text = ""
 
+
 @dataclass
 class AudioSettings:
     """音频配置数据类"""
@@ -84,7 +85,7 @@ class ServiceSettings:
     qdrant_url: str = "http://localhost:6333"
     ollama_base_url: str = "http://localhost:11434"
     redis_url: str = "redis://localhost:6379"
-    llm_model: str = "qwen2.5:7b"
+    llm_model: str = "qwen3:14b-q4_K_M"
     llm_model_light: str = "qwen2.5:1.5b"
     embed_text_model: str = "bge-m3"
     reset_collections: bool = False
