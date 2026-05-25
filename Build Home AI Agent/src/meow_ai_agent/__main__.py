@@ -26,7 +26,7 @@ def main():
         this_app = app.builder.compile(checkpointer=memory)
 
         # 线程配置
-        thread_config = {"configurable": {"thread_id": "home_assistant_007"}}
+        thread_config = {"configurable": {"thread_id": "home_assistant_000"}}
 
         # 输入管理器
         input_manager = InputManager()
@@ -43,28 +43,28 @@ def main():
             logger.info(f"检测到输入内容：{user_input}")
             try:
                 # 流式
-                for chunk in this_app.stream(
-                        {"messages": [HumanMessage(content=user_input)]},
-                        config=thread_config,
-                        stream_mode="messages"
-                ):
-                    msg_chunk, metadata = chunk
-
-                    # 过滤空 token
-                    if not msg_chunk.content:
-                        continue
-
-                    # 输出AI回复
-                    output_manager.output(msg_chunk.content)
-
-                output_manager.output("\n")  # 换行
+                # for chunk in this_app.stream(
+                #         {"messages": [HumanMessage(content=user_input)]},
+                #         config=thread_config,
+                #         stream_mode="messages"
+                # ):
+                #     msg_chunk, metadata = chunk
+                #
+                #     # 过滤空 token
+                #     if not msg_chunk.content:
+                #         continue
+                #
+                #     # 输出AI回复
+                #     output_manager.output(msg_chunk.content)
+                #
+                # output_manager.output("\n")  # 换行
 
                 # 非流式
-                # result = this_app.invoke(
-                #     {"messages": [HumanMessage(content=user_input)]},
-                #     config=thread_config
-                # )
-                # output_manager.output(result["messages"][-1].content + "\n")
+                result = this_app.invoke(
+                    {"messages": [HumanMessage(content=user_input)]},
+                    config=thread_config
+                )
+                output_manager.output(result["messages"][-1].content + "\n")
             except Exception as e:
                 logger.error(f"处理输入时出错: {e}")
 
